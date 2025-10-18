@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chuk-mcp-linkedin"
+version = "0.1.0"
+description = "Design system MCP server for creating LinkedIn posts with shadcn-inspired components, variants, and themes"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Christopher Hay", email = "chris@chrishay.com" }
+]
+keywords = [
+    "mcp",
+    "linkedin",
+    "design-system",
+    "content-creation",
+    "social-media",
+    "automation"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "mcp>=0.9.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "httpx>=0.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.7.0",
+    "ruff>=0.0.285",
+    "mypy>=1.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/chrishayuk/chuk-mcp-linkedin"
+Repository = "https://github.com/chrishayuk/chuk-mcp-linkedin"
+Issues = "https://github.com/chrishayuk/chuk-mcp-linkedin/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chuk_mcp_linkedin"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src/chuk_mcp_linkedin --cov-report=term-missing"

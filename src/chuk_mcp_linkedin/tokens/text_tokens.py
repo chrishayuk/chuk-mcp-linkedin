@@ -16,58 +16,58 @@ class TextTokens:
 
     # Ideal length ranges for different post types
     IDEAL_LENGTH: Dict[str, Tuple[int, int]] = {
-        "micro": (50, 150),       # Quick update/question
-        "short": (150, 300),      # Standard engagement post
-        "medium": (300, 800),     # Thought leadership
-        "long": (800, 1500),      # Deep dive analysis
-        "story": (1000, 3000)     # Long-form narrative
+        "micro": (50, 150),  # Quick update/question
+        "short": (150, 300),  # Standard engagement post
+        "medium": (300, 800),  # Thought leadership
+        "long": (800, 1500),  # Deep dive analysis
+        "story": (1000, 3000),  # Long-form narrative
     }
 
     # Line break styles for scannability
     LINE_BREAKS: Dict[str, int] = {
-        "dense": 1,       # Traditional paragraph
-        "readable": 2,    # Standard spacing
-        "scannable": 3,   # Easy to scan (recommended)
-        "dramatic": 5,    # High visual impact
-        "extreme": 7      # Maximum white space
+        "dense": 1,  # Traditional paragraph
+        "readable": 2,  # Standard spacing
+        "scannable": 3,  # Easy to scan (recommended)
+        "dramatic": 5,  # High visual impact
+        "extreme": 7,  # Maximum white space
     }
 
     # Paragraph length guidelines
     PARAGRAPH_LENGTH: Dict[str, Tuple[int, int]] = {
-        "tight": (1, 2),     # 1-2 sentences
+        "tight": (1, 2),  # 1-2 sentences
         "standard": (2, 4),  # 2-4 sentences
-        "loose": (4, 6)      # 4-6 sentences
+        "loose": (4, 6),  # 4-6 sentences
     }
 
     # Emoji usage formulas (emojis per word ratio)
     EMOJI: Dict[str, float] = {
         "none": 0.0,
-        "minimal": 0.01,     # 1 per 100 words (~1-2 per post)
-        "moderate": 0.05,    # 1 per 20 words (~3-5 per post)
-        "expressive": 0.1,   # 1 per 10 words (~5-10 per post)
-        "heavy": 0.15        # 1 per 7 words (influencer style)
+        "minimal": 0.01,  # 1 per 100 words (~1-2 per post)
+        "moderate": 0.05,  # 1 per 20 words (~3-5 per post)
+        "expressive": 0.1,  # 1 per 10 words (~5-10 per post)
+        "heavy": 0.15,  # 1 per 7 words (influencer style)
     }
 
     # Hashtag best practices
     HASHTAGS: Dict[str, Any] = {
         "count": {
             "minimal": (1, 2),
-            "optimal": (3, 5),      # Sweet spot based on 2025 data
+            "optimal": (3, 5),  # Sweet spot based on 2025 data
             "maximum": (5, 7),
-            "over_limit": 8         # Diminishing returns
+            "over_limit": 8,  # Diminishing returns
         },
         "placement": {
             "inline": "Within the text flow",
             "mid": "After main content, before CTA",
             "end": "At the very end (most common)",
-            "first_comment": "In first comment (keeps post clean)"
+            "first_comment": "In first comment (keeps post clean)",
         },
         "strategy": {
             "branded": "Company/personal brand tags",
             "trending": "Current trending topics",
             "niche": "Industry-specific hashtags",
-            "mixed": "Blend of all three (recommended)"
-        }
+            "mixed": "Blend of all three (recommended)",
+        },
     }
 
     # Visual formatting symbols
@@ -79,16 +79,11 @@ class TextTokens:
         "lightning": "⚡",
         "bulb": "💡",
         "target": "🎯",
-        "pin": "📌"
+        "pin": "📌",
     }
 
     # Separators for visual breaks
-    SEPARATORS: Dict[str, str] = {
-        "line": "---",
-        "dots": "• • •",
-        "wave": "~",
-        "heavy": "━━━"
-    }
+    SEPARATORS: Dict[str, str] = {"line": "---", "dots": "• • •", "wave": "~", "heavy": "━━━"}
 
     @classmethod
     def get_length_range(cls, length_type: str) -> Tuple[int, int]:

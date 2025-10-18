@@ -5,7 +5,7 @@ Provides 10 pre-built themes for different LinkedIn personas and strategies.
 """
 
 from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 
 
 @dataclass
@@ -79,9 +79,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "document", "carousel"],
         media_frequency=0.4,
         post_frequency=4,
-        best_posting_times=["morning", "lunch"]
+        best_posting_times=["morning", "lunch"],
     ),
-
     "personal_brand": LinkedInTheme(
         name="Personal Brand Builder",
         description="Build authentic personal connection and following",
@@ -105,9 +104,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "image", "video"],
         media_frequency=0.6,
         post_frequency=5,
-        best_posting_times=["morning", "evening"]
+        best_posting_times=["morning", "evening"],
     ),
-
     "technical_expert": LinkedInTheme(
         name="Technical Expert",
         description="Deep technical knowledge and precision",
@@ -131,9 +129,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "document", "carousel"],
         media_frequency=0.3,
         post_frequency=3,
-        best_posting_times=["morning"]
+        best_posting_times=["morning"],
     ),
-
     "community_builder": LinkedInTheme(
         name="Community Builder",
         description="Foster connection and conversation",
@@ -157,9 +154,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["poll", "text", "video"],
         media_frequency=0.5,
         post_frequency=5,
-        best_posting_times=["morning", "lunch", "evening"]
+        best_posting_times=["morning", "lunch", "evening"],
     ),
-
     "corporate_professional": LinkedInTheme(
         name="Corporate Professional",
         description="Polished corporate communication",
@@ -183,9 +179,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["document", "image", "article"],
         media_frequency=0.7,
         post_frequency=3,
-        best_posting_times=["morning", "lunch"]
+        best_posting_times=["morning", "lunch"],
     ),
-
     "contrarian_voice": LinkedInTheme(
         name="Contrarian Voice",
         description="Challenge status quo, spark debate",
@@ -209,9 +204,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "carousel", "video"],
         media_frequency=0.3,
         post_frequency=4,
-        best_posting_times=["morning", "lunch"]
+        best_posting_times=["morning", "lunch"],
     ),
-
     "storyteller": LinkedInTheme(
         name="Storyteller",
         description="Narrative-driven, emotional connection",
@@ -235,9 +229,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "video", "image"],
         media_frequency=0.5,
         post_frequency=4,
-        best_posting_times=["morning", "evening"]
+        best_posting_times=["morning", "evening"],
     ),
-
     "data_driven": LinkedInTheme(
         name="Data-Driven Analyst",
         description="Let the numbers tell the story",
@@ -261,9 +254,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["document", "carousel", "image"],
         media_frequency=0.8,
         post_frequency=3,
-        best_posting_times=["morning", "lunch"]
+        best_posting_times=["morning", "lunch"],
     ),
-
     "coach_mentor": LinkedInTheme(
         name="Coach/Mentor",
         description="Guide and support your audience",
@@ -287,9 +279,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "carousel", "video"],
         media_frequency=0.5,
         post_frequency=5,
-        best_posting_times=["morning", "evening"]
+        best_posting_times=["morning", "evening"],
     ),
-
     "entertainer": LinkedInTheme(
         name="The Entertainer",
         description="Make LinkedIn fun and memorable",
@@ -313,8 +304,8 @@ THEMES: Dict[str, LinkedInTheme] = {
         preferred_formats=["text", "video", "image"],
         media_frequency=0.6,
         post_frequency=5,
-        best_posting_times=["lunch", "evening"]
-    )
+        best_posting_times=["lunch", "evening"],
+    ),
 }
 
 
@@ -371,7 +362,7 @@ class ThemeManager:
             "post_frequency": f"{theme.post_frequency}x per week",
             "best_formats": theme.preferred_formats,
             "emoji_level": theme.emoji_level,
-            "controversy_level": theme.controversy_level
+            "controversy_level": theme.controversy_level,
         }
 
     def recommend_theme(self, goal: str) -> List[str]:

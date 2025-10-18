@@ -19,8 +19,8 @@ class EngagementTokens:
             "templates": [
                 "What if {bold_claim}?",
                 "Why do {common_problem}?",
-                "How can {desired_outcome}?"
-            ]
+                "How can {desired_outcome}?",
+            ],
         },
         "stat": {
             "power": 0.9,
@@ -29,8 +29,8 @@ class EngagementTokens:
             "templates": [
                 "{percentage}% of {audience} {surprising_fact}",
                 "Only {number} out of {total} {outcome}",
-                "{year} data shows {insight}"
-            ]
+                "{year} data shows {insight}",
+            ],
         },
         "story": {
             "power": 0.85,
@@ -39,8 +39,8 @@ class EngagementTokens:
             "templates": [
                 "{time_reference} changed everything",
                 "I'll never forget when {event}",
-                "{years_ago}, {pivotal_moment}"
-            ]
+                "{years_ago}, {pivotal_moment}",
+            ],
         },
         "controversy": {
             "power": 0.95,
@@ -50,8 +50,8 @@ class EngagementTokens:
                 "Unpopular opinion: {contrarian_view}",
                 "Everyone's wrong about {topic}",
                 "Stop {common_practice}. Here's why:",
-                "Hot take: {bold_statement}"
-            ]
+                "Hot take: {bold_statement}",
+            ],
         },
         "list": {
             "power": 0.7,
@@ -60,8 +60,8 @@ class EngagementTokens:
             "templates": [
                 "{number} ways to {desired_outcome}",
                 "The {number} mistakes {audience} make",
-                "Here's what works: {promise}"
-            ]
+                "Here's what works: {promise}",
+            ],
         },
         "curiosity": {
             "power": 0.75,
@@ -71,9 +71,9 @@ class EngagementTokens:
                 "The secret to {outcome}",
                 "What nobody tells you about {topic}",
                 "Here's the truth about {controversial_topic}",
-                "The {adjective} way to {goal}"
-            ]
-        }
+                "The {adjective} way to {goal}",
+            ],
+        },
     }
 
     # Call-to-action styles with use cases
@@ -85,8 +85,8 @@ class EngagementTokens:
             "templates": [
                 "Comment below with {question}",
                 "Share your thoughts on {topic}",
-                "Let me know {what_to_share}"
-            ]
+                "Let me know {what_to_share}",
+            ],
         },
         "curiosity": {
             "examples": ["What do you think?", "Am I missing something?", "Agree or disagree?"],
@@ -96,8 +96,8 @@ class EngagementTokens:
                 "What do you think about {topic}?",
                 "Am I missing something here?",
                 "Agree or disagree?",
-                "Is this {adjective} or am I crazy?"
-            ]
+                "Is this {adjective} or am I crazy?",
+            ],
         },
         "action": {
             "examples": ["Try this today", "Save this for later", "Tag someone who needs this"],
@@ -107,8 +107,8 @@ class EngagementTokens:
                 "Try this {timeframe}",
                 "Save this for later",
                 "Tag someone who {needs_this}",
-                "Bookmark this if {condition}"
-            ]
+                "Bookmark this if {condition}",
+            ],
         },
         "share": {
             "examples": ["Tag someone who...", "Share if you...", "Send this to..."],
@@ -118,8 +118,8 @@ class EngagementTokens:
                 "Tag someone who {characteristic}",
                 "Share if you {relate}",
                 "Send this to {person_type}",
-                "Who else needs to see this?"
-            ]
+                "Who else needs to see this?",
+            ],
         },
         "poll": {
             "examples": ["Vote in the poll", "Which option?", "Pick one"],
@@ -128,8 +128,8 @@ class EngagementTokens:
             "templates": [
                 "Vote in the poll below",
                 "Which option resonates with you?",
-                "Pick one and tell me why"
-            ]
+                "Pick one and tell me why",
+            ],
         },
         "soft": {
             "examples": ["Thoughts?", "Your take?", "What's your experience?"],
@@ -139,39 +139,39 @@ class EngagementTokens:
                 "Thoughts?",
                 "Your take?",
                 "What's your experience with {topic}?",
-                "How do you handle this?"
-            ]
-        }
+                "How do you handle this?",
+            ],
+        },
     }
 
     # First-hour engagement targets (critical for algorithm)
     FIRST_HOUR_TARGETS: Dict[str, int] = {
-        "minimum": 10,      # Minimum for algorithm consideration
-        "good": 50,         # Good engagement
-        "great": 100,       # Great engagement
-        "viral": 200        # Viral potential threshold
+        "minimum": 10,  # Minimum for algorithm consideration
+        "good": 50,  # Good engagement
+        "great": 100,  # Great engagement
+        "viral": 200,  # Viral potential threshold
     }
 
     # Comment response strategy
     COMMENT_RESPONSE: Dict[str, Any] = {
         "timing": {
             "critical_window": 60,  # First 60 minutes
-            "recommended": 30,      # Respond within 30 min
-            "maximum": 120         # Don't exceed 2 hours
+            "recommended": 30,  # Respond within 30 min
+            "maximum": 120,  # Don't exceed 2 hours
         },
         "depth": {
             "minimal": "Thanks!",
             "standard": "Thanks for sharing! [brief response]",
             "meaningful": "[Thoughtful response with follow-up question]",
-            "deep": "[Detailed response, acknowledges specific points, asks question]"
+            "deep": "[Detailed response, acknowledges specific points, asks question]",
         },
         "best_practices": [
             "Reply within 60 minutes",
             "Make it meaningful, not just 'Thanks!'",
             "Ask follow-up questions",
             "Tag others when relevant",
-            "Use their name when possible"
-        ]
+            "Use their name when possible",
+        ],
     }
 
     # Timing optimization (2025 data)
@@ -179,31 +179,31 @@ class EngagementTokens:
         "best_days": ["tuesday", "wednesday", "thursday"],
         "worst_days": ["saturday", "sunday"],
         "best_hours": {
-            "morning": (7, 9),      # 7-9 AM local time
-            "lunch": (12, 14),      # 12-2 PM local time
-            "evening": (17, 18)     # 5-6 PM local time
+            "morning": (7, 9),  # 7-9 AM local time
+            "lunch": (12, 14),  # 12-2 PM local time
+            "evening": (17, 18),  # 5-6 PM local time
         },
         "posting_frequency": {
-            "minimum": 3,           # Posts per week minimum
-            "optimal": (4, 5),      # Sweet spot
-            "maximum": 7,           # Daily (risk of fatigue)
-            "over_limit": 10        # Definitely too much
-        }
+            "minimum": 3,  # Posts per week minimum
+            "optimal": (4, 5),  # Sweet spot
+            "maximum": 7,  # Daily (risk of fatigue)
+            "over_limit": 10,  # Definitely too much
+        },
     }
 
     # Formatting for engagement
     FORMATTING: Dict[str, Any] = {
         "bold_usage": {
             "none": 0.0,
-            "key_phrases": 0.05,    # 5% of text
-            "emphasis": 0.1,        # 10% of text
-            "heavy": 0.15           # Can feel aggressive
+            "key_phrases": 0.05,  # 5% of text
+            "emphasis": 0.1,  # 10% of text
+            "heavy": 0.15,  # Can feel aggressive
         },
         "white_space_ratio": {
-            "dense": 0.1,           # 10% white space
-            "balanced": 0.3,        # 30% white space (optimal)
-            "airy": 0.5             # 50% white space (very scannable)
-        }
+            "dense": 0.1,  # 10% white space
+            "balanced": 0.3,  # 30% white space (optimal)
+            "airy": 0.5,  # 50% white space (very scannable)
+        },
     }
 
     @classmethod
@@ -229,9 +229,18 @@ class EngagementTokens:
     @classmethod
     def is_optimal_posting_time(cls, day: str, hour: int) -> bool:
         """Check if a given time is optimal for posting"""
-        if day.lower() in cls.TIMING["worst_days"]:
+        day_lower = day.lower()
+
+        # Check if day is valid (in either best_days or worst_days)
+        valid_days = cls.TIMING["best_days"] + cls.TIMING["worst_days"]
+        if day_lower not in valid_days:
             return False
 
+        # Check if it's a worst day
+        if day_lower in cls.TIMING["worst_days"]:
+            return False
+
+        # Check if hour is in optimal time slots
         for period, (start, end) in cls.TIMING["best_hours"].items():
             if start <= hour < end:
                 return True

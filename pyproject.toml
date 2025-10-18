@@ -75,3 +75,8 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=src/chuk_mcp_linkedin --cov-report=term-missing"
+
+[tool.coverage.run]
+omit = [
+    "src/chuk_mcp_linkedin/server.py",  # MCP server - requires special testing infrastructure
+]

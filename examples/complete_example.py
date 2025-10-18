@@ -11,7 +11,7 @@ from chuk_mcp_linkedin import (
     PostBuilder,
     ComponentRegistry,
     VariantResolver,
-    PostVariants
+    PostVariants,
 )
 
 
@@ -33,7 +33,8 @@ def example_1_simple_text_post():
 
     # Add components using fluent API
     post.add_hook("stat", "80% of B2B decision makers prefer thought leadership content over ads.")
-    post.add_body("""
+    post.add_body(
+        """
 Yet most companies just promote.
 
 Here's what actually works:
@@ -44,7 +45,9 @@ Tell stories, not sales pitches
 Build trust, not transactions
 
 The algorithm rewards value.
-""", structure="listicle")
+""",
+        structure="listicle",
+    )
     post.add_cta("curiosity", "What's your LinkedIn strategy?")
     post.add_hashtags(["B2BMarketing", "LinkedInStrategy", "ContentMarketing"])
 
@@ -88,7 +91,7 @@ It was embarrassing.""",
 
 The platform rewarded the shift.""",
         lesson="LinkedIn isn't a megaphone. It's a coffee shop. Show up, add value, build relationships.",
-        theme=theme
+        theme=theme,
     )
 
     final_text = story.compose()
@@ -114,10 +117,10 @@ def example_3_thought_leadership():
             "Actionable - Give clear next steps",
             "Leveraged - Show scalable impact",
             "Unique - Differentiate your approach",
-            "Efficient - Prove time/cost savings"
+            "Efficient - Prove time/cost savings",
         ],
         conclusion="Master this framework and you'll never struggle to articulate your worth again.",
-        theme=theme
+        theme=theme,
     )
 
     final_text = post.compose()
@@ -135,11 +138,7 @@ def example_4_variants_system():
     variants = PostVariants.text_post_variants()
 
     # Select variants
-    selected = {
-        "style": "hot_take",
-        "tone": "professional",
-        "length": "micro"
-    }
+    selected = {"style": "hot_take", "tone": "professional", "length": "micro"}
 
     # Resolve configuration
     config = VariantResolver.resolve(variants, selected)
@@ -175,7 +174,7 @@ def example_5_component_registry():
     print(f"  Subcomponents: {overview['subcomponents']}")
 
     print("\nTop Performers (2025):")
-    for key, value in overview['top_performers'].items():
+    for key, value in overview["top_performers"].items():
         print(f"  {key}: {value}")
 
     # Get recommendations for a goal
@@ -185,7 +184,7 @@ def example_5_component_registry():
     print(f"  Theme: {recs['theme']}")
     print(f"  Frequency: {recs['post_frequency']}")
     print("\n  Best practices:")
-    for practice in recs['best_practices']:
+    for practice in recs["best_practices"]:
         print(f"    - {practice}")
     print()
 
@@ -229,7 +228,7 @@ def example_7_draft_management():
     # List all drafts
     print("\nAll Drafts:")
     for draft_info in manager.list_drafts():
-        current = " [CURRENT]" if draft_info['is_current'] else ""
+        current = " [CURRENT]" if draft_info["is_current"] else ""
         print(f"  {draft_info['name']} ({draft_info['post_type']}){current}")
 
     # Switch to a draft
@@ -264,10 +263,10 @@ def example_8_listicle_post():
             "Posting without a hook (first 210 chars matter)",
             "Using 10+ hashtags (3-5 is optimal)",
             "Never engaging with comments (algorithm killer)",
-            "Selling before building trust (relationship first)"
+            "Selling before building trust (relationship first)",
         ],
         conclusion="Master these basics and you'll outperform 90% of LinkedIn users.",
-        theme=theme
+        theme=theme,
     )
 
     final_text = post.compose()

@@ -5,10 +5,9 @@ Provides comprehensive information about all post types, variants, themes,
 and their properties.
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from .themes.theme_manager import THEMES
-from .variants import PostVariants, VariantResolver
-from .tokens.engagement_tokens import EngagementTokens
+from .variants import VariantResolver
 
 
 class ComponentRegistry:
@@ -27,14 +26,14 @@ class ComponentRegistry:
                     "hooks": "Opening hook lines",
                     "call_to_action": "Engagement driver",
                     "hashtags": "List of hashtags",
-                    "emoji_style": "minimal | moderate | expressive"
+                    "emoji_style": "minimal | moderate | expressive",
                 },
                 "best_for": ["thought leadership", "quick updates", "storytelling"],
                 "examples": [
                     "Thought leadership post with framework",
                     "Personal story with lesson",
-                    "Industry insight with data"
-                ]
+                    "Industry insight with data",
+                ],
             },
             "document_post": {
                 "description": "PDF carousel slides (HIGHEST ENGAGEMENT 2025)",
@@ -46,15 +45,15 @@ class ComponentRegistry:
                     "commentary": "Introduction text",
                     "pdf_path": "Path to PDF file",
                     "slide_count": "5-10 slides recommended",
-                    "theme": "Visual theme"
+                    "theme": "Visual theme",
                 },
                 "best_for": ["education", "lead magnets", "authority building"],
                 "best_practices": [
                     "Keep to 5-10 slides",
                     "One message per slide",
                     "18pt minimum font size",
-                    "Square or portrait format"
-                ]
+                    "Square or portrait format",
+                ],
             },
             "poll_post": {
                 "description": "Poll for engagement (HIGHEST REACH 2025)",
@@ -66,9 +65,9 @@ class ComponentRegistry:
                     "commentary": "Poll introduction",
                     "question": "Poll question",
                     "options": "2-4 answer options",
-                    "duration_days": "1-14 days"
+                    "duration_days": "1-14 days",
                 },
-                "best_for": ["engagement", "research", "community building"]
+                "best_for": ["engagement", "research", "community building"],
             },
             "video_post": {
                 "description": "Video content (1.4x engagement)",
@@ -81,14 +80,14 @@ class ComponentRegistry:
                     "video_path": "Path to video file",
                     "duration_seconds": "30-60s optimal",
                     "vertical": "True (recommended)",
-                    "captions_enabled": "True (required)"
+                    "captions_enabled": "True (required)",
                 },
                 "best_practices": [
                     "First 3 seconds are critical",
                     "Always use captions",
                     "Vertical format preferred",
-                    "Hook in opening frame"
-                ]
+                    "Hook in opening frame",
+                ],
             },
             "image_post": {
                 "description": "Single image with text (2x comments vs text)",
@@ -98,9 +97,9 @@ class ComponentRegistry:
                     "commentary": "Image description/context",
                     "image_path": "Path to image",
                     "image_format": "square | portrait",
-                    "alt_text": "Accessibility text"
+                    "alt_text": "Accessibility text",
                 },
-                "best_for": ["quick tips", "quotes", "announcements"]
+                "best_for": ["quick tips", "quotes", "announcements"],
             },
             "carousel_post": {
                 "description": "Multi-image storytelling",
@@ -111,9 +110,9 @@ class ComponentRegistry:
                 "properties": {
                     "commentary": "Introduction text",
                     "images": "List of image slides (max 10)",
-                    "theme": "Visual theme for carousel"
+                    "theme": "Visual theme for carousel",
                 },
-                "best_for": ["step-by-step", "lists", "comparisons"]
+                "best_for": ["step-by-step", "lists", "comparisons"],
             },
             "article_post": {
                 "description": "Link sharing with commentary",
@@ -123,9 +122,9 @@ class ComponentRegistry:
                 "properties": {
                     "commentary": "Your take on the article",
                     "article_url": "URL to share",
-                    "link_placement": "inline | first-comment (recommended)"
-                }
-            }
+                    "link_placement": "inline | first-comment (recommended)",
+                },
+            },
         }
 
     @staticmethod
@@ -137,33 +136,27 @@ class ComponentRegistry:
                 "types": {
                     "question": {
                         "power": 0.8,
-                        "examples": ["What if...?", "Why do...?", "How can...?"]
+                        "examples": ["What if...?", "Why do...?", "How can...?"],
                     },
-                    "stat": {
-                        "power": 0.9,
-                        "examples": ["95% of...", "2025 data shows..."]
-                    },
+                    "stat": {"power": 0.9, "examples": ["95% of...", "2025 data shows..."]},
                     "story": {
                         "power": 0.85,
-                        "examples": ["Last Tuesday...", "I'll never forget..."]
+                        "examples": ["Last Tuesday...", "I'll never forget..."],
                     },
                     "controversy": {
                         "power": 0.95,
-                        "examples": ["Unpopular opinion:", "Everyone's wrong about..."]
+                        "examples": ["Unpopular opinion:", "Everyone's wrong about..."],
                     },
-                    "list": {
-                        "power": 0.7,
-                        "examples": ["5 ways to...", "The 3 mistakes..."]
-                    },
+                    "list": {"power": 0.7, "examples": ["5 ways to...", "The 3 mistakes..."]},
                     "curiosity": {
                         "power": 0.75,
-                        "examples": ["The secret to...", "What nobody tells you..."]
-                    }
+                        "examples": ["The secret to...", "What nobody tells you..."],
+                    },
                 },
                 "best_practices": [
                     "First 210 chars visible before 'see more'",
-                    "Make it count - hook determines read-through"
-                ]
+                    "Make it count - hook determines read-through",
+                ],
             },
             "body": {
                 "description": "Main content component",
@@ -172,8 +165,8 @@ class ComponentRegistry:
                     "listicle": "Numbered/bulleted points",
                     "framework": "Acronym breakdown",
                     "story_arc": "Problem → Journey → Solution",
-                    "comparison": "Option A vs Option B"
-                }
+                    "comparison": "Option A vs Option B",
+                },
             },
             "cta": {
                 "description": "Call-to-action to drive engagement",
@@ -182,8 +175,8 @@ class ComponentRegistry:
                     "curiosity": {"power": 0.85, "examples": ["What do you think?"]},
                     "action": {"power": 0.75, "examples": ["Try this today"]},
                     "share": {"power": 0.9, "examples": ["Tag someone who..."]},
-                    "soft": {"power": 0.8, "examples": ["Thoughts?"]}
-                }
+                    "soft": {"power": 0.8, "examples": ["Thoughts?"]},
+                },
             },
             "hashtags": {
                 "description": "Hashtag strategy",
@@ -194,10 +187,10 @@ class ComponentRegistry:
                     "optimal": "3-5 balanced mix (recommended)",
                     "branded": "Company/personal tags",
                     "trending": "Current trends",
-                    "mixed": "Blend of all (recommended)"
+                    "mixed": "Blend of all (recommended)",
                 },
-                "placement": ["inline", "mid", "end", "first_comment"]
-            }
+                "placement": ["inline", "mid", "end", "first_comment"],
+            },
         }
 
     @staticmethod
@@ -211,7 +204,7 @@ class ComponentRegistry:
                 "post_frequency": f"{theme.post_frequency}x per week",
                 "best_formats": theme.preferred_formats,
                 "emoji_level": theme.emoji_level,
-                "controversy_level": theme.controversy_level
+                "controversy_level": theme.controversy_level,
             }
             for theme_name, theme in THEMES.items()
         }
@@ -229,10 +222,10 @@ class ComponentRegistry:
                     "Use polls for maximum reach (200%+ boost)",
                     "Short videos (30-60s) with captions",
                     "Ask questions in every post",
-                    "Reply to all comments within 60 min"
+                    "Reply to all comments within 60 min",
                 ],
                 "hook_types": ["question", "controversy", "curiosity"],
-                "cta_types": ["curiosity", "share"]
+                "cta_types": ["curiosity", "share"],
             },
             "authority": {
                 "top_formats": ["document_post", "text_post", "carousel_post"],
@@ -242,10 +235,10 @@ class ComponentRegistry:
                     "Lead with data/stats",
                     "Use frameworks",
                     "Document posts for deep dives",
-                    "Minimal hashtags"
+                    "Minimal hashtags",
                 ],
                 "hook_types": ["stat", "framework"],
-                "cta_types": ["curiosity", "direct"]
+                "cta_types": ["curiosity", "direct"],
             },
             "leads": {
                 "top_formats": ["document_post", "video_post", "carousel_post"],
@@ -255,10 +248,10 @@ class ComponentRegistry:
                     "Valuable downloadables",
                     "Clear CTAs",
                     "Link in first comment",
-                    "Professional design"
+                    "Professional design",
                 ],
                 "hook_types": ["stat", "list"],
-                "cta_types": ["action", "direct"]
+                "cta_types": ["action", "direct"],
             },
             "community": {
                 "top_formats": ["poll_post", "text_post", "video_post"],
@@ -268,10 +261,10 @@ class ComponentRegistry:
                     "Show vulnerability",
                     "Ask for input",
                     "Share team moments",
-                    "Respond to everyone"
+                    "Respond to everyone",
                 ],
                 "hook_types": ["question", "story"],
-                "cta_types": ["curiosity", "soft"]
+                "cta_types": ["curiosity", "soft"],
             },
             "awareness": {
                 "top_formats": ["video_post", "carousel_post", "document_post"],
@@ -281,11 +274,11 @@ class ComponentRegistry:
                     "Mix of formats",
                     "Consistent branding",
                     "Trending hashtags",
-                    "Visual content"
+                    "Visual content",
                 ],
                 "hook_types": ["curiosity", "story"],
-                "cta_types": ["share", "action"]
-            }
+                "cta_types": ["share", "action"],
+            },
         }
 
         return recommendations.get(goal.lower(), recommendations["engagement"])
@@ -303,7 +296,7 @@ class ComponentRegistry:
                 "highest_engagement": "document_post (45.85% engagement rate)",
                 "highest_reach": "poll_post (200%+ above average)",
                 "fastest_growing": "video_post (+69% usage, 1.4x engagement)",
-                "most_underused": "poll_post (biggest opportunity)"
+                "most_underused": "poll_post (biggest opportunity)",
             },
             "system_features": [
                 "7 post type components with variants",
@@ -311,15 +304,15 @@ class ComponentRegistry:
                 "CVA-inspired variant system with compounds",
                 "Shadcn-style composition patterns",
                 "Research-backed design tokens",
-                "Algorithm optimization built-in"
+                "Algorithm optimization built-in",
             ],
             "key_metrics": {
                 "max_post_length": 3000,
                 "truncation_point": 210,
                 "optimal_hashtags": "3-5",
                 "first_hour_target": 50,
-                "best_posting_times": ["7-9 AM", "12-2 PM", "5-6 PM"]
-            }
+                "best_posting_times": ["7-9 AM", "12-2 PM", "5-6 PM"],
+            },
         }
 
     @staticmethod
@@ -340,7 +333,7 @@ class ComponentRegistry:
             "base": variants.get("base", {}),
             "variants": list(variants.get("variants", {}).keys()),
             "default": variants.get("default_variant", {}),
-            "has_compounds": len(variants.get("compound_variants", [])) > 0
+            "has_compounds": len(variants.get("compound_variants", [])) > 0,
         }
 
     @staticmethod
@@ -352,21 +345,25 @@ class ComponentRegistry:
         # Search post types
         for name, info in ComponentRegistry.list_post_components().items():
             if query in name.lower() or query in info.get("description", "").lower():
-                results.append({
-                    "type": "post_component",
-                    "name": name,
-                    "description": info.get("description", ""),
-                    "engagement_rank": info.get("engagement_rank")
-                })
+                results.append(
+                    {
+                        "type": "post_component",
+                        "name": name,
+                        "description": info.get("description", ""),
+                        "engagement_rank": info.get("engagement_rank"),
+                    }
+                )
 
         # Search themes
         for name, info in ComponentRegistry.list_themes().items():
             if query in name.lower() or query in info.get("description", "").lower():
-                results.append({
-                    "type": "theme",
-                    "name": name,
-                    "description": info.get("description", ""),
-                    "goal": info.get("goal")
-                })
+                results.append(
+                    {
+                        "type": "theme",
+                        "name": name,
+                        "description": info.get("description", ""),
+                        "goal": info.get("goal"),
+                    }
+                )
 
         return results

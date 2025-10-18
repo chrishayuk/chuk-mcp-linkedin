@@ -6,15 +6,13 @@ Provides tools for creating, managing, and optimizing LinkedIn posts.
 
 from mcp.server import Server
 from mcp.types import Tool, TextContent
-from pydantic import BaseModel, Field
-from typing import Any, Optional, List
+from typing import Any
 import json
 
 from .manager import LinkedInManager
-from .composition import ComposablePost, PostBuilder
-from .themes.theme_manager import ThemeManager, THEMES
+from .composition import ComposablePost
+from .themes.theme_manager import ThemeManager
 from .registry import ComponentRegistry
-from .variants import VariantResolver, PostVariants
 
 
 class LinkedInServer:
@@ -46,17 +44,17 @@ class LinkedInServer:
                             "post_type": {
                                 "type": "string",
                                 "enum": ["text", "document", "poll", "video", "carousel", "image"],
-                                "description": "Type of LinkedIn post"
+                                "description": "Type of LinkedIn post",
                             },
-                            "theme": {"type": "string", "description": "Theme name (optional)"}
+                            "theme": {"type": "string", "description": "Theme name (optional)"},
                         },
-                        "required": ["name", "post_type"]
-                    }
+                        "required": ["name", "post_type"],
+                    },
                 ),
                 Tool(
                     name="linkedin_list",
                     description="List all draft posts",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
                     name="linkedin_switch",
@@ -66,8 +64,8 @@ class LinkedInServer:
                         "properties": {
                             "draft_id": {"type": "string", "description": "Draft ID to switch to"}
                         },
-                        "required": ["draft_id"]
-                    }
+                        "required": ["draft_id"],
+                    },
                 ),
                 Tool(
                     name="linkedin_get_info",
@@ -75,9 +73,12 @@ class LinkedInServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "draft_id": {"type": "string", "description": "Draft ID (optional, uses current if not provided)"}
-                        }
-                    }
+                            "draft_id": {
+                                "type": "string",
+                                "description": "Draft ID (optional, uses current if not provided)",
+                            }
+                        },
+                    },
                 ),
                 Tool(
                     name="linkedin_delete",
@@ -87,15 +88,14 @@ class LinkedInServer:
                         "properties": {
                             "draft_id": {"type": "string", "description": "Draft ID to delete"}
                         },
-                        "required": ["draft_id"]
-                    }
+                        "required": ["draft_id"],
+                    },
                 ),
                 Tool(
                     name="linkedin_clear_all",
                     description="Clear all drafts",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
-
                 # === COMPOSITION ===
                 Tool(
                     name="linkedin_add_hook",
@@ -105,13 +105,20 @@ class LinkedInServer:
                         "properties": {
                             "hook_type": {
                                 "type": "string",
-                                "enum": ["question", "stat", "story", "controversy", "list", "curiosity"],
-                                "description": "Type of hook"
+                                "enum": [
+                                    "question",
+                                    "stat",
+                                    "story",
+                                    "controversy",
+                                    "list",
+                                    "curiosity",
+                                ],
+                                "description": "Type of hook",
                             },
-                            "content": {"type": "string", "description": "Hook text"}
+                            "content": {"type": "string", "description": "Hook text"},
                         },
-                        "required": ["hook_type", "content"]
-                    }
+                        "required": ["hook_type", "content"],
+                    },
                 ),
                 Tool(
                     name="linkedin_add_body",
@@ -122,12 +129,18 @@ class LinkedInServer:
                             "content": {"type": "string", "description": "Body text"},
                             "structure": {
                                 "type": "string",
-                                "enum": ["linear", "listicle", "framework", "story_arc", "comparison"],
-                                "description": "Content structure"
-                            }
+                                "enum": [
+                                    "linear",
+                                    "listicle",
+                                    "framework",
+                                    "story_arc",
+                                    "comparison",
+                                ],
+                                "description": "Content structure",
+                            },
                         },
-                        "required": ["content"]
-                    }
+                        "required": ["content"],
+                    },
                 ),
                 Tool(
                     name="linkedin_add_cta",
@@ -138,12 +151,12 @@ class LinkedInServer:
                             "cta_type": {
                                 "type": "string",
                                 "enum": ["direct", "curiosity", "action", "share", "soft"],
-                                "description": "Type of CTA"
+                                "description": "Type of CTA",
                             },
-                            "text": {"type": "string", "description": "CTA text"}
+                            "text": {"type": "string", "description": "CTA text"},
                         },
-                        "required": ["cta_type", "text"]
-                    }
+                        "required": ["cta_type", "text"],
+                    },
                 ),
                 Tool(
                     name="linkedin_add_hashtags",
@@ -154,23 +167,22 @@ class LinkedInServer:
                             "tags": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "description": "List of hashtags (without #)"
+                                "description": "List of hashtags (without #)",
                             },
                             "placement": {
                                 "type": "string",
                                 "enum": ["inline", "mid", "end", "first_comment"],
-                                "description": "Where to place hashtags"
-                            }
+                                "description": "Where to place hashtags",
+                            },
                         },
-                        "required": ["tags"]
-                    }
+                        "required": ["tags"],
+                    },
                 ),
-
                 # === THEME & VARIANT MANAGEMENT ===
                 Tool(
                     name="linkedin_list_themes",
                     description="List all available themes",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
                     name="linkedin_get_theme",
@@ -180,8 +192,8 @@ class LinkedInServer:
                         "properties": {
                             "theme_name": {"type": "string", "description": "Theme name"}
                         },
-                        "required": ["theme_name"]
-                    }
+                        "required": ["theme_name"],
+                    },
                 ),
                 Tool(
                     name="linkedin_apply_theme",
@@ -191,15 +203,14 @@ class LinkedInServer:
                         "properties": {
                             "theme_name": {"type": "string", "description": "Theme to apply"}
                         },
-                        "required": ["theme_name"]
-                    }
+                        "required": ["theme_name"],
+                    },
                 ),
-
                 # === COMPONENT REGISTRY ===
                 Tool(
                     name="linkedin_list_components",
                     description="List all available post components",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
                     name="linkedin_get_component_info",
@@ -209,8 +220,8 @@ class LinkedInServer:
                         "properties": {
                             "component_type": {"type": "string", "description": "Component type"}
                         },
-                        "required": ["component_type"]
-                    }
+                        "required": ["component_type"],
+                    },
                 ),
                 Tool(
                     name="linkedin_get_recommendations",
@@ -220,19 +231,24 @@ class LinkedInServer:
                         "properties": {
                             "goal": {
                                 "type": "string",
-                                "enum": ["engagement", "authority", "leads", "community", "awareness"],
-                                "description": "Your LinkedIn goal"
+                                "enum": [
+                                    "engagement",
+                                    "authority",
+                                    "leads",
+                                    "community",
+                                    "awareness",
+                                ],
+                                "description": "Your LinkedIn goal",
                             }
                         },
-                        "required": ["goal"]
-                    }
+                        "required": ["goal"],
+                    },
                 ),
                 Tool(
                     name="linkedin_get_system_overview",
                     description="Get complete overview of the design system",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
-
                 # === CONTENT GENERATION ===
                 Tool(
                     name="linkedin_compose_post",
@@ -242,20 +258,20 @@ class LinkedInServer:
                         "properties": {
                             "optimize": {
                                 "type": "boolean",
-                                "description": "Optimize for engagement (default: true)"
+                                "description": "Optimize for engagement (default: true)",
                             }
-                        }
-                    }
+                        },
+                    },
                 ),
                 Tool(
                     name="linkedin_get_preview",
                     description="Get preview of current draft (first 210 chars)",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
                     name="linkedin_export_draft",
                     description="Export current draft as JSON",
-                    inputSchema={"type": "object", "properties": {}}
+                    inputSchema={"type": "object", "properties": {}},
                 ),
             ]
 
@@ -269,24 +285,24 @@ class LinkedInServer:
                 draft = self.manager.create_draft(
                     name=arguments["name"],
                     post_type=arguments["post_type"],
-                    theme=arguments.get("theme")
+                    theme=arguments.get("theme"),
                 )
-                return [TextContent(
-                    type="text",
-                    text=f"Created draft '{draft.name}' (ID: {draft.draft_id})"
-                )]
+                return [
+                    TextContent(
+                        type="text", text=f"Created draft '{draft.name}' (ID: {draft.draft_id})"
+                    )
+                ]
 
             elif name == "linkedin_list":
                 drafts = self.manager.list_drafts()
-                return [TextContent(
-                    type="text",
-                    text=json.dumps(drafts, indent=2)
-                )]
+                return [TextContent(type="text", text=json.dumps(drafts, indent=2))]
 
             elif name == "linkedin_switch":
                 success = self.manager.switch_draft(arguments["draft_id"])
                 if success:
-                    return [TextContent(type="text", text=f"Switched to draft {arguments['draft_id']}")]
+                    return [
+                        TextContent(type="text", text=f"Switched to draft {arguments['draft_id']}")
+                    ]
                 return [TextContent(type="text", text=f"Draft {arguments['draft_id']} not found")]
 
             elif name == "linkedin_get_info":
@@ -295,10 +311,7 @@ class LinkedInServer:
 
                 if draft:
                     stats = self.manager.get_draft_stats(draft_id)
-                    info = {
-                        **draft.to_dict(),
-                        "stats": stats
-                    }
+                    info = {**draft.to_dict(), "stats": stats}
                     return [TextContent(type="text", text=json.dumps(info, indent=2))]
                 return [TextContent(type="text", text="No draft found")]
 
@@ -316,16 +329,22 @@ class LinkedInServer:
             elif name == "linkedin_add_hook":
                 draft = self.manager.get_current_draft()
                 if not draft:
-                    return [TextContent(type="text", text="No active draft. Create one first with linkedin_create.")]
+                    return [
+                        TextContent(
+                            type="text",
+                            text="No active draft. Create one first with linkedin_create.",
+                        )
+                    ]
 
-                hook_data = {
-                    "type": arguments["hook_type"],
-                    "content": arguments["content"]
-                }
-                draft.content.setdefault("components", []).append({"component": "hook", **hook_data})
+                hook_data = {"type": arguments["hook_type"], "content": arguments["content"]}
+                draft.content.setdefault("components", []).append(
+                    {"component": "hook", **hook_data}
+                )
                 self.manager.update_draft(draft.draft_id, content=draft.content)
 
-                return [TextContent(type="text", text=f"Added {arguments['hook_type']} hook to draft")]
+                return [
+                    TextContent(type="text", text=f"Added {arguments['hook_type']} hook to draft")
+                ]
 
             elif name == "linkedin_add_body":
                 draft = self.manager.get_current_draft()
@@ -334,22 +353,25 @@ class LinkedInServer:
 
                 body_data = {
                     "content": arguments["content"],
-                    "structure": arguments.get("structure", "linear")
+                    "structure": arguments.get("structure", "linear"),
                 }
-                draft.content.setdefault("components", []).append({"component": "body", **body_data})
+                draft.content.setdefault("components", []).append(
+                    {"component": "body", **body_data}
+                )
                 self.manager.update_draft(draft.draft_id, content=draft.content)
 
-                return [TextContent(type="text", text=f"Added body with {body_data['structure']} structure")]
+                return [
+                    TextContent(
+                        type="text", text=f"Added body with {body_data['structure']} structure"
+                    )
+                ]
 
             elif name == "linkedin_add_cta":
                 draft = self.manager.get_current_draft()
                 if not draft:
                     return [TextContent(type="text", text="No active draft")]
 
-                cta_data = {
-                    "type": arguments["cta_type"],
-                    "text": arguments["text"]
-                }
+                cta_data = {"type": arguments["cta_type"], "text": arguments["text"]}
                 draft.content.setdefault("components", []).append({"component": "cta", **cta_data})
                 self.manager.update_draft(draft.draft_id, content=draft.content)
 
@@ -362,9 +384,11 @@ class LinkedInServer:
 
                 hashtag_data = {
                     "tags": arguments["tags"],
-                    "placement": arguments.get("placement", "end")
+                    "placement": arguments.get("placement", "end"),
                 }
-                draft.content.setdefault("components", []).append({"component": "hashtags", **hashtag_data})
+                draft.content.setdefault("components", []).append(
+                    {"component": "hashtags", **hashtag_data}
+                )
                 self.manager.update_draft(draft.draft_id, content=draft.content)
 
                 return [TextContent(type="text", text=f"Added {len(arguments['tags'])} hashtags")]
@@ -440,7 +464,12 @@ class LinkedInServer:
                 draft.content["composed_text"] = final_text
                 self.manager.update_draft(draft.draft_id, content=draft.content)
 
-                return [TextContent(type="text", text=f"Composed post ({len(final_text)} chars):\n\n{final_text}")]
+                return [
+                    TextContent(
+                        type="text",
+                        text=f"Composed post ({len(final_text)} chars):\n\n{final_text}",
+                    )
+                ]
 
             elif name == "linkedin_get_preview":
                 draft = self.manager.get_current_draft()
@@ -466,9 +495,7 @@ class LinkedInServer:
 
         async with stdio_server() as (read_stream, write_stream):
             await self.server.run(
-                read_stream,
-                write_stream,
-                self.server.create_initialization_options()
+                read_stream, write_stream, self.server.create_initialization_options()
             )
 
 

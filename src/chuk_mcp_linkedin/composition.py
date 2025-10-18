@@ -7,7 +7,6 @@ Shadcn-style composition with Hook, Body, CTA, and Hashtags components.
 from typing import List, Optional, Dict, Any
 from abc import ABC, abstractmethod
 from .tokens.text_tokens import TextTokens
-from .tokens.engagement_tokens import EngagementTokens
 from .tokens.structure_tokens import StructureTokens
 
 
@@ -28,21 +27,13 @@ class PostComponent(ABC):
 class Hook(PostComponent):
     """Opening hook component"""
 
-    def __init__(
-        self,
-        hook_type: str,
-        content: str,
-        theme: Optional[Any] = None
-    ):
+    def __init__(self, hook_type: str, content: str, theme: Optional[Any] = None):
         self.hook_type = hook_type
         self.content = content
         self.theme = theme
 
     def render(self, theme: Optional[Any] = None) -> str:
         theme = theme or self.theme
-
-        # Get templates for this hook type
-        templates = EngagementTokens.get_hook_examples(self.hook_type)
 
         # Apply theme-specific emphasis if needed
         rendered = self.content
@@ -60,12 +51,7 @@ class Hook(PostComponent):
 class Body(PostComponent):
     """Main content body component"""
 
-    def __init__(
-        self,
-        content: str,
-        structure: str = "linear",
-        theme: Optional[Any] = None
-    ):
+    def __init__(self, content: str, structure: str = "linear", theme: Optional[Any] = None):
         self.content = content
         self.structure = structure
         self.theme = theme
@@ -141,12 +127,7 @@ class Body(PostComponent):
 class CallToAction(PostComponent):
     """Call-to-action component"""
 
-    def __init__(
-        self,
-        cta_type: str,
-        text: str,
-        theme: Optional[Any] = None
-    ):
+    def __init__(self, cta_type: str, text: str, theme: Optional[Any] = None):
         self.cta_type = cta_type
         self.text = text
         self.theme = theme
@@ -161,7 +142,7 @@ class CallToAction(PostComponent):
                 "curiosity": "🤔",
                 "action": "⚡",
                 "share": "🔄",
-                "soft": "💭"
+                "soft": "💭",
             }
             emoji = emoji_map.get(self.cta_type, "")
             return f"{emoji} {self.text}" if emoji else self.text
@@ -180,7 +161,7 @@ class Hashtags(PostComponent):
         tags: List[str],
         placement: str = "end",
         strategy: str = "mixed",
-        theme: Optional[Any] = None
+        theme: Optional[Any] = None,
     ):
         self.tags = tags
         self.placement = placement
@@ -227,10 +208,7 @@ class ComposablePost:
     """Shadcn-style composition for LinkedIn posts"""
 
     def __init__(
-        self,
-        post_type: str,
-        theme: Optional[Any] = None,
-        variant_config: Optional[Dict] = None
+        self, post_type: str, theme: Optional[Any] = None, variant_config: Optional[Dict] = None
     ):
         self.post_type = post_type
         self.theme = theme
@@ -238,28 +216,28 @@ class ComposablePost:
         self.components: List[PostComponent] = []
         self.metadata: Dict[str, Any] = {}
 
-    def add_hook(self, hook_type: str, content: str) -> 'ComposablePost':
+    def add_hook(self, hook_type: str, content: str) -> "ComposablePost":
         """Add opening hook"""
         self.components.append(Hook(hook_type, content, self.theme))
         return self
 
-    def add_body(self, content: str, structure: Optional[str] = None) -> 'ComposablePost':
+    def add_body(self, content: str, structure: Optional[str] = None) -> "ComposablePost":
         """Add main content body"""
         structure = structure or self.variant_config.get("structure", "linear")
         self.components.append(Body(content, structure, self.theme))
         return self
 
-    def add_separator(self, style: str = "line") -> 'ComposablePost':
+    def add_separator(self, style: str = "line") -> "ComposablePost":
         """Add visual separator"""
         self.components.append(Separator(style))
         return self
 
-    def add_cta(self, cta_type: str, text: str) -> 'ComposablePost':
+    def add_cta(self, cta_type: str, text: str) -> "ComposablePost":
         """Add call-to-action"""
         self.components.append(CallToAction(cta_type, text, self.theme))
         return self
 
-    def add_hashtags(self, tags: List[str], placement: str = "end") -> 'ComposablePost':
+    def add_hashtags(self, tags: List[str], placement: str = "end") -> "ComposablePost":
         """Add hashtags"""
         self.components.append(Hashtags(tags, placement, theme=self.theme))
         return self
@@ -277,7 +255,9 @@ class ComposablePost:
 
         # Validate total length
         if len(final_text) > TextTokens.MAX_LENGTH:
-            raise ValueError(f"Post exceeds {TextTokens.MAX_LENGTH} character limit: {len(final_text)} chars")
+            raise ValueError(
+                f"Post exceeds {TextTokens.MAX_LENGTH} character limit: {len(final_text)} chars"
+            )
 
         return final_text
 
@@ -288,7 +268,7 @@ class ComposablePost:
             return full_text
         return full_text[:chars] + "..."
 
-    def optimize_for_engagement(self) -> 'ComposablePost':
+    def optimize_for_engagement(self) -> "ComposablePost":
         """Apply engagement optimizations"""
         # Ensure hook exists
         has_hook = any(isinstance(c, Hook) for c in self.components)
@@ -310,15 +290,11 @@ class ComposablePost:
             "post_type": self.post_type,
             "theme": self.theme.name if self.theme else None,
             "components": [
-                {
-                    "type": type(c).__name__,
-                    "content": c.render(self.theme)
-                }
-                for c in self.components
+                {"type": type(c).__name__, "content": c.render(self.theme)} for c in self.components
             ],
             "final_text": self.compose(),
             "character_count": len(self.compose()),
-            "preview": self.get_preview()
+            "preview": self.get_preview(),
         }
 
 
@@ -327,11 +303,7 @@ class PostBuilder:
 
     @staticmethod
     def thought_leadership_post(
-        hook_stat: str,
-        framework_name: str,
-        framework_parts: List[str],
-        conclusion: str,
-        theme: Any
+        hook_stat: str, framework_name: str, framework_parts: List[str], conclusion: str, theme: Any
     ) -> ComposablePost:
         """Pre-built thought leadership pattern"""
 
@@ -352,12 +324,7 @@ class PostBuilder:
 
     @staticmethod
     def story_post(
-        hook: str,
-        problem: str,
-        journey: str,
-        solution: str,
-        lesson: str,
-        theme: Any
+        hook: str, problem: str, journey: str, solution: str, lesson: str, theme: Any
     ) -> ComposablePost:
         """Pre-built story arc pattern"""
 
@@ -375,12 +342,7 @@ class PostBuilder:
         return post
 
     @staticmethod
-    def listicle_post(
-        hook: str,
-        items: List[str],
-        conclusion: str,
-        theme: Any
-    ) -> ComposablePost:
+    def listicle_post(hook: str, items: List[str], conclusion: str, theme: Any) -> ComposablePost:
         """Pre-built listicle pattern"""
 
         post = ComposablePost("text", theme=theme)
@@ -398,11 +360,7 @@ class PostBuilder:
 
     @staticmethod
     def comparison_post(
-        hook: str,
-        option_a: str,
-        option_b: str,
-        recommendation: str,
-        theme: Any
+        hook: str, option_a: str, option_b: str, recommendation: str, theme: Any
     ) -> ComposablePost:
         """Pre-built comparison pattern"""
 

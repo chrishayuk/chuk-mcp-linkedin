@@ -20,7 +20,7 @@ class Draft:
         post_type: str,
         content: Dict[str, Any],
         theme: Optional[str] = None,
-        variant_config: Optional[Dict[str, Any]] = None
+        variant_config: Optional[Dict[str, Any]] = None,
     ):
         self.draft_id = draft_id
         self.name = name
@@ -48,11 +48,11 @@ class Draft:
             "variant_config": self.variant_config,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Draft':
+    def from_dict(cls, data: Dict[str, Any]) -> "Draft":
         """Create draft from dictionary"""
         draft = cls(
             draft_id=data["draft_id"],
@@ -60,7 +60,7 @@ class Draft:
             post_type=data["post_type"],
             content=data["content"],
             theme=data.get("theme"),
-            variant_config=data.get("variant_config", {})
+            variant_config=data.get("variant_config", {}),
         )
         draft.created_at = data.get("created_at", draft.created_at)
         draft.updated_at = data.get("updated_at", draft.updated_at)
@@ -93,7 +93,7 @@ class LinkedInManager:
         post_type: str,
         content: Optional[Dict[str, Any]] = None,
         theme: Optional[str] = None,
-        variant_config: Optional[Dict[str, Any]] = None
+        variant_config: Optional[Dict[str, Any]] = None,
     ) -> Draft:
         """Create a new draft"""
         draft_id = f"draft_{len(self.drafts) + 1}_{datetime.now().timestamp()}"
@@ -104,7 +104,7 @@ class LinkedInManager:
             post_type=post_type,
             content=content or {},
             theme=theme,
-            variant_config=variant_config
+            variant_config=variant_config,
         )
 
         self.drafts[draft_id] = draft
@@ -134,7 +134,7 @@ class LinkedInManager:
                 "theme": draft.theme,
                 "created_at": draft.created_at,
                 "updated_at": draft.updated_at,
-                "is_current": draft.draft_id == self.current_draft_id
+                "is_current": draft.draft_id == self.current_draft_id,
             }
             for draft in self.drafts.values()
         ]
@@ -151,7 +151,7 @@ class LinkedInManager:
         draft_id: str,
         content: Optional[Dict[str, Any]] = None,
         theme: Optional[str] = None,
-        variant_config: Optional[Dict[str, Any]] = None
+        variant_config: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """Update a draft"""
         draft = self.get_draft(draft_id)
@@ -174,7 +174,7 @@ class LinkedInManager:
     def delete_draft(self, draft_id: str) -> bool:
         """Delete a draft"""
         if draft_id in self.drafts:
-            draft = self.drafts.pop(draft_id)
+            self.drafts.pop(draft_id)
 
             # Delete from storage
             draft_file = self.storage_path / f"{draft_id}.json"
@@ -260,20 +260,20 @@ class LinkedInManager:
             "preview_visible": min(210, char_count),
             "has_hook": draft.content.get("hook") is not None,
             "has_cta": draft.content.get("cta") is not None,
-            "hashtag_count": len(draft.content.get("hashtags", []))
+            "hashtag_count": len(draft.content.get("hashtags", [])),
         }
 
     def _save_draft(self, draft: Draft):
         """Save draft to storage"""
         draft_file = self.storage_path / f"{draft.draft_id}.json"
-        with open(draft_file, 'w') as f:
+        with open(draft_file, "w") as f:
             json.dump(draft.to_dict(), f, indent=2)
 
     def _load_drafts(self):
         """Load drafts from storage"""
         for draft_file in self.storage_path.glob("*.json"):
             try:
-                with open(draft_file, 'r') as f:
+                with open(draft_file, "r") as f:
                     data = json.load(f)
                     draft = Draft.from_dict(data)
                     self.drafts[draft.draft_id] = draft
@@ -290,5 +290,5 @@ class LinkedInManager:
             "total_drafts": len(self.drafts),
             "current_draft_id": self.current_draft_id,
             "storage_path": str(self.storage_path),
-            "draft_types": list(set(d.post_type for d in self.drafts.values()))
+            "draft_types": list(set(d.post_type for d in self.drafts.values())),
         }

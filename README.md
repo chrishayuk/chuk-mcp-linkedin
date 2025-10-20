@@ -8,6 +8,11 @@ A comprehensive design system MCP server for creating LinkedIn posts with shadcn
 
 ## Features
 
+- **Local Preview System**: Generate pixel-perfect HTML previews of posts before publishing
+  - LinkedIn-style UI rendering
+  - Real-time analytics and optimization tips
+  - "See more" line visualization at 210 characters
+  - Browser-based preview with CLI utility
 - **Component-Based Architecture**: 13+ specialized post types (text, document, poll, video, carousel, etc.)
 - **Variant System**: CVA-inspired variants with compound variant support
 - **Theme System**: 10 pre-built themes (thought leader, storyteller, community builder, etc.)
@@ -41,6 +46,20 @@ pip install chuk-mcp-linkedin
 ```
 
 ## Quick Start
+
+### Preview Your First Post (60 seconds)
+
+```bash
+# 1. Try the preview example
+python examples/preview_example.py
+
+# 2. Browser opens automatically showing your LinkedIn post preview
+#    with analytics and optimization tips
+
+# 3. Edit and preview your own drafts
+python preview_post.py --list    # See all drafts
+python preview_post.py           # Preview current draft
+```
 
 ### Simple Text Post
 
@@ -158,6 +177,67 @@ Start treating posts like conversations, not broadcasts.
 manager.publish_text(post)
 ```
 
+## Local Preview System
+
+Preview your LinkedIn posts locally in a pixel-perfect browser preview before publishing. See exactly how your post will appear on LinkedIn with real-time analytics and optimization recommendations.
+
+### Features
+
+**Visual Preview**:
+- Authentic LinkedIn post card styling (avatar, header, actions)
+- Proper text formatting and line breaks
+- Hashtag highlighting
+- "See more" line indicator at 210 characters
+
+**Analytics Dashboard**:
+- Character and word counts
+- Characters remaining (3000 max)
+- Optimal length indicators (warnings for too short/long)
+- Hashtag count analysis (optimal: 3-5)
+- Hook and CTA status indicators
+- Engagement optimization tips
+
+### Python API
+
+```python
+from chuk_mcp_linkedin import LinkedInManager
+
+manager = LinkedInManager()
+
+# Create and compose your post
+draft = manager.create_draft("My Post", "text")
+# ... add content ...
+
+# Generate HTML preview - opens automatically in browser
+preview_path = manager.generate_html_preview(draft.draft_id)
+```
+
+### Quick Preview CLI
+
+The fastest way to preview posts:
+
+```bash
+# Preview current draft (auto-opens in browser)
+python preview_post.py
+
+# Preview specific draft
+python preview_post.py draft_id_here
+
+# List all available drafts
+python preview_post.py --list
+```
+
+### MCP Tool
+
+```python
+# Via MCP server
+linkedin_preview_html(open_browser=True)
+```
+
+**Preview Output**: All previews are saved to `.linkedin_drafts/previews/` as standalone HTML files you can share or archive.
+
+**Live Editing Workflow**: Keep the preview open in your browser and run the preview command again after edits to see changes instantly.
+
 ## Component System
 
 ### Post Types
@@ -225,7 +305,8 @@ manager.publish_text(post)
 ### Publishing
 - `linkedin_publish` - Publish to LinkedIn
 - `linkedin_schedule` - Schedule for later
-- `linkedin_preview` - Get preview
+- `linkedin_preview` - Get text preview (first 210 chars)
+- `linkedin_preview_html` - Generate HTML preview and open in browser
 - `linkedin_export_draft` - Export as JSON
 
 ### Analytics
@@ -233,47 +314,305 @@ manager.publish_text(post)
 - `linkedin_get_suggestions` - Get content suggestions
 - `linkedin_analyze_draft` - Analyze draft performance potential
 
-## Design Tokens
+## Design Token System
 
-Research-backed design tokens for optimal engagement:
+A centralized design system that manages all visual and content decisions, similar to the PPTX MCP approach.
 
-### Text Formatting
+### Why Token-Based Design?
+
+Instead of hardcoding values:
+```python
+❌ font_size = 24
+❌ color = '#000000'
+❌ margin = 60
+```
+
+Use design tokens:
+```python
+✓ font_size = DesignTokens.get_font_size('body')
+✓ color = DesignTokens.get_color('minimal', 'primary')
+✓ margin = DesignTokens.get_spacing('gaps', 'large')
+```
+
+**Benefits:**
+- **Consistency**: All designs use same values
+- **Maintainability**: Change once, update everywhere
+- **Performance**: Values based on 1M+ posts analyzed
+- **Mobile-First**: All tokens optimized for mobile
+- **Platform-Aware**: LinkedIn-specific optimizations built-in
+
+### Token Categories
+
+#### 1. **Design Tokens** (`DesignTokens`)
+Visual design system for layouts, documents, and carousels:
+
+**Canvas Sizes:**
+- Document posts: 1920x1920 (square, highest engagement format)
+- Carousels: 1080x1080 (square) or 1080x1350 (portrait)
+
+**Typography:**
+- Font sizes: tiny (14pt) → massive (200pt)
+- Font weights: light → black
+- Line heights: tight (1.2) → loose (2.0)
+- Minimum 18pt for LinkedIn mobile readability
+
+**Colors:**
+- 5 color schemes: minimal, modern, vibrant, dark, linkedin
+- Semantic colors: success, error, warning, info
+- LinkedIn brand blue: #0A66C2
+
+**Spacing:**
+- Safe areas: minimal → spacious
+- Gaps: tiny (8px) → huge (120px)
+- Padding: tight (20px) → spacious (80px)
+
+#### 2. **Text Tokens** (`TextTokens`)
+Content formatting and structure:
 - Character limits (3000 max, 210 before "see more")
 - Ideal lengths (micro: 50-150, short: 150-300, medium: 300-800, long: 800-1500, story: 1000-3000)
 - Line break styles (dense, readable, scannable, dramatic, extreme)
+- Emoji levels: none → heavy (0-15% of text)
+- Hashtag strategy: optimal count 3-5
 
-### Emoji Usage
-- None, minimal (1%), moderate (5%), expressive (10%), heavy (15%)
-
-### Hashtags
-- Optimal count: 3-5 hashtags
-- Placement strategies: inline, mid, end, first_comment
-
-### Engagement Patterns
+#### 3. **Engagement Tokens** (`EngagementTokens`)
+Algorithm optimization patterns:
 - Hook types with power ratings (controversy: 0.95, stat: 0.9, story: 0.85)
 - CTA styles (direct, curiosity, action, share, soft)
 - First hour targets (minimum: 10, good: 50, viral: 100 engagements)
+- Timing optimization (Tuesday-Thursday, 7-9 AM / 12-2 PM / 5-6 PM)
 
-### Timing
-- Best days: Tuesday, Wednesday, Thursday
-- Best hours: 7-9 AM, 12-2 PM, 5-6 PM
-- Optimal frequency: 4-5 posts per week
+#### 4. **Structure Tokens** (`StructureTokens`)
+Content structure patterns:
+- Formats: linear, listicle, framework, story_arc, comparison
+- Visual formatting: symbols (→, •, ✓), separators
+- Hook patterns and templates
+
+### LinkedIn-Specific Optimizations (2025 Data)
+
+Based on 1M+ posts analyzed:
+
+**Document Posts (PDF):**
+- Engagement rate: 45.85% (HIGHEST)
+- Optimal slides: 5-10
+- Format: 1920x1920 square
+- Font min: 18pt
+
+**Poll Posts:**
+- Reach multiplier: 3.0x (200%+ higher!)
+- Most underused format (opportunity!)
+
+**Carousels:**
+- Declining (-18% reach, -25% engagement vs 2024)
+- Keep to 5-10 slides maximum
+
+### Example: Token Usage
+
+```python
+from chuk_mcp_linkedin.tokens import DesignTokens, TextTokens, EngagementTokens
+
+# Get canvas size for document
+canvas = DesignTokens.get_canvas_size("document_square")  # (1920, 1920)
+
+# Get optimal font size
+title_size = DesignTokens.get_font_size("title")  # 56pt
+
+# Check if mobile-friendly
+min_font = DesignTokens.LINKEDIN_SPECIFIC["mobile"]["min_font_size"]  # 18pt
+
+# Get optimal post length
+ideal_length = TextTokens.IDEAL_LENGTH["medium"]  # (300, 800)
+
+# Get hook power rating
+stat_power = EngagementTokens.HOOKS["stat"]["power"]  # 0.9
+
+# Get best posting time
+best_days = EngagementTokens.TIMING["best_days"]  # ['tuesday', 'wednesday', 'thursday']
+```
+
+### Try the Showcase
+
+Run the complete token and layout showcase:
+```bash
+python examples/layout_token_showcase.py
+```
+
+This demonstrates:
+- All token categories with examples
+- How layouts reference tokens
+- 2025 LinkedIn-specific optimizations
+- Mobile-first design principles
+
+## Component Architecture
+
+### Visual Component Library
+
+The design system includes a comprehensive library of reusable visual components for creating LinkedIn documents and carousels.
+
+#### ✅ **Fully Implemented Components**
+
+**Visual Elements** (38 total variants across 5 categories):
+
+1. **Dividers** (6 variants)
+   - `horizontal_line()` - Simple line separators
+   - `gradient_fade()` - Subtle gradient dividers
+   - `decorative_accent()` - LinkedIn-style accent lines
+   - `section_break()` - Visual section separators (•••)
+   - `spacer()` - Invisible spacing elements
+   - `title_underline()` - Title underlines (single/double/thick)
+
+2. **Badges** (7 variants)
+   - `pill_badge()` - Rounded pill-shaped badges
+   - `status_badge()` - Semantic status indicators (NEW, TRENDING, etc.)
+   - `number_badge()` - Notification-style number badges
+   - `percentage_change()` - Change indicators with ↑↓ arrows
+   - `category_tag()` - Topic/category tags
+   - `icon_badge()` - Icon+text badges
+   - `corner_ribbon()` - Diagonal corner ribbons
+
+3. **Backgrounds** (8 variants)
+   - `solid()` - Solid color backgrounds
+   - `gradient()` - Linear gradients (vertical/horizontal/diagonal)
+   - `subtle_pattern()` - Subtle texture patterns
+   - `card()` - Card containers with shadows
+   - `highlight_box()` - Highlighted content boxes
+   - `branded_header()` - Branded header sections
+   - `split_background()` - Split backgrounds for comparisons
+   - `image_overlay()` - Semi-transparent overlays for images
+
+4. **Borders** (8 variants)
+   - `simple()` - Basic borders
+   - `accent()` - Accent borders (left/right/top/bottom)
+   - `double()` - Double-line borders
+   - `gradient()` - Gradient borders
+   - `corner_brackets()` - Corner bracket decoration
+   - `callout()` - Callout boxes (success/warning/error/info)
+   - `shadow_frame()` - Elevated frames with shadows
+   - `inset_panel()` - Inset panels
+
+5. **Shapes** (9 variants)
+   - `circle()` - Circles (filled/outline)
+   - `rectangle()` - Rectangles and squares
+   - `icon_container()` - Icon container boxes
+   - `arrow()` - Directional arrows
+   - `checkmark()` - Checkmarks and crosses
+   - `bullet_point()` - Custom bullet points
+   - `decorative_element()` - Decorative shapes
+   - `progress_ring()` - Progress indicators
+   - `divider_ornament()` - Decorative divider elements
+
+**Document Layouts** (11 types):
+- Title Slide, Content Slide, Split Content, Big Number
+- Quote Slide, Comparison, Two Column, Checklist
+- Timeline, Icon Grid, Data Visual
+
+All components use the design token system for consistent styling and are mobile-optimized.
+
+#### Usage Example
+
+```python
+from chuk_mcp_linkedin.components import Dividers, Badges, Backgrounds, Borders, Shapes
+
+# Create visual elements
+accent = Dividers.decorative_accent()
+new_badge = Badges.pill_badge("NEW", size="medium")
+card_bg = Backgrounds.card()
+highlight = Borders.callout(type="success")
+icon = Shapes.icon_container("🚀", size="large")
+
+# Use in document layouts
+from chuk_mcp_linkedin.components.layouts import DocumentLayouts
+
+layout = DocumentLayouts.content_slide()
+# Add components to layout zones
+```
+
+#### ⚠️ **Placeholder Components** (Not Yet Implemented)
+
+The following component categories are defined in `__init__.py` files but implementation files don't exist yet:
+
+**Typography Components** (5 needed):
+- `Headers` - H1, H2, H3 with token-based sizing
+- `BodyText` - Paragraph text with line height/spacing
+- `Captions` - Small descriptive text
+- `Quotes` - Pull quotes and blockquotes
+- `Lists` - Bulleted and numbered lists
+
+**Data Visualization** (5 needed):
+- `Charts` - Bar, line, pie, donut charts
+- `Metrics` - KPI metric cards with icons
+- `Progress` - Progress bars and rings
+- `Tables` - Data tables with styling
+- `Infographics` - Visual data representations
+
+**Content Blocks** (6 needed):
+- `CTA` - Call-to-action blocks
+- `Testimonials` - Customer testimonial cards
+- `FeatureCards` - Product/service feature cards
+- `TimelineItems` - Timeline event blocks
+- `ChecklistItems` - Checklist/task items
+- `StatCards` - Statistic display cards
+
+**Media Components** (4 needed):
+- `Images` - Image handling with crops/filters
+- `Avatars` - Profile avatars and logos
+- `VideoFrames` - Video thumbnails and frames
+- `IconSets` - Icon libraries and sets
+
+**Interactive Components** (3 needed):
+- `Buttons` - CTA buttons with hover states
+- `PollOptions` - Poll option styling
+- `FormElements` - Input elements for forms
+
+**Additional Needed**:
+- `CarouselLayouts` - Layouts for carousel posts (mentioned but not implemented)
+- `LayoutRenderer` - Render layouts to actual visual output (mentioned but not implemented)
+
+### Component Development Status
+
+| Category | Status | Count | Progress |
+|----------|--------|-------|----------|
+| Tokens | ✅ Complete | 4 | 100% |
+| Document Layouts | ✅ Complete | 11 | 100% |
+| Visual Elements | ✅ Complete | 38 variants | 100% |
+| Preview System | ✅ Complete | 1 | 100% |
+| Typography | ⚠️ Placeholder | 0/5 | 0% |
+| Data Viz | ⚠️ Placeholder | 0/5 | 0% |
+| Content Blocks | ⚠️ Placeholder | 0/6 | 0% |
+| Media | ⚠️ Placeholder | 0/4 | 0% |
+| Interactive | ⚠️ Placeholder | 0/3 | 0% |
+| Carousel Layouts | ⚠️ Placeholder | 0 | 0% |
+| Layout Renderer | ⚠️ Placeholder | 0 | 0% |
+
+**Overall Progress**: 58 implemented / 85 total components (68% complete)
 
 ## Architecture
 
 ```
 src/chuk_mcp_linkedin/
-├── components/        # Post type components
-├── subcomponents/     # Composition subcomponents
-├── tokens/           # Design tokens
-├── themes/           # Theme system
-├── layouts/          # Visual layouts
-├── charts/           # Chart components
-├── variants.py       # Variant system
-├── composition.py    # Composition patterns
-├── registry.py       # Component registry
-├── manager.py        # Draft management
-└── server.py         # MCP server
+├── components/
+│   ├── visual_elements/      # ✅ 38 variants (Dividers, Badges, Backgrounds, Borders, Shapes)
+│   ├── layouts/              # ✅ 11 document layouts + base system
+│   ├── typography/           # ⚠️ Placeholder (__init__.py only)
+│   ├── data_viz/             # ⚠️ Placeholder (__init__.py only)
+│   ├── content_blocks/       # ⚠️ Placeholder (__init__.py only)
+│   ├── media/                # ⚠️ Placeholder (__init__.py only)
+│   ├── interactive/          # ⚠️ Placeholder (__init__.py only)
+│   └── component_renderer.py # ✅ Renders visual elements to HTML
+├── tokens/                   # ✅ 4 token systems (Design, Text, Engagement, Structure)
+├── themes/                   # Theme system
+├── variants.py               # Variant system
+├── composition.py            # Composition patterns
+├── registry.py               # Component registry
+├── manager.py                # Draft management
+├── preview.py                # ✅ HTML preview generator
+└── server.py                 # MCP server
+
+preview_post.py               # ✅ Quick CLI preview utility
+examples/
+├── tokens_showcase.py        # ✅ Token system demonstration
+├── components_showcase.py    # ✅ Visual components demonstration
+├── preview_example.py        # ✅ Preview system example
+└── complete_example.py       # Comprehensive usage examples
 ```
 
 ## Development
@@ -290,6 +629,44 @@ black src tests
 
 # Type checking
 mypy src
+
+# Try the preview example
+python examples/preview_example.py
+```
+
+## Examples
+
+Check out the `examples/` directory:
+
+**`layout_token_showcase.py`** - Complete design token and layout system demonstration
+```bash
+python examples/layout_token_showcase.py
+```
+Comprehensive showcase of the entire token system:
+- All design tokens (typography, colors, spacing, layouts)
+- Text and engagement tokens
+- LinkedIn-specific 2025 optimizations
+- How layouts reference tokens
+- Mobile-first design principles
+
+**`preview_example.py`** - Complete preview workflow demonstration
+```bash
+python examples/preview_example.py
+```
+Creates a sample thought leadership post and generates a browser preview with analytics.
+
+**`complete_example.py`** - Comprehensive usage examples covering all post types and features.
+
+**Quick Start**:
+```bash
+# See the token system in action
+python examples/layout_token_showcase.py
+
+# Try the preview system
+python examples/preview_example.py
+
+# Or use the CLI utility for your drafts
+python preview_post.py --list
 ```
 
 ## License

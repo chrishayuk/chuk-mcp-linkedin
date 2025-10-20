@@ -49,6 +49,7 @@ from .themes.theme_manager import ThemeManager, LinkedInTheme, THEMES
 from .registry import ComponentRegistry
 from .variants import PostVariants, VariantResolver
 from .tokens import TextTokens, EngagementTokens, StructureTokens
+from .preview import LinkedInPreview
 
 __version__ = "0.1.0"
 
@@ -75,4 +76,6 @@ __all__ = [
     "TextTokens",
     "EngagementTokens",
     "StructureTokens",
+    # Preview
+    "LinkedInPreview",
 ]

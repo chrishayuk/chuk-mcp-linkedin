@@ -292,3 +292,39 @@ class LinkedInManager:
             "storage_path": str(self.storage_path),
             "draft_types": list(set(d.post_type for d in self.drafts.values())),
         }
+
+    def generate_html_preview(
+        self, draft_id: str, output_path: Optional[str] = None
+    ) -> Optional[str]:
+        """
+        Generate HTML preview for a draft.
+
+        Args:
+            draft_id: Draft ID to preview
+            output_path: Optional path to save the preview (defaults to previews/{draft_id}.html)
+
+        Returns:
+            Path to the saved HTML file, or None if draft not found
+        """
+        from .preview import LinkedInPreview
+
+        draft = self.get_draft(draft_id)
+        if not draft:
+            return None
+
+        # Get stats
+        stats = self.get_draft_stats(draft_id)
+
+        # Generate HTML
+        html_content = LinkedInPreview.generate_html(draft.to_dict(), stats)
+
+        # Determine output path
+        if not output_path:
+            preview_dir = self.storage_path / "previews"
+            preview_dir.mkdir(exist_ok=True)
+            output_path = str(preview_dir / f"{draft_id}.html")
+
+        # Save preview
+        saved_path = LinkedInPreview.save_preview(html_content, output_path)
+
+        return saved_path

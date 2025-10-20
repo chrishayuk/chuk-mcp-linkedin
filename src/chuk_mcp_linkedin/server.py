@@ -269,6 +269,23 @@ class LinkedInServer:
                     inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
+                    name="linkedin_preview_html",
+                    description="Generate HTML preview of current draft and open in browser",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "output_path": {
+                                "type": "string",
+                                "description": "Optional custom output path for HTML file",
+                            },
+                            "open_browser": {
+                                "type": "boolean",
+                                "description": "Auto-open preview in browser (default: true)",
+                            },
+                        },
+                    },
+                ),
+                Tool(
                     name="linkedin_export_draft",
                     description="Export current draft as JSON",
                     inputSchema={"type": "object", "properties": {}},
@@ -486,6 +503,43 @@ class LinkedInServer:
 
                 export_json = self.manager.export_draft(draft.draft_id)
                 return [TextContent(type="text", text=export_json or "Export failed")]
+
+            elif name == "linkedin_preview_html":
+                draft = self.manager.get_current_draft()
+                if not draft:
+                    return [TextContent(type="text", text="No active draft")]
+
+                output_path = arguments.get("output_path")
+                open_browser = arguments.get("open_browser", True)
+
+                # Generate preview
+                saved_path = self.manager.generate_html_preview(draft.draft_id, output_path)
+
+                if not saved_path:
+                    return [TextContent(type="text", text="Failed to generate preview")]
+
+                # Open in browser if requested
+                if open_browser:
+                    import webbrowser
+                    import os
+
+                    # Convert to file:// URL
+                    file_url = f"file://{os.path.abspath(saved_path)}"
+                    webbrowser.open(file_url)
+
+                    return [
+                        TextContent(
+                            type="text",
+                            text=f"Preview generated and opened in browser:\n{saved_path}",
+                        )
+                    ]
+                else:
+                    return [
+                        TextContent(
+                            type="text",
+                            text=f"Preview generated:\n{saved_path}\n\nOpen in browser to view.",
+                        )
+                    ]
 
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
 

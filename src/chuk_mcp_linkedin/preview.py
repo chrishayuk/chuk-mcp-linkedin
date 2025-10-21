@@ -389,24 +389,53 @@ class LinkedInPreview:
     @staticmethod
     def _format_content(text: str) -> str:
         """Format content with proper HTML escaping and highlighting"""
-        # Escape HTML
-        text = html.escape(text)
-
-        # Split at 210 characters for "see more" indicator
-        if len(text) > 210:
-            preview_part = text[:210]
-            rest_part = text[210:]
-
-            formatted = f"""{preview_part}<div class="see-more-line">
-                <span class="see-more-text">...see more</span>
-            </div>{rest_part}"""
-        else:
-            formatted = text
-
-        # Highlight hashtags
         import re
 
-        formatted = re.sub(r"#(\w+)", r'<span class="hashtag">#\1</span>', formatted)
+        # First, find and mark hashtags BEFORE escaping
+        # Replace hashtags with a placeholder
+        hashtag_pattern = r'#(\w+)'
+        hashtags = []
+
+        def replace_hashtag(match):
+            hashtags.append(match.group(1))
+            return f'__HASHTAG_{len(hashtags)-1}__'
+
+        text = re.sub(hashtag_pattern, replace_hashtag, text)
+
+        # Now escape HTML (this won't affect our placeholders)
+        text = html.escape(text)
+
+        # Restore hashtags with proper HTML formatting
+        for idx, tag in enumerate(hashtags):
+            text = text.replace(
+                f'__HASHTAG_{idx}__',
+                f'<span class="hashtag">#{tag}</span>'
+            )
+
+        # Split at 210 characters for "see more" indicator (LinkedIn's truncation point)
+        if len(text) > 210:
+            # Find a good break point near 210 chars (end of line if possible)
+            preview_text = text[:210]
+            # Try to break at a newline
+            last_newline = preview_text.rfind('\n')
+            if last_newline > 150:  # If there's a newline reasonably close
+                preview_text = preview_text[:last_newline]
+
+            rest_text = text[len(preview_text):]
+
+            formatted = f"""
+                <div class="collapsed-view" id="collapsed" style="display: block;">
+                    {preview_text}
+                    <div class="see-more-line">
+                        <span class="see-more-text" onclick="document.getElementById('collapsed').style.display='none'; document.getElementById('expanded').style.display='block';" style="cursor: pointer;">...see more</span>
+                    </div>
+                </div>
+                <div class="expanded-view" id="expanded" style="display: none;">
+                    {text}
+                </div>
+            """
+        else:
+            formatted = text
 
         return formatted
 

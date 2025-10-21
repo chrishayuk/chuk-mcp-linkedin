@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/visual_elements/dividers.py
 """
 Divider components for LinkedIn documents.
 

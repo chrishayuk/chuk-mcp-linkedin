@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/typography/__init__.py
 """
 Typography components for LinkedIn documents.
 

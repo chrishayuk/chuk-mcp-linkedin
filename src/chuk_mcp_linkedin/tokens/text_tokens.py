@@ -79,8 +79,49 @@ class TextTokens:
         "cross": "✗",
         "lightning": "⚡",
         "bulb": "💡",
+        "lightbulb": "💡",
         "target": "🎯",
         "pin": "📌",
+        "quote": "💬",
+        "calendar": "📅",
+        "checklist": "✓",
+        "checkbox": "☐",
+        "transformation": "🔄",
+        "poll": "📊",
+        "features": "✨",
+        "list": "📝",
+    }
+
+    # Chart-specific tokens
+    CHART_EMOJIS: Dict[str, str] = {
+        "bar": "📊",
+        "metrics": "📈",
+        "comparison": "⚖️",
+        "progress": "📊",
+        "ranking": "🏆",
+        "time": "⏱️",
+        "stats": "📊",
+    }
+
+    # Bar chart colors (emoji squares for LinkedIn compatibility)
+    BAR_COLORS: list[str] = ["🟦", "🟩", "🟨", "🟧", "🟥", "🟪", "🟫"]
+
+    # Indicators
+    INDICATORS: Dict[str, str] = {
+        "positive": "✅",
+        "negative": "❌",
+        "neutral": "⚪",
+        "warning": "⚠️",
+        "gold_medal": "🥇",
+        "silver_medal": "🥈",
+        "bronze_medal": "🥉",
+    }
+
+    # Progress bar characters
+    PROGRESS_BARS: Dict[str, str] = {
+        "filled": "█",
+        "empty": "░",
+        "partial": "▓",
     }
 
     # Separators for visual breaks

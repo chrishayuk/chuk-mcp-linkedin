@@ -3,7 +3,7 @@ Tests for Document Layouts - All 11 layout types.
 """
 
 from chuk_mcp_linkedin.components.layouts.base import LayoutConfig, LayoutType, LayoutZone
-from chuk_mcp_linkedin.components.layouts.document_layouts import (
+from chuk_mcp_linkedin.documents.layouts import (
     title_slide,
     content_slide,
     split_content,

@@ -49,7 +49,7 @@ class Metrics:
             "value_color": value_color,
             "font_family": DesignTokens.TYPOGRAPHY["fonts"]["sans"],
             "padding": DesignTokens.SPACING["padding"]["normal"],
-            "background_color": "#FFFFFF",
+            "background_color": DesignTokens.get_color(color_scheme, "background"),
             "border_radius": DesignTokens.LAYOUT["border_radius"]["medium"],
         }
 

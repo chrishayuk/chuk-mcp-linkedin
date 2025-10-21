@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/visual_elements/shapes.py
 """
 Shape and icon components for LinkedIn documents.
 

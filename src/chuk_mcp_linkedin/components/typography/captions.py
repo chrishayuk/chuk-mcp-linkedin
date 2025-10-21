@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/typography/captions.py
 """
 Caption components for LinkedIn documents.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/typography/quotes.py
 """
 Quote components for LinkedIn documents.
 

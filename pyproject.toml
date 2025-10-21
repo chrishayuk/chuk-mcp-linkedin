@@ -7,7 +7,7 @@ name = "chuk-mcp-linkedin"
 version = "0.1.0"
 description = "Design system MCP server for creating LinkedIn posts with shadcn-inspired components, variants, and themes"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
     { name = "Christopher Hay", email = "chris@chrishay.com" }
 ]
@@ -24,7 +24,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
@@ -34,6 +33,7 @@ dependencies = [
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
     "httpx>=0.24.0",
+    "chuk-mcp-server>=0.4.4",
 ]
 
 [project.optional-dependencies]
@@ -56,14 +56,14 @@ packages = ["src/chuk_mcp_linkedin"]
 
 [tool.black]
 line-length = 100
-target-version = ["py310", "py311", "py312"]
+target-version = ["py311", "py312"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
@@ -79,4 +79,9 @@ addopts = "-v --cov=src/chuk_mcp_linkedin --cov-report=term-missing"
 [tool.coverage.run]
 omit = [
     "src/chuk_mcp_linkedin/server.py",  # MCP server - requires special testing infrastructure
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
 ]

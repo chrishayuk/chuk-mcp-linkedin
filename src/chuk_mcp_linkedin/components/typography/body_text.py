@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/typography/body_text.py
 """
 Body text components for LinkedIn documents.
 

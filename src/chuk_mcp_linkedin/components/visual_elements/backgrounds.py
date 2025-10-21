@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/visual_elements/backgrounds.py
 """
 Background components for LinkedIn documents.
 
@@ -180,16 +181,20 @@ class Backgrounds:
 
     @staticmethod
     def image_overlay(
-        image_path: str, overlay_color: str = "#000000", overlay_opacity: float = 0.5
+        image_path: str, overlay_color: str = None, overlay_opacity: float = 0.5, color_scheme: str = "minimal"
     ) -> Dict[str, Any]:
         """
         Image background with color overlay.
 
         Args:
             image_path: Path to background image
-            overlay_color: Overlay color
+            overlay_color: Overlay color (defaults to primary from color_scheme)
             overlay_opacity: Overlay opacity (0.0-1.0)
+            color_scheme: Color scheme to use
         """
+        if overlay_color is None:
+            overlay_color = DesignTokens.get_color(color_scheme, "primary")
+
         return {
             "type": "background",
             "variant": "image_overlay",

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/visual_elements/borders.py
 """
 Border and frame components for LinkedIn documents.
 

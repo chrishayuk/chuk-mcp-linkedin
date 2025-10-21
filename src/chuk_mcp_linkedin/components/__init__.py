@@ -13,17 +13,16 @@ Complete component library including:
 All components use the design token system for consistency.
 """
 
-from .layouts import LayoutConfig, LayoutType, LayoutZone, DocumentLayouts
+from .layouts import LayoutConfig, LayoutType, LayoutZone
 from .visual_elements import Dividers, Backgrounds, Borders, Badges, Shapes
 from .typography import Headers, BodyText, Captions, Quotes, Lists
 from .data_viz import Charts, Metrics, Progress, Tables, Infographics
 
 __all__ = [
-    # Layouts
+    # Layouts (base classes only - DocumentLayouts moved to documents/)
     "LayoutConfig",
     "LayoutType",
     "LayoutZone",
-    "DocumentLayouts",
     # Visual Elements
     "Dividers",
     "Backgrounds",

@@ -5,7 +5,6 @@ Provides pixel-perfect layouts optimized for LinkedIn's 2025 best practices.
 """
 
 from .base import LayoutConfig, LayoutType, LayoutZone
-from .document_layouts import DocumentLayouts
 
 # from .carousel_layouts import CarouselLayouts  # TODO: Not yet implemented
 # from .renderer import LayoutRenderer, RenderSpecs  # TODO: Not yet implemented
@@ -14,7 +13,6 @@ __all__ = [
     "LayoutConfig",
     "LayoutType",
     "LayoutZone",
-    "DocumentLayouts",
     # "CarouselLayouts",
     # "LayoutRenderer",
     # "RenderSpecs",

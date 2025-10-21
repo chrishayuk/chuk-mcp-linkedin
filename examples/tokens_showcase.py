@@ -454,7 +454,7 @@ layout = LayoutConfig(
 def showcase_all_layouts():
     """Showcase all 11 document layouts with visual representations"""
 
-    from chuk_mcp_linkedin.components.layouts.document_layouts import DocumentLayouts
+    from chuk_mcp_linkedin.documents.layouts import DocumentLayouts
 
     print("=" * 80)
     print("ALL DOCUMENT LAYOUTS (11 TYPES)")

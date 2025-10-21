@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get LinkedIn Member ID</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        button {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #005885;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Get Your LinkedIn Member ID</h1>
+
+        <div id="step1">
+            <h2>Step 1: Get Your Access Token</h2>
+            <p>Paste your LinkedIn access token below:</p>
+            <input type="text" id="accessToken" placeholder="AQVYY6ajcSjbXm3G..." style="width: 100%; padding: 8px;">
+            <br><br>
+            <button onclick="getMemberId()">Get Member ID</button>
+        </div>
+
+        <div id="result" class="result" style="display:none;">
+            <h3>Result:</h3>
+            <div id="resultContent"></div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3>Alternative Method:</h3>
+            <p>1. Go to <a href="https://www.linkedin.com/developers/apps" target="_blank">LinkedIn Developer Apps</a></p>
+            <p>2. Click on your app</p>
+            <p>3. Go to "Auth" tab</p>
+            <p>4. Look for "Test mode" or try the OAuth 2.0 tools</p>
+            <p>5. After authentication, decode the token at <a href="https://jwt.io" target="_blank">jwt.io</a></p>
+        </div>
+    </div>
+
+    <script>
+        async function getMemberId() {
+            const accessToken = document.getElementById('accessToken').value.trim();
+
+            if (!accessToken) {
+                alert('Please enter an access token');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            resultDiv.style.display = 'block';
+            resultContent.innerHTML = '<p>Fetching member ID...</p>';
+
+            // Try userinfo endpoint
+            try {
+                const response = await fetch('https://api.linkedin.com/v2/userinfo', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Response:', data);
+
+                    if (data.sub) {
+                        const memberUrn = `urn:li:member:${data.sub}`;
+                        resultContent.innerHTML = `
+                            <p class="success">✓ Success!</p>
+                            <p><strong>Member ID:</strong> <code>${data.sub}</code></p>
+                            <p><strong>Member URN:</strong> <code>${memberUrn}</code></p>
+                            <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+                            <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+                            <hr>
+                            <p>Add this to your .env file:</p>
+                            <code>LINKEDIN_PERSON_URN=${memberUrn}</code>
+                        `;
+                    } else {
+                        resultContent.innerHTML = `
+                            <p class="error">Response doesn't contain 'sub' field</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                    }
+                } else {
+                    const errorData = await response.json();
+                    resultContent.innerHTML = `
+                        <p class="error">Error ${response.status}: ${errorData.message || 'Unknown error'}</p>
+                        <p>This usually means your access token doesn't have the <code>openid</code> and <code>profile</code> scopes.</p>
+                        <p>Please run the OAuth flow again with these scopes enabled in your LinkedIn app.</p>
+                    `;
+                }
+            } catch (error) {
+                resultContent.innerHTML = `
+                    <p class="error">Error: ${error.message}</p>
+                    <p>CORS might be blocking the request. Try using the manual method below.</p>
+                `;
+            }
+        }
+
+        // Check if we have token in URL (from OAuth callback)
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            if (token) {
+                document.getElementById('accessToken').value = token;
+                getMemberId();
+            }
+        };
+    </script>
+</body>
+</html>

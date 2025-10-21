@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/typography/lists.py
 """
 List components for LinkedIn documents.
 

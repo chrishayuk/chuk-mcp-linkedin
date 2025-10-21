@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/visual_elements/__init__.py
 """
 Visual elements for LinkedIn documents.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/components/typography/headers.py
 """
 Header components for LinkedIn documents.
 

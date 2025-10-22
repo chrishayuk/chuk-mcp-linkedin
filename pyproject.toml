@@ -45,6 +45,15 @@ dev = [
     "ruff>=0.0.285",
     "mypy>=1.5.0",
 ]
+# Document preview dependencies
+# Install with: pip install chuk-mcp-linkedin[preview]
+preview = [
+    "pdf2image>=1.16.3",  # PDF to image conversion (requires poppler)
+    "Pillow>=10.0.0",      # Image manipulation
+    "python-pptx>=0.6.21", # PowerPoint support
+    "python-docx>=1.0.0",  # Word document support
+    "PyPDF2>=3.0.0",       # PDF page counting
+]
 
 [project.urls]
 Homepage = "https://github.com/chrishayuk/chuk-mcp-linkedin"

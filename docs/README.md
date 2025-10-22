@@ -29,6 +29,13 @@ The LinkedIn MCP Design System is a comprehensive framework for creating optimiz
    - Custom theme creation
    - Multi-theme strategies
 
+3. **[Preview System](./PREVIEW.md)** 🆕
+   - HTML preview generation
+   - Document page rendering (PDF, PowerPoint, Word)
+   - Interactive carousel navigation
+   - Analytics dashboard
+   - Installation and usage guide
+
 ### Quick Links
 
 - **[Main README](../README.md)** - Project overview and quick start
@@ -516,6 +523,7 @@ MIT License - See [LICENSE](../LICENSE)
 - **Main README:** [../README.md](../README.md)
 - **Design Tokens:** [TOKENS.md](./TOKENS.md)
 - **Theme System:** [THEMES.md](./THEMES.md)
+- **Preview System:** [PREVIEW.md](./PREVIEW.md)
 - **Examples:** [../examples/complete_example.py](../examples/complete_example.py)
 - **Implementation Status:** [../IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md)
 

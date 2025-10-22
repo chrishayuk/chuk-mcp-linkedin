@@ -635,6 +635,62 @@ class Separator(PostComponent):
         return True
 
 
+class DocumentAttachment(PostComponent):
+    """Document attachment component - reference to existing PDF/PPTX/DOCX file"""
+
+    def __init__(
+        self,
+        filepath: str,
+        title: Optional[str] = None,
+        caption: Optional[str] = None,
+        theme: Optional[Any] = None,
+    ):
+        """
+        Attach an existing document file to the post.
+
+        Args:
+            filepath: Path to PDF, PPTX, or DOCX file
+            title: Document title (defaults to filename)
+            caption: Optional caption text
+        """
+        self.filepath = filepath
+        self.title = title
+        self.caption = caption
+        self.theme = theme
+
+    def render(self, theme: Optional[Any] = None) -> str:
+        """Render document reference for text-only view"""
+        import os
+        from pathlib import Path
+
+        path = Path(self.filepath)
+        title = self.title or path.stem
+        file_ext = path.suffix.upper()
+
+        # For text rendering, show a placeholder
+        emoji = TextTokens.SYMBOLS.get("pin", "📌")
+        lines = []
+        lines.append(f"{emoji} {title}")
+        lines.append(f"   (Attached {file_ext} document)")
+
+        if self.caption:
+            lines.append("")
+            lines.append(self.caption)
+
+        return "\n".join(lines)
+
+    def validate(self) -> bool:
+        """Validate document file exists and is supported format"""
+        from pathlib import Path
+
+        path = Path(self.filepath)
+        if not path.exists():
+            return False
+
+        supported_extensions = ['.pdf', '.ppt', '.pptx', '.doc', '.docx']
+        return path.suffix.lower() in supported_extensions
+
+
 class ComposablePost:
     """Shadcn-style composition for LinkedIn posts"""
 
@@ -798,6 +854,22 @@ class ComposablePost:
     def add_hashtags(self, tags: List[str], placement: str = "end") -> "ComposablePost":
         """Add hashtags"""
         self.components.append(Hashtags(tags, placement, theme=self.theme))
+        return self
+
+    def add_document(
+        self,
+        filepath: str,
+        title: Optional[str] = None,
+        caption: Optional[str] = None
+    ) -> "ComposablePost":
+        """Add document attachment (PDF/PPTX/DOCX file)
+
+        Args:
+            filepath: Path to existing document file
+            title: Document title (defaults to filename)
+            caption: Optional caption for the document
+        """
+        self.components.append(DocumentAttachment(filepath, title, caption, self.theme))
         return self
 
     def compose(self) -> str:

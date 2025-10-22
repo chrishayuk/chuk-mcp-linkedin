@@ -1,10 +1,19 @@
 # chuk-mcp-linkedin
 
-A comprehensive design system MCP server for creating LinkedIn posts with shadcn-inspired component architecture, CVA-style variants, and powerful theming.
+MCP server for LinkedIn content creation and posting with theme-based composition, document API integration, and local HTML previews.
 
 ## Overview
 
-`chuk-mcp-linkedin` brings design system principles to LinkedIn content creation. Create posts using composable components, variants, and themes - similar to modern frontend design systems like shadcn/ui but for social media content.
+`chuk-mcp-linkedin` streamlines LinkedIn posting workflows: compose posts with themes and components, upload existing documents via LinkedIn's API, preview posts locally in authentic LinkedIn UI, and publish to LinkedIn.
+
+**What it does:**
+- ✅ Compose post text with themes and components
+- ✅ Upload existing PDF/PPTX/DOCX to LinkedIn via Documents API
+- ✅ Preview posts locally with authentic LinkedIn UI
+- ✅ Post to LinkedIn API
+
+**What it doesn't do:**
+- ❌ Create PowerPoint/PDF files (use [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx) for that)
 
 ## Features
 
@@ -41,9 +50,37 @@ Based on analysis of 1M+ posts across 9K company pages:
 
 ## Installation
 
+### Basic Installation
+
 ```bash
 pip install chuk-mcp-linkedin
 ```
+
+### With Document Preview Support
+
+For rendering actual document pages (PDF, PowerPoint, Word) in previews:
+
+```bash
+# Install with preview dependencies
+pip install chuk-mcp-linkedin[preview]
+
+# System requirements for PDF support (poppler)
+# macOS
+brew install poppler
+
+# Ubuntu/Debian
+sudo apt-get install poppler-utils
+
+# Windows
+# Download poppler from: https://github.com/oschwartz10612/poppler-windows/releases
+```
+
+The preview dependencies include:
+- `pdf2image` - PDF to image conversion
+- `Pillow` - Image processing
+- `python-pptx` - PowerPoint support
+- `python-docx` - Word document support
+- `PyPDF2` - PDF utilities
 
 ## Quick Start
 
@@ -96,38 +133,44 @@ post.publish(visibility="PUBLIC")
 
 ### Document Post (Highest Engagement)
 
+Document posts have the highest engagement rate (45.85%)! Upload an existing PDF/PPTX/DOCX:
+
 ```python
-from chuk_mcp_linkedin import DocumentPost, ChartComponents
+from chuk_mcp_linkedin.posts import ComposablePost
+from chuk_mcp_linkedin.documents import LinkedInDocumentsAPI, DocumentPostBuilder
+from chuk_mcp_linkedin.themes import ThemeManager
 
-# Create document post
-doc = DocumentPost(
-    commentary="Our Q4 results are in. Here's what we learned 📊",
-    variant="report",
-    theme=theme_mgr.get_theme("data_driven")
+# 1. Compose post text
+theme = theme_mgr.get_theme("data_driven")
+post = ComposablePost("document", theme=theme)
+post.add_hook("stat", "Document posts get 45.85% engagement")
+post.add_body("Our Q4 results are in. Here's what we learned 📊")
+post.add_cta("curiosity", "What's your biggest takeaway?")
+text = post.compose()
+
+# 2. Upload existing document to LinkedIn
+# Note: Create the PDF/PPTX using chuk-mcp-pptx first
+api = LinkedInDocumentsAPI(access_token)
+doc = api.upload_document(
+    "Q4_Report.pdf",  # Your existing PDF
+    owner_urn="urn:li:person:abc123",
+    title="Q4 2024 Results"
 )
 
-# Add slides
-doc.add_slide(
-    layout="title_slide",
-    content={"title": "Q4 2024 Results", "subtitle": "Growth & Insights"}
+# 3. Create post with document attached
+post_data = DocumentPostBuilder.create_document_post(
+    commentary=text,
+    document_urn=doc.urn,
+    document_title="Q4 2024 Results"
 )
 
-# Add metrics with chart
-metrics_chart = ChartComponents.metric_grid(
-    title="Key Metrics",
-    metrics=[
-        {"label": "Revenue", "value": "$1.2M", "trend": "+12%"},
-        {"label": "Customers", "value": "450", "trend": "+25%"},
-    ]
-)
-
-doc.add_slide(
-    layout="content_slide",
-    content={"title": "Q4 Performance", "chart": metrics_chart}
-)
-
-doc.publish()
+# 4. Publish
+from chuk_mcp_linkedin.api import LinkedInClient
+client = LinkedInClient(access_token)
+client.create_post(post_data)
 ```
+
+**Creating PDF/PowerPoint**: Use [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx) to create the actual PDF/PowerPoint files first, then upload them with this MCP.
 
 ### Poll Post (Highest Reach)
 
@@ -188,6 +231,8 @@ Preview your LinkedIn posts locally in a pixel-perfect browser preview before pu
 - Proper text formatting and line breaks
 - Hashtag highlighting
 - "See more" line indicator at 210 characters
+- **Document page rendering** - Actual PDF/PowerPoint/Word pages as images
+- Interactive carousel navigation for multi-page documents
 
 **Analytics Dashboard**:
 - Character and word counts
@@ -196,6 +241,14 @@ Preview your LinkedIn posts locally in a pixel-perfect browser preview before pu
 - Hashtag count analysis (optimal: 3-5)
 - Hook and CTA status indicators
 - Engagement optimization tips
+
+**Document Preview** (with `[preview]` dependencies):
+- Converts PDF pages to images (exactly like LinkedIn does)
+- Renders PowerPoint slides as carousel
+- Displays Word document pages
+- Smart caching - converts once, reuses on subsequent previews
+- LinkedIn-style carousel with navigation controls
+- Page counter and indicators
 
 ### Python API
 
@@ -211,6 +264,56 @@ draft = manager.create_draft("My Post", "text")
 # Generate HTML preview - opens automatically in browser
 preview_path = manager.generate_html_preview(draft.draft_id)
 ```
+
+#### Preview with Document Attachments
+
+```python
+from chuk_mcp_linkedin.posts import ComposablePost
+from chuk_mcp_linkedin.preview import LinkedInPreview
+from chuk_mcp_linkedin.themes import ThemeManager
+
+# Create post with document
+theme_mgr = ThemeManager()
+theme = theme_mgr.get_theme("thought_leader")
+
+post = ComposablePost("document", theme=theme)
+post.add_hook("question", "How do you share detailed insights?")
+post.add_body("PDFs are perfect for sharing research and frameworks.")
+post.add_cta("curiosity", "What's your preferred format?")
+post.add_hashtags(["ContentStrategy", "ThoughtLeadership"])
+
+# Compose text
+text = post.compose()
+
+# Create draft with document attachment
+draft_data = {
+    "name": "Q4 Strategy Report",
+    "post_type": "document",
+    "content": {
+        "composed_text": text,
+        "document_file": {
+            "filename": "strategy.pdf",
+            "filepath": "/path/to/strategy.pdf",
+            "title": "Q4 Strategy Framework",
+            "pages": 12,
+            "file_type": "pdf"
+        }
+    },
+    "theme": theme.name
+}
+
+# Generate preview with actual rendered pages
+html_preview = LinkedInPreview.generate_html(draft_data)
+preview_path = LinkedInPreview.save_preview(html_preview, ".linkedin_drafts/previews/my_post.html")
+
+# Preview opens with:
+# - Your post text
+# - Interactive carousel showing each PDF page as an image
+# - Navigation controls (prev/next, page indicators)
+# - Just like LinkedIn's actual document post preview!
+```
+
+**Note**: The preview system converts PDF/PPTX/DOCX pages to images (just like LinkedIn does). Create the actual documents using [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx), then preview them here.
 
 ### Quick Preview CLI
 
@@ -587,33 +690,40 @@ The following component categories are defined in `__init__.py` files but implem
 
 ## Architecture
 
+Clean, focused architecture with clear separation of concerns:
+
 ```
 src/chuk_mcp_linkedin/
-├── components/
-│   ├── visual_elements/      # ✅ 38 variants (Dividers, Badges, Backgrounds, Borders, Shapes)
-│   ├── layouts/              # ✅ 11 document layouts + base system
-│   ├── typography/           # ⚠️ Placeholder (__init__.py only)
-│   ├── data_viz/             # ⚠️ Placeholder (__init__.py only)
-│   ├── content_blocks/       # ⚠️ Placeholder (__init__.py only)
-│   ├── media/                # ⚠️ Placeholder (__init__.py only)
-│   ├── interactive/          # ⚠️ Placeholder (__init__.py only)
-│   └── component_renderer.py # ✅ Renders visual elements to HTML
-├── tokens/                   # ✅ 4 token systems (Design, Text, Engagement, Structure)
-├── themes/                   # Theme system
-├── variants.py               # Variant system
-├── composition.py            # Composition patterns
-├── registry.py               # Component registry
-├── manager.py                # Draft management
-├── preview.py                # ✅ HTML preview generator
-└── server.py                 # MCP server
+├── /preview/                      # Post preview generation
+│   ├── __init__.py               # Exports: LinkedInPreview
+│   ├── post_preview.py           # Generate HTML previews of posts
+│   └── /utils/
+│       └── document_converter.py # Convert docs to images for preview
+│
+├── /documents/                    # LinkedIn Documents API
+│   ├── __init__.py               # Exports: API classes, attachment helpers
+│   ├── api.py                    # Upload documents to LinkedIn
+│   └── attachment.py             # Attach documents to posts
+│
+├── /posts/                        # Post text composition
+│   ├── __init__.py
+│   ├── composition.py            # ComposablePost
+│   └── /components/              # Hook, Body, CTA, Hashtags
+│
+├── /components/                   # HTML rendering helpers (shared)
+│   ├── component_renderer.py    # Simple HTML rendering
+│   ├── /visual_elements/         # Badges, callouts, etc.
+│   └── /data_viz/                # Charts, metrics
+│
+├── /themes/                       # Post themes and tone
+├── /api/                          # LinkedIn API client
+├── /utils/                        # Shared utilities
+└── server.py                      # MCP server
 
-preview_post.py               # ✅ Quick CLI preview utility
-examples/
-├── tokens_showcase.py        # ✅ Token system demonstration
-├── components_showcase.py    # ✅ Visual components demonstration
-├── preview_example.py        # ✅ Preview system example
-└── complete_example.py       # Comprehensive usage examples
+preview_post.py                    # Quick CLI preview utility
 ```
+
+**See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.**
 
 ## Development
 

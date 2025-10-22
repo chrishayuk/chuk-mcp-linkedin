@@ -1,264 +1,251 @@
-# LinkedIn Design System - Examples
+# LinkedIn MCP Server Examples
 
-Comprehensive examples demonstrating the complete design system with interactive HTML rendering.
+Clean, focused examples demonstrating core functionality of the LinkedIn MCP Server.
 
-## Quick Start
+## Available Examples
 
-```bash
-# Generate interactive HTML showcase of all components
-python examples/comprehensive_showcase.py
-# Opens: ~/.linkedin_drafts/previews/comprehensive_showcase.html
+### 1. **Complete Component Showcase** ⭐
 
-# Show design tokens with visual examples
-python examples/tokens_showcase.py
-
-# Create and preview a LinkedIn post
-python examples/preview_example.py
-
-# Complete usage example
-python examples/complete_example.py
-```
-
-## Examples
-
-### 1. Comprehensive Showcase (`comprehensive_showcase.py`) ⭐
-
-**The main showcase** - Interactive HTML rendering of all 91+ component variants
-
-**Generates:** `~/.linkedin_drafts/previews/comprehensive_showcase.html` (51KB)
-
-**Includes:**
-- **Visual Elements (38 variants)**
-  - Dividers (6 types)
-  - Badges (7 types)
-  - Borders (8 types)
-  - Shapes (9 types)
-  - Backgrounds (8 types)
-
-- **Typography (31 variants)**
-  - Headers (7 types)
-  - Body Text (7 types)
-  - Captions (6 types)
-  - Quotes (4 types)
-  - Lists (7 types)
-
-- **Data Visualization (22 variants)**
-  - Charts (8 types)
-  - Metrics (5 types)
-  - Progress (5 types)
-  - Tables (5 types)
-  - Infographics (6 types)
+#### `showcase_all_components.py`
+**THE MAIN SHOWCASE** - Interactive HTML previews of EVERY post component.
 
 **Features:**
-- ✅ Fully rendered HTML components
-- ✅ Interactive browser preview
-- ✅ Professional showcase styling
-- ✅ Grouped by category
-- ✅ Descriptive explanations
-- ✅ All components use design tokens
+- **Post Structure:** Hook, Body, CTA, Hashtags, Separator
+- **Charts:** Bar, Metrics, Comparison, Progress, Ranking (5 types)
+- **Features:** Quote, BigStat, Timeline, KeyTakeaway, ProCon (5 types)
+- **Combined Examples:** Multiple components in real-world posts
+- Generates 13 HTML previews
+- LinkedIn-style formatting
+- Opens in browser
 
 **Run:**
 ```bash
-python examples/comprehensive_showcase.py
-# Automatically generates HTML and shows path
-# Open the file in your browser to view
+python examples/showcase_all_components.py
 ```
 
-**Preview:**
-```html
-Component Showcase - Complete Library
+**Output:** Saves 13 HTML files to `~/.linkedin_drafts/previews/showcase/`
 
-TYPOGRAPHY COMPONENTS
-└─ Headers
-   ├─ H1 - Display Header (72pt, 900 weight)
-   ├─ H2 - Large Header (56pt)
-   └─ Eyebrow Text (18pt uppercase)
-
-DATA VISUALIZATION COMPONENTS
-└─ Charts
-   ├─ Bar Chart (with value labels)
-   ├─ Pie Chart (proportional segments)
-   └─ Line Chart (smooth curves)
-```
-
-### 2. Tokens Showcase (`tokens_showcase.py`)
-
-**Shows:** Design token system with visual examples
-
-**Includes:**
-- Typography tokens (font sizes, weights, line heights)
-- Color schemes (LinkedIn brand, semantic colors)
-- Spacing tokens (gaps, padding, safe areas)
-- Layout properties (border radius, shadows)
-- LinkedIn 2025 optimizations
-- All 11 document layout types
-
-**Run:**
-```bash
-python examples/tokens_showcase.py
-```
-
-**Output:**
-```
-TYPOGRAPHY TOKENS - VISUAL RENDERING
-  TINY (14pt)     ← Too small for mobile ✗
-  SMALL (18pt)    ← Minimum for mobile ✓
-  BODY (24pt)     ← Standard text
-  LARGE (32pt)    ← Lead text
-  TITLE (56pt)    ← Headers
-  HERO (120pt)    ← Big numbers
-  MASSIVE (200pt) ← Huge stats
-```
-
-### 3. Preview Example (`preview_example.py`)
-
-**Shows:** End-to-end LinkedIn post creation and HTML preview
-
-**Includes:**
-- Creating posts with LinkedInManager
-- Content composition with themes
-- HTML preview generation
-- Auto-opening in browser
-
-**Run:**
-```bash
-python examples/preview_example.py
-# Creates a post and opens preview in browser
-```
-
-### 4. Complete Example (`complete_example.py`)
-
-**Shows:** Complete usage of all system features
-
-**Run:**
-```bash
-python examples/complete_example.py
-```
-
-## Component System Architecture
-
-```
-src/chuk_mcp_linkedin/
-├── tokens/                      # Design tokens
-│   ├── design_tokens.py         # Visual design (typography, colors, spacing)
-│   ├── text_tokens.py           # Content formatting rules
-│   ├── engagement_tokens.py     # Algorithm optimization
-│   └── structure_tokens.py      # Content structure patterns
-│
-├── components/                  # Component library
-│   ├── layouts/                 # 11 document layouts
-│   │   └── document_layouts.py
-│   ├── visual_elements/         # 38 visual components
-│   │   ├── dividers.py
-│   │   ├── badges.py
-│   │   ├── borders.py
-│   │   ├── shapes.py
-│   │   └── backgrounds.py
-│   ├── typography/              # 31 typography components
-│   │   ├── headers.py
-│   │   ├── body_text.py
-│   │   ├── captions.py
-│   │   ├── quotes.py
-│   │   └── lists.py
-│   └── data_viz/                # 22 data viz components
-│       ├── charts.py
-│       ├── metrics.py
-│       ├── progress.py
-│       ├── tables.py
-│       └── infographics.py
-│
-├── renderer.py                  # HTML component renderer
-└── preview.py                   # LinkedIn post previewer
-```
-
-## System Completion Status
-
-| Category | Components | Status |
-|----------|------------|--------|
-| **Layouts** | 11 layouts | ✅ 100% |
-| **Visual Elements** | 38 variants | ✅ 100% |
-| **Typography** | 31 variants | ✅ 100% |
-| **Data Visualization** | 22 variants | ✅ 100% |
-| **Content Blocks** | 10 planned | ⏳ Phase 2 |
-| **Media** | 4 planned | ⏳ Phase 2 |
-| **Interactive** | 3 planned | ⏳ Phase 3 |
-
-**Current:** 68/85 components (80% complete)
-
-## Token-Based Design
-
-All components reference design tokens for consistency:
-
-```python
-# Typography
-from chuk_mcp_linkedin.tokens.design_tokens import DesignTokens
-
-font_size = DesignTokens.get_font_size('title')      # 56pt
-font_weight = DesignTokens.TYPOGRAPHY['weights']['bold']  # 700
-
-# Colors
-color = DesignTokens.get_color('minimal', 'accent')  # #0A66C2
-success = DesignTokens.COLORS['semantic']['success'] # #057642
-
-# Spacing
-gap = DesignTokens.get_spacing('gaps', 'large')      # 40px
-padding = DesignTokens.SPACING['padding']['normal']  # 40px
-```
-
-## Usage Example
-
-```python
-from chuk_mcp_linkedin.components.typography import Headers, Lists
-from chuk_mcp_linkedin.components.data_viz import Charts, Metrics
-from chuk_mcp_linkedin.renderer import ShowcaseRenderer
-
-# Create components
-title = Headers.h2("Q4 2024 Results")
-chart = Charts.bar_chart([
-    {"label": "Q1", "value": 100},
-    {"label": "Q2", "value": 150},
-])
-metric = Metrics.metric_card(
-    label="Revenue",
-    value="$1.2M",
-    change=12.5
-)
-
-# Render to HTML
-sections = [{
-    "title": "Performance Dashboard",
-    "components": [
-        {"name": "Title", "component": title},
-        {"name": "Growth Chart", "component": chart},
-        {"name": "Revenue Metric", "component": metric},
-    ]
-}]
-
-html = ShowcaseRenderer.create_showcase_page(
-    title="My Dashboard",
-    sections=sections
-)
-```
-
-## LinkedIn 2025 Optimizations
-
-All components follow LinkedIn's 2025 best practices:
-
-✅ **Mobile-First:** 18pt minimum font size
-✅ **Document Posts:** 45.85% engagement (highest format)
-✅ **Character Limits:** 3000 max, 300-800 optimal
-✅ **Hashtags:** 3-5 optimal
-✅ **Visual Hierarchy:** Token-based typography scale
-✅ **Accessibility:** WCAG compliant contrast ratios
-✅ **Responsive:** Works on all LinkedIn platforms
-
-## Next Steps
-
-1. **Explore:** Run `comprehensive_showcase.py` to see all components
-2. **Build:** Use components in your LinkedIn content
-3. **Extend:** Add Phase 2 components (Content Blocks, Media)
-4. **Share:** Export designs as HTML previews
+This is the best place to start to see everything the system can do!
 
 ---
 
-**Total System:** 11 layouts + 91 component variants + complete token system = Production-ready LinkedIn design system
+### 2. **Charts & Data Visualization**
+
+#### `demo_atomic_charts.py`
+Terminal output demonstration of all chart components with Pydantic validation.
+
+**Features:**
+- Bar charts with colored emoji squares
+- Metrics charts with ✅/❌ indicators
+- Comparison charts (A vs B)
+- Progress bars (0-100%)
+- Ranking charts with medals
+- Combined charts in one post
+- Pydantic data validation examples
+
+**Run:**
+```bash
+python examples/demo_atomic_charts.py
+```
+
+#### `demo_charts_preview.py`
+Interactive HTML previews of all chart and feature components.
+
+**Features:**
+- All chart types with LinkedIn-style previews
+- Feature components (Quote, BigStat, Timeline, KeyTakeaway, ProCon)
+- Combined components example
+- Opens previews in browser
+- Interactive preview selection
+
+**Run:**
+```bash
+python examples/demo_charts_preview.py
+```
+
+### 3. **Media Attachments**
+
+#### `showcase_media_types.py`
+Demonstrates different media types in LinkedIn posts.
+
+**Features:**
+- Single image posts
+- Multiple images (2-4 grid layout)
+- Video posts with thumbnails
+- PDF document attachments
+- PowerPoint presentations
+- Interactive HTML previews
+
+**Run:**
+```bash
+python examples/showcase_media_types.py
+```
+
+### 4. **Documents**
+
+#### `demo_document_page_preview.py`
+Shows document-to-image conversion for preview (like LinkedIn does).
+
+**Features:**
+- PDF pages rendered as images
+- PowerPoint slides rendered as images
+- Interactive carousel navigation
+- Cached conversions for performance
+- Requires: `pip install chuk-mcp-linkedin[preview]`
+
+**Run:**
+```bash
+python examples/demo_document_page_preview.py
+```
+
+**Requirements:**
+- Install preview dependencies: `pip install chuk-mcp-linkedin[preview]`
+- Install poppler: `brew install poppler` (macOS) or `sudo apt-get install poppler-utils` (Ubuntu)
+
+#### `demo_document_upload_and_attach.py`
+Complete workflow for LinkedIn's Documents API.
+
+**Features:**
+- Document validation (size, format, pages)
+- Upload documents to LinkedIn API
+- Get document URNs
+- Create posts with document attachments
+- Integration with ComposablePost
+
+**Run:**
+```bash
+python examples/demo_document_upload_and_attach.py
+```
+
+**Note:** Requires LinkedIn API credentials to actually upload. Example shows the structure.
+
+## Quick Start
+
+### Install Dependencies
+
+**Core functionality:**
+```bash
+pip install chuk-mcp-linkedin
+```
+
+**With preview support:**
+```bash
+pip install "chuk-mcp-linkedin[preview]"
+brew install poppler  # macOS only, for PDF support
+```
+
+### Run Any Example
+
+```bash
+# From the project root
+python examples/demo_charts_preview.py
+
+# Or from examples directory
+cd examples
+python demo_charts_preview.py
+```
+
+## Example Categories
+
+### Complete Showcase ⭐
+- `showcase_all_components.py` - **START HERE** - Every component with HTML preview
+
+### Charts & Visualization
+- `demo_atomic_charts.py` - Terminal output with validation
+- `demo_charts_preview.py` - HTML previews in browser
+
+### Media Types
+- `showcase_media_types.py` - Images, videos, documents
+
+### Documents
+- `demo_document_page_preview.py` - Document rendering
+- `demo_document_upload_and_attach.py` - LinkedIn API workflow
+
+## Output Locations
+
+Examples save previews to:
+- **HTML previews:** `~/.linkedin_drafts/previews/`
+- **Document cache:** `~/.linkedin_drafts/document_cache/`
+
+## Common Patterns
+
+### Create a Post with Charts
+
+```python
+from chuk_mcp_linkedin.posts import ComposablePost
+
+post = ComposablePost("text")
+post.add_hook("stat", "📊 Data-Driven Insights")
+post.add_bar_chart(
+    data={"Q1": 100, "Q2": 150, "Q3": 200},
+    title="QUARTERLY GROWTH",
+    unit="customers"
+)
+post.add_cta("curiosity", "What's your growth rate?")
+post.add_hashtags(["Data", "Growth"])
+
+text = post.compose()
+```
+
+### Generate HTML Preview
+
+```python
+from chuk_mcp_linkedin.preview import LinkedInPreview
+
+draft_data = {
+    "name": "My Post",
+    "post_type": "text",
+    "content": {"composed_text": text}
+}
+
+html = LinkedInPreview.generate_html(draft_data)
+preview_path = LinkedInPreview.save_preview(html, "my_post.html")
+```
+
+### Upload Document to LinkedIn
+
+```python
+from chuk_mcp_linkedin.api import LinkedInDocumentsAPI, DocumentPostBuilder
+
+# Upload document
+api = LinkedInDocumentsAPI(access_token)
+doc = api.upload_document(
+    "report.pdf",
+    owner_urn="urn:li:person:abc123",
+    title="Q4 Report"
+)
+
+# Create post with document
+post = DocumentPostBuilder.create_document_post(
+    commentary="Check out our Q4 results!",
+    document_urn=doc.urn,
+    document_title="Q4 Performance Report"
+)
+```
+
+## Testing Examples
+
+All examples are self-contained and can be run independently. They use test files from:
+```
+/test_files/
+  ├── test_image_1.png
+  ├── test_document.pdf
+  └── test_presentation.pptx
+```
+
+## Need Help?
+
+- **Documentation:** `/docs/ARCHITECTURE.md`
+- **API Reference:** `/docs/README.md`
+- **Issues:** https://github.com/chrishayuk/chuk-mcp-linkedin/issues
+
+## Example Output
+
+All examples provide clear terminal output and/or open HTML previews in your browser:
+
+- ✅ Chart examples show formatted text output
+- 🌐 Preview examples open HTML in browser
+- 📊 Document examples show conversion progress
+- 🔗 API examples show workflow structure
+
+Happy posting! 🚀

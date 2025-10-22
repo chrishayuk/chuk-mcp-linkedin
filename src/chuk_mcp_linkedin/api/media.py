@@ -300,54 +300,13 @@ class MediaAPIMixin:
             except httpx.HTTPError as e:
                 raise LinkedInAPIError(f"HTTP error during video finalization: {str(e)}")
 
-            # Step 4: Wait for video processing (poll status)
+            # Step 4: Wait for video processing
+            # LinkedIn processes videos asynchronously after finalization
+            # For small videos, this usually takes 5-15 seconds
+            # We'll wait a reasonable amount of time before proceeding
             import asyncio
-            max_wait = 60  # Wait up to 60 seconds
-            wait_interval = 2  # Check every 2 seconds
+            wait_time = 10  # Wait 10 seconds for processing
 
-            try:
-                for attempt in range(max_wait // wait_interval):
-                    # Get video status
-                    video_id = video_urn.split(":")[-1]
-                    status_url = f"https://api.linkedin.com/rest/videos/{video_id}"
-
-                    status_response = await client.get(
-                        status_url,
-                        headers=self._get_headers(use_rest_api=True),
-                        timeout=10.0
-                    )
-
-                    if status_response.status_code == 200:
-                        status_data = status_response.json()
-                        status = status_data.get("status", "UNKNOWN")
-
-                        # DEBUG: Print status
-                        import sys
-                        print(f"  Video status check {attempt + 1}: {status}", file=sys.stderr, flush=True)
-
-                        if status == "AVAILABLE":
-                            # Video is ready!
-                            break
-                        elif status == "PROCESSING_FAILED":
-                            raise LinkedInAPIError("Video processing failed on LinkedIn")
-                        # Status is PROCESSING, keep waiting
-                    else:
-                        # DEBUG: Print response
-                        import sys
-                        print(f"  Status check failed: {status_response.status_code} - {status_response.text}", file=sys.stderr, flush=True)
-
-                    await asyncio.sleep(wait_interval)
-                else:
-                    # Timed out waiting for video
-                    raise LinkedInAPIError(
-                        f"Video upload timed out after {max_wait} seconds. "
-                        f"Video may still be processing. URN: {video_urn}"
-                    )
-
-            except httpx.HTTPError as e:
-                # Don't fail if status check fails - video might still work
-                import sys
-                print(f"  Status check error: {str(e)}", file=sys.stderr, flush=True)
-                pass
+            await asyncio.sleep(wait_time)
 
         return video_urn

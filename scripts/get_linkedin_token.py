@@ -11,7 +11,6 @@ Usage:
     4. Your access token will be saved to .env
 """
 
-import os
 import sys
 import webbrowser
 from urllib.parse import urlencode, parse_qs, urlparse
@@ -24,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import config
 
+
 class OAuthCallbackHandler(BaseHTTPRequestHandler):
     """Handle OAuth callback"""
 
@@ -34,32 +34,36 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
         # Parse the callback URL
         query = parse_qs(urlparse(self.path).query)
 
-        if 'code' in query:
-            OAuthCallbackHandler.auth_code = query['code'][0]
+        if "code" in query:
+            OAuthCallbackHandler.auth_code = query["code"][0]
             self.send_response(200)
-            self.send_header('Content-type', 'text/html')
+            self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(b"""
+            self.wfile.write(
+                b"""
                 <html>
                 <body>
                     <h1>Authorization Successful!</h1>
                     <p>You can close this window and return to the terminal.</p>
                 </body>
                 </html>
-            """)
-        elif 'error' in query:
-            error = query['error'][0]
+            """
+            )
+        elif "error" in query:
+            error = query["error"][0]
             self.send_response(400)
-            self.send_header('Content-type', 'text/html')
+            self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(f"""
+            self.wfile.write(
+                f"""
                 <html>
                 <body>
                     <h1>Authorization Failed</h1>
                     <p>Error: {error}</p>
                 </body>
                 </html>
-            """.encode())
+            """.encode()
+            )
         else:
             self.send_response(400)
             self.end_headers()
@@ -80,7 +84,10 @@ def get_linkedin_token():
         print("  LINKEDIN_CLIENT_SECRET=your_actual_client_secret")
         return None
 
-    if not config.linkedin_client_secret or config.linkedin_client_secret == "your_client_secret_here":
+    if (
+        not config.linkedin_client_secret
+        or config.linkedin_client_secret == "your_client_secret_here"
+    ):
         print("❌ Error: LINKEDIN_CLIENT_SECRET not set in .env")
         return None
 
@@ -104,7 +111,7 @@ def get_linkedin_token():
         "client_id": config.linkedin_client_id,
         "redirect_uri": redirect_uri,
         "scope": scope,
-        "state": "random_state_string_123"  # Should be random in production
+        "state": "random_state_string_123",  # Should be random in production
     }
 
     auth_url = f"{authorization_base_url}?{urlencode(auth_params)}"
@@ -114,7 +121,7 @@ def get_linkedin_token():
     print()
 
     # Start local server to receive callback
-    server = HTTPServer(('localhost', 8000), OAuthCallbackHandler)
+    server = HTTPServer(("localhost", 8000), OAuthCallbackHandler)
 
     # Open browser
     webbrowser.open(auth_url)
@@ -149,7 +156,7 @@ def get_linkedin_token():
             response = client.post(
                 token_url,
                 data=token_data,
-                headers={"Content-Type": "application/x-www-form-urlencoded"}
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
 
             if response.status_code == 200:
@@ -157,7 +164,7 @@ def get_linkedin_token():
                 access_token = token_response.get("access_token")
                 expires_in = token_response.get("expires_in", "unknown")
 
-                print(f"✓ Access token received!")
+                print("✓ Access token received!")
                 print(f"  Token: {access_token[:20]}...")
                 print(f"  Expires in: {expires_in} seconds")
                 print()
@@ -176,8 +183,8 @@ def get_linkedin_token():
                     return access_token
                 else:
                     print("⚠️  Could not get person URN automatically")
-                    print(f"   Please add manually to .env:")
-                    print(f"   LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID")
+                    print("   Please add manually to .env:")
+                    print("   LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID")
                     print()
                     save_to_env(access_token, None)
                     return access_token
@@ -197,9 +204,7 @@ def get_person_urn(access_token):
         with httpx.Client() as client:
             response = client.get(
                 "https://api.linkedin.com/v2/userinfo",
-                headers={
-                    "Authorization": f"Bearer {access_token}"
-                }
+                headers={"Authorization": f"Bearer {access_token}"},
             )
 
             if response.status_code == 200:
@@ -222,7 +227,7 @@ def save_to_env(access_token, person_urn=None):
     try:
         # Read existing .env
         if env_path.exists():
-            with open(env_path, 'r') as f:
+            with open(env_path, "r") as f:
                 lines = f.readlines()
         else:
             lines = []
@@ -233,23 +238,23 @@ def save_to_env(access_token, person_urn=None):
         urn_updated = False
 
         for line in lines:
-            if line.startswith('LINKEDIN_ACCESS_TOKEN='):
-                new_lines.append(f'LINKEDIN_ACCESS_TOKEN={access_token}\n')
+            if line.startswith("LINKEDIN_ACCESS_TOKEN="):
+                new_lines.append(f"LINKEDIN_ACCESS_TOKEN={access_token}\n")
                 token_updated = True
-            elif line.startswith('LINKEDIN_PERSON_URN=') and person_urn:
-                new_lines.append(f'LINKEDIN_PERSON_URN={person_urn}\n')
+            elif line.startswith("LINKEDIN_PERSON_URN=") and person_urn:
+                new_lines.append(f"LINKEDIN_PERSON_URN={person_urn}\n")
                 urn_updated = True
             else:
                 new_lines.append(line)
 
         # Add if not found
         if not token_updated:
-            new_lines.append(f'LINKEDIN_ACCESS_TOKEN={access_token}\n')
+            new_lines.append(f"LINKEDIN_ACCESS_TOKEN={access_token}\n")
         if person_urn and not urn_updated:
-            new_lines.append(f'LINKEDIN_PERSON_URN={person_urn}\n')
+            new_lines.append(f"LINKEDIN_PERSON_URN={person_urn}\n")
 
         # Write back
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.writelines(new_lines)
 
         print("✓ Credentials saved to .env")
@@ -261,7 +266,7 @@ def save_to_env(access_token, person_urn=None):
 
     except Exception as e:
         print(f"❌ Error saving to .env: {e}")
-        print(f"\nPlease manually add to .env:")
+        print("\nPlease manually add to .env:")
         print(f"LINKEDIN_ACCESS_TOKEN={access_token}")
         if person_urn:
             print(f"LINKEDIN_PERSON_URN={person_urn}")

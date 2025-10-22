@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/tools/publishing_tools.py
 """
 Publishing tools for LinkedIn API integration.
 

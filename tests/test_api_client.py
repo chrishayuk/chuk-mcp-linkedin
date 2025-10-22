@@ -5,6 +5,7 @@ Tests the API client configuration and structure without making real API calls.
 """
 
 import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInConfig, LinkedInAPIError
 
 
@@ -273,5 +274,75 @@ class TestLinkedInConfigMethods:
         assert "LINKEDIN_PERSON_URN" in missing
 
 
-# Note: Async connection tests skipped due to test framework setup complexity
-# The client.test_connection() method is tested through integration tests
+class TestLinkedInClientConnection:
+    """Test LinkedIn client connection testing"""
+
+    @pytest.mark.asyncio
+    async def test_connection_success(self):
+        """Test successful connection"""
+        config = LinkedInConfig(
+            linkedin_access_token="test_token",
+            linkedin_person_urn="urn:li:person:test123",
+        )
+        client = LinkedInClient(config=config)
+
+        with patch("httpx.AsyncClient") as mock_client_class:
+            mock_client = AsyncMock()
+            mock_response = MagicMock()
+            mock_response.status_code = 200
+            mock_client.get = AsyncMock(return_value=mock_response)
+            mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client.__aexit__ = AsyncMock(return_value=None)
+            mock_client_class.return_value = mock_client
+
+            result = await client.test_connection()
+            assert result is True
+
+    @pytest.mark.asyncio
+    async def test_connection_no_token(self):
+        """Test connection fails without token"""
+        config = LinkedInConfig(linkedin_access_token=None)
+        client = LinkedInClient(config=config)
+
+        result = await client.test_connection()
+        assert result is False
+
+    @pytest.mark.asyncio
+    async def test_connection_http_error(self):
+        """Test connection fails on HTTP error"""
+        config = LinkedInConfig(
+            linkedin_access_token="test_token",
+            linkedin_person_urn="urn:li:person:test123",
+        )
+        client = LinkedInClient(config=config)
+
+        with patch("httpx.AsyncClient") as mock_client_class:
+            mock_client = AsyncMock()
+            mock_response = MagicMock()
+            mock_response.status_code = 401
+            mock_client.get = AsyncMock(return_value=mock_response)
+            mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client.__aexit__ = AsyncMock(return_value=None)
+            mock_client_class.return_value = mock_client
+
+            result = await client.test_connection()
+            assert result is False
+
+    @pytest.mark.asyncio
+    async def test_connection_exception(self):
+        """Test connection fails on exception"""
+        config = LinkedInConfig(
+            linkedin_access_token="test_token",
+            linkedin_person_urn="urn:li:person:test123",
+        )
+        client = LinkedInClient(config=config)
+
+        with patch("httpx.AsyncClient") as mock_client_class:
+            mock_client = AsyncMock()
+            mock_client.get = AsyncMock(side_effect=Exception("Connection error"))
+            mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client.__aexit__ = AsyncMock(return_value=None)
+            mock_client_class.return_value = mock_client
+
+            result = await client.test_connection()
+            assert result is False

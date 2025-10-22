@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/preview/post_preview.py
 """
 LinkedIn post preview generator.
 
@@ -569,7 +570,6 @@ class LinkedInPreview:
     @staticmethod
     def _render_video(video: Dict[str, Any]) -> str:
         """Render video attachment with placeholder"""
-        title = video.get("title", "Video")
         duration = video.get("duration", "0:00")
         thumbnail = video.get("thumbnail", "")
 
@@ -957,8 +957,6 @@ class LinkedInPreview:
             last_newline = preview_text.rfind("\n")
             if last_newline > 150:  # If there's a newline reasonably close
                 preview_text = preview_text[:last_newline]
-
-            rest_text = text[len(preview_text) :]
 
             # Trim trailing whitespace/newlines from preview_text to reduce gap before "see more"
             preview_text = preview_text.rstrip()

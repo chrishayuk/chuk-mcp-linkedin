@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/data_viz/comparison_chart.py
 """
 Side-by-side A vs B comparison chart component.
 

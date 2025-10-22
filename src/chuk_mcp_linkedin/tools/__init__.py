@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/tools/__init__.py
 """
 MCP tools for LinkedIn post management.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/tools/registry_tools.py
 """
 Component registry and information tools.
 

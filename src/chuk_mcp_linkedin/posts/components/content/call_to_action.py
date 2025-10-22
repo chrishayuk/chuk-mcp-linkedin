@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/content/call_to_action.py
 """
 Call-to-action component for LinkedIn posts.
 

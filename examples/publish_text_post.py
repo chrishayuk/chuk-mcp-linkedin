@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
-from chuk_mcp_linkedin.composition import ComposablePost
+from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.themes.theme_manager import ThemeManager
 
 

@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
-from chuk_mcp_linkedin.composition import ComposablePost
+from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.themes.theme_manager import ThemeManager
 
 
@@ -128,7 +128,7 @@ LinkedIn converts each page to an interactive carousel.""",
         if post_id:
             # Format: urn:li:share:123456 or activity:123456
             if ":" in post_id:
-                activity_id = post_id.split(":")[-1]
+                _ = post_id.split(":")[-1]  # activity_id extracted but not used
                 post_url = f"https://www.linkedin.com/feed/update/{post_id}"
                 print(f"  URL: {post_url}")
 

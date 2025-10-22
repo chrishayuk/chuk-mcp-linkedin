@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from chuk_mcp_linkedin.api import LinkedInClient, config
+from chuk_mcp_linkedin.api import config
 import httpx
 
 
@@ -37,15 +37,11 @@ async def try_post():
             "lifecycleState": "PUBLISHED",
             "specificContent": {
                 "com.linkedin.ugc.ShareContent": {
-                    "shareCommentary": {
-                        "text": test_text
-                    },
-                    "shareMediaCategory": "NONE"
+                    "shareCommentary": {"text": test_text},
+                    "shareMediaCategory": "NONE",
                 }
             },
-            "visibility": {
-                "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-            }
+            "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"},
         }
 
         url = "https://api.linkedin.com/v2/ugcPosts"
@@ -58,9 +54,9 @@ async def try_post():
                     headers={
                         "Authorization": f"Bearer {config.linkedin_access_token}",
                         "Content-Type": "application/json",
-                        "X-Restli-Protocol-Version": "2.0.0"
+                        "X-Restli-Protocol-Version": "2.0.0",
                     },
-                    timeout=30.0
+                    timeout=30.0,
                 )
 
                 print(f"  Status: {response.status_code}")
@@ -70,7 +66,7 @@ async def try_post():
                     result = response.json()
                     print(f"  Response: {result}")
                     print()
-                    print(f"Add this to .env:")
+                    print("Add this to .env:")
                     print(f"LINKEDIN_PERSON_URN={urn}")
                     return
                 else:

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/themes/__init__.py
 """
 Theme system for LinkedIn posts.
 

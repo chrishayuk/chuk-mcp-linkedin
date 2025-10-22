@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/data_viz/bar_chart.py
 """
 Horizontal bar chart component using colored emoji squares.
 

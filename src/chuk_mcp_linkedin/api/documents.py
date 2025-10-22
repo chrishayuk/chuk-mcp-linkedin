@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/api/documents.py
 """
 LinkedIn Documents API operations.
 

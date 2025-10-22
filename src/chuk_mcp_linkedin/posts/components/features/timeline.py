@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/timeline.py
 """
 Timeline/step component for LinkedIn posts.
 

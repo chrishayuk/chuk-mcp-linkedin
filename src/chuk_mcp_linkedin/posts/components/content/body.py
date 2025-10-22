@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/content/body.py
 """
 Main content body component for LinkedIn posts.
 

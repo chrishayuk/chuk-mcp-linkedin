@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # LinkedIn MCP Server - STDIO mode (default)
+  linkedin-mcp-stdio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chuk-mcp-linkedin:latest
+    container_name: linkedin-mcp-stdio
+    command: ["linkedin-mcp", "stdio", "--debug"]
+    environment:
+      - MCP_SERVER_MODE=stdio
+      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      # Mount .env file for credentials
+      - ./.env:/app/.env:ro
+      # Mount drafts directory for persistence
+      - ./.linkedin_drafts:/app/.linkedin_drafts
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    profiles:
+      - stdio
+    networks:
+      - mcp-network
+
+  # LinkedIn MCP Server - HTTP mode (alternative)
+  linkedin-mcp-http:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chuk-mcp-linkedin:latest
+    container_name: linkedin-mcp-http
+    command: ["linkedin-mcp", "http", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      - MCP_SERVER_MODE=http
+      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - PORT=8000
+    ports:
+      - "${HTTP_PORT:-8000}:8000"
+    volumes:
+      # Mount .env file for credentials
+      - ./.env:/app/.env:ro
+      # Mount drafts directory for persistence
+      - ./.linkedin_drafts:/app/.linkedin_drafts
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    profiles:
+      - http
+    networks:
+      - mcp-network
+
+  # Development mode - with source code mounted
+  linkedin-mcp-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: chuk-mcp-linkedin:dev
+    container_name: linkedin-mcp-dev
+    command: ["linkedin-mcp", "stdio", "--debug"]
+    environment:
+      - MCP_SERVER_MODE=stdio
+      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - DEBUG=1
+      - PYTHONPATH=/app/src
+    volumes:
+      # Mount entire source code for development
+      - ./src:/app/src
+      - ./.env:/app/.env:ro
+      - ./.linkedin_drafts:/app/.linkedin_drafts
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    profiles:
+      - dev
+    networks:
+      - mcp-network
+
+  # Auto mode - detects best transport
+  linkedin-mcp-auto:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chuk-mcp-linkedin:latest
+    container_name: linkedin-mcp-auto
+    command: ["linkedin-mcp", "auto", "--http-port", "8000"]
+    environment:
+      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - MCP_STDIO=${MCP_STDIO:-}
+      - MCP_HTTP=${MCP_HTTP:-}
+    ports:
+      - "${HTTP_PORT:-8000}:8000"
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./.linkedin_drafts:/app/.linkedin_drafts
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    profiles:
+      - auto
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    name: mcp-network
+    driver: bridge
+
+# Volumes for persistent data
+volumes:
+  linkedin-drafts:
+    driver: local

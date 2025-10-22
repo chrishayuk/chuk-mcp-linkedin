@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/models/chart_models.py
 """
 Pydantic models for chart component data structures.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/data_viz/rankings_chart.py
 """
 Ranked list chart component with medals and numbers.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/layout/seperator.py
 """
 Visual separator component for LinkedIn posts.
 

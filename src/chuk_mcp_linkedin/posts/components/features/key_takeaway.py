@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/key_takeaway.py
 """
 Key takeaway/insight box component for LinkedIn posts.
 

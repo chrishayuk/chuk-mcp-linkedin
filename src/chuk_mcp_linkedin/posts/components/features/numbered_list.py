@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/numbered_list.py
 """
 Numbered list component for ordered content.
 

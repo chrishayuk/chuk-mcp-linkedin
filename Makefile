@@ -21,7 +21,7 @@ NC := \033[0m # No Color
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help install dev clean test lint format typecheck coverage security audit docs serve-docs build deploy all ci quality examples check
+.PHONY: help install dev clean test lint format typecheck coverage security audit docs serve-docs build deploy all ci quality examples check docker pre-commit hooks
 
 ## General Commands ------------------------------------------------
 
@@ -206,11 +206,97 @@ publish: build ## Publish to PyPI
 
 ## CI/CD ----------------------------------------------------------
 
-ci: install dev check ## Run full CI pipeline
+ci: ## Run full CI pipeline locally
+	@echo "$(BLUE)Running CI pipeline...$(NC)"
+	@$(MAKE) clean
+	@$(MAKE) install
+	@$(MAKE) dev
+	@$(MAKE) quality
+	@$(MAKE) test
+	@$(MAKE) coverage
 	@echo "$(GREEN)✓ CI pipeline complete$(NC)"
 
-pre-commit: format lint test-fast ## Run pre-commit checks
+ci-quick: ## Quick CI check (no coverage)
+	@echo "$(BLUE)Running quick CI check...$(NC)"
+	@$(MAKE) quality
+	@$(MAKE) test-fast
+	@echo "$(GREEN)✓ Quick CI check complete$(NC)"
+
+## Git Hooks -------------------------------------------------------
+
+hooks-install: ## Install pre-commit hooks
+	@echo "$(BLUE)Installing pre-commit hooks...$(NC)"
+	@$(PYTHON) -m pip install pre-commit
+	@pre-commit install
+	@echo "$(GREEN)✓ Pre-commit hooks installed$(NC)"
+
+hooks-uninstall: ## Uninstall pre-commit hooks
+	@echo "$(BLUE)Uninstalling pre-commit hooks...$(NC)"
+	@pre-commit uninstall
+	@echo "$(GREEN)✓ Pre-commit hooks uninstalled$(NC)"
+
+hooks-run: ## Run pre-commit hooks on all files
+	@echo "$(BLUE)Running pre-commit hooks...$(NC)"
+	@pre-commit run --all-files
+	@echo "$(GREEN)✓ Pre-commit hooks complete$(NC)"
+
+hooks-update: ## Update pre-commit hooks to latest versions
+	@echo "$(BLUE)Updating pre-commit hooks...$(NC)"
+	@pre-commit autoupdate
+	@echo "$(GREEN)✓ Pre-commit hooks updated$(NC)"
+
+pre-commit: format lint test-fast ## Run pre-commit checks manually
 	@echo "$(GREEN)✓ Pre-commit checks passed$(NC)"
+
+## Docker ---------------------------------------------------------
+
+docker-build: ## Build Docker image
+	@echo "$(BLUE)Building Docker image...$(NC)"
+	@docker build -t chuk-mcp-linkedin:latest .
+	@echo "$(GREEN)✓ Docker image built$(NC)"
+
+docker-build-dev: ## Build Docker image for development
+	@echo "$(BLUE)Building development Docker image...$(NC)"
+	@docker build -t chuk-mcp-linkedin:dev --target builder .
+	@echo "$(GREEN)✓ Development Docker image built$(NC)"
+
+docker-run-stdio: ## Run Docker container in stdio mode
+	@echo "$(BLUE)Running Docker container (stdio mode)...$(NC)"
+	@docker-compose --profile stdio up -d
+	@echo "$(GREEN)✓ Container started$(NC)"
+
+docker-run-http: ## Run Docker container in HTTP mode
+	@echo "$(BLUE)Running Docker container (HTTP mode)...$(NC)"
+	@docker-compose --profile http up -d
+	@echo "$(GREEN)✓ Container started on http://localhost:8000$(NC)"
+
+docker-run-dev: ## Run Docker container in development mode
+	@echo "$(BLUE)Running Docker container (dev mode)...$(NC)"
+	@docker-compose --profile dev up -d
+	@echo "$(GREEN)✓ Development container started$(NC)"
+
+docker-stop: ## Stop Docker containers
+	@echo "$(BLUE)Stopping Docker containers...$(NC)"
+	@docker-compose down
+	@echo "$(GREEN)✓ Containers stopped$(NC)"
+
+docker-logs: ## View Docker container logs
+	@docker-compose logs -f
+
+docker-shell: ## Open shell in running container
+	@echo "$(BLUE)Opening shell in container...$(NC)"
+	@docker-compose exec linkedin-mcp-stdio /bin/bash
+
+docker-clean: ## Remove Docker images and containers
+	@echo "$(BLUE)Cleaning Docker resources...$(NC)"
+	@docker-compose down -v --remove-orphans
+	@docker rmi chuk-mcp-linkedin:latest chuk-mcp-linkedin:dev 2>/dev/null || true
+	@echo "$(GREEN)✓ Docker cleanup complete$(NC)"
+
+docker-test: docker-build ## Build and test Docker image
+	@echo "$(BLUE)Testing Docker image...$(NC)"
+	@docker run --rm chuk-mcp-linkedin:latest python -c "import chuk_mcp_linkedin; print('✓ Import successful')"
+	@echo "$(GREEN)✓ Docker image test passed$(NC)"
 
 ## Development Workflow -------------------------------------------
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/data_viz/metrics_chart.py
 """
 Key metrics chart component with emoji indicators.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/content/hashtags.py
 """
 Hashtag component for LinkedIn posts.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/models/content_models.py
 """
 Pydantic models for content component data structures.
 

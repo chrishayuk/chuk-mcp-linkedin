@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/preview/__init__.py
 """
 LinkedIn Post Preview System.
 
@@ -38,5 +39,6 @@ Note: This is for PREVIEW only. To:
 """
 
 from .post_preview import LinkedInPreview
+from .artifact_preview import ArtifactPreviewManager, get_artifact_manager
 
-__all__ = ["LinkedInPreview"]
+__all__ = ["LinkedInPreview", "ArtifactPreviewManager", "get_artifact_manager"]

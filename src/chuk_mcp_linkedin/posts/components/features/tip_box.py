@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/tip_box.py
 """
 Tip/Note box component for highlighting important information.
 

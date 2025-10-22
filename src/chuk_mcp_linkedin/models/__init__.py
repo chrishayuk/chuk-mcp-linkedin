@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/models/__init__.py
 """
 Pydantic models for type-safe data structures.
 """

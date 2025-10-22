@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/api/posts.py
 """
 LinkedIn Posts API operations.
 

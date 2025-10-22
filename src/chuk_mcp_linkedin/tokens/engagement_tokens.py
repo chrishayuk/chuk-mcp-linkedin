@@ -1,4 +1,4 @@
-# src/chuk_mcp_linkedin/engagement_tokens.py
+# src/chuk_mcp_linkedin/tokens/engagement_tokens.py
 """
 Engagement pattern tokens for LinkedIn posts.
 

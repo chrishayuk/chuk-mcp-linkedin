@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/api/__init__.py
 """
 LinkedIn API integration module.
 

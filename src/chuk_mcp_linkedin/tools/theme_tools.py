@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/tools/theme_tools.py
 """
 Theme and variant management tools.
 

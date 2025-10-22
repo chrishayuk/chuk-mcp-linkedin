@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/quote.py
 """
 Quote/testimonial component for LinkedIn posts.
 

@@ -77,7 +77,7 @@ The `[preview]` dependencies include:
 ### Preview Your First Post (60 seconds)
 
 ```python
-from chuk_mcp_linkedin.composition import ComposablePost
+from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.preview import LinkedInPreview
 from chuk_mcp_linkedin.themes import ThemeManager
 
@@ -136,7 +136,7 @@ python preview_post.py --list
 Text posts include the post text, hashtags, and engagement analytics.
 
 ```python
-from chuk_mcp_linkedin.composition import ComposablePost
+from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.preview import LinkedInPreview
 
 post = ComposablePost("text")
@@ -165,7 +165,7 @@ Document posts render actual PDF, PowerPoint, or Word pages as images in an inte
 
 ```python
 from pathlib import Path
-from chuk_mcp_linkedin.composition import ComposablePost
+from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.preview import LinkedInPreview
 from chuk_mcp_linkedin.utils.document_converter import DocumentConverter
 

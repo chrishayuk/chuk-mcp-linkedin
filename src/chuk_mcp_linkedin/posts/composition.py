@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/composition.py
 """
 Composition system for building LinkedIn posts from components.
 

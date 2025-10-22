@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/checklist.py
 """
 Checklist component for action items and tasks.
 

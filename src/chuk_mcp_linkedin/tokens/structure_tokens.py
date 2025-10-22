@@ -1,4 +1,4 @@
-# src/chuk_mcp_linkedin/structure_tokens.py
+# src/chuk_mcp_linkedin/tokens/structure_tokens.py
 """
 Content structure tokens for LinkedIn posts.
 

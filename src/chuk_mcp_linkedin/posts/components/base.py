@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/base.py
 """
 Base component class for all LinkedIn post components.
 """

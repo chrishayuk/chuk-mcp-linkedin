@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/layout/__init__.py
 """
 Layout components for LinkedIn posts.
 

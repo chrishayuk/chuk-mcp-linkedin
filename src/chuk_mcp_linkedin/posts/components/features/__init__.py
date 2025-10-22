@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/__init__.py
 """
 Feature components for LinkedIn posts.
 

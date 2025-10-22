@@ -44,7 +44,7 @@ final_text = post.compose()
 """
 
 from .manager import LinkedInManager, Draft
-from .composition import ComposablePost, PostBuilder, Hook, Body, CallToAction, Hashtags
+from .posts import ComposablePost, PostBuilder, Hook, Body, CallToAction, Hashtags
 from .themes.theme_manager import ThemeManager, LinkedInTheme, THEMES
 from .registry import ComponentRegistry
 from .variants import PostVariants, VariantResolver

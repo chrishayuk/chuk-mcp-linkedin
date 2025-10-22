@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/stats_grid.py
 """
 Stats grid component for displaying multiple statistics.
 

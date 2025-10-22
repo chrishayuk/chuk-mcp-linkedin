@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/preview/component_renderer.py
 """
 Component Renderer - Converts components to HTML/CSS.
 

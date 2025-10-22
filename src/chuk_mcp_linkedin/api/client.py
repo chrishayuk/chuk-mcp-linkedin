@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/api/client.py
 """
 LinkedIn API base client.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/api/config.py
 """
 Configuration management for LinkedIn MCP server.
 

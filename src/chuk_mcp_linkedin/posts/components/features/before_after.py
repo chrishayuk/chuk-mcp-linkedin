@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/before_after.py
 """
 Before/After comparison component for transformations.
 

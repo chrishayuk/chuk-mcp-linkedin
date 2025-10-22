@@ -1,207 +1,123 @@
-# chuk-mcp-linkedin
+# LinkedIn MCP Server
 
-MCP server for LinkedIn content creation and posting with theme-based composition, document API integration, and local HTML previews.
+<div align="center">
+
+**Design system MCP server for creating high-performing LinkedIn content**
+
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-green.svg)](https://modelcontextprotocol.io)
+
+[Features](#features) •
+[Quick Start](#quick-start) •
+[Installation](#installation) •
+[Documentation](#documentation) •
+[Examples](#examples)
+
+</div>
+
+---
 
 ## Overview
 
-`chuk-mcp-linkedin` streamlines LinkedIn posting workflows: compose posts with themes and components, upload existing documents via LinkedIn's API, preview posts locally in authentic LinkedIn UI, and publish to LinkedIn.
+A professional Model Context Protocol (MCP) server for LinkedIn content creation, featuring a shadcn-inspired component system, 10 performance-tuned themes, and data-driven optimization based on 1M+ post analysis.
 
 **What it does:**
-- ✅ Compose post text with themes and components
-- ✅ Upload existing PDF/PPTX/DOCX to LinkedIn via Documents API
-- ✅ Preview posts locally with authentic LinkedIn UI
-- ✅ Post to LinkedIn API
+- ✅ Compose posts with theme-based components and variants
+- ✅ Upload documents (PDF/PPTX/DOCX) via LinkedIn API
+- ✅ Preview posts with session-isolated artifact storage
+- ✅ Publish and schedule posts to LinkedIn
+- ✅ Optimize content using 2025 performance data
+- ✅ Generate secure, time-limited preview URLs
 
 **What it doesn't do:**
 - ❌ Create PowerPoint/PDF files (use [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx) for that)
 
 ## Features
 
-- **Local Preview System**: Generate pixel-perfect HTML previews of posts before publishing
-  - LinkedIn-style UI rendering
-  - Real-time analytics and optimization tips
-  - "See more" line visualization at 210 characters
-  - Browser-based preview with CLI utility
-- **Component-Based Architecture**: 13+ specialized post types (text, document, poll, video, carousel, etc.)
-- **Variant System**: CVA-inspired variants with compound variant support
-- **Theme System**: 10 pre-built themes (thought leader, storyteller, community builder, etc.)
-- **Composition Patterns**: Build complex posts from subcomponents (hooks, body, CTA, hashtags)
-- **Design Tokens**: Research-backed tokens for engagement, formatting, and timing
-- **2025 Performance Data**: Built-in optimization based on 1M+ post analysis
-- **MCP Integration**: Full Model Context Protocol support for LLM workflows
+### 🎨 Design System Architecture
+- **Component-based composition** - Build posts from reusable components (Hook, Body, CTA, Hashtags)
+- **CVA-inspired variants** - Type-safe variants with compound variant support
+- **10 pre-built themes** - Thought Leader, Data Driven, Storyteller, and more
+- **Design tokens** - Centralized styling system for consistency
+- **Shadcn philosophy** - Copy, paste, and own your components
 
-## 2025 LinkedIn Performance Insights
+### 📊 Data-Driven Optimization
+Based on 2025 analysis of 1M+ posts across 9K company pages:
+- **Document posts**: 45.85% engagement (highest format)
+- **Poll posts**: 200%+ higher reach (most underused)
+- **Video posts**: 1.4x engagement, 69% growth
+- **Optimal timing**: Tuesday-Thursday, 7-9 AM
+- **First 210 chars**: Critical hook window before "see more"
 
-Based on analysis of 1M+ posts across 9K company pages:
+### 🖥️ Preview & Artifact System
+- **Pixel-perfect LinkedIn UI** - Authentic post card rendering
+- **Real-time analytics** - Character counts, engagement predictions
+- **Document rendering** - PDF/PPTX pages as images (like LinkedIn)
+- **Session isolation** - Secure, session-based draft storage
+- **Artifact storage** - Multiple backends (memory, S3, IBM COS)
+- **Presigned URLs** - Time-limited, secure preview URLs
 
-### Top Performing Formats
-1. **Document Posts (PDF)** - 45.85% engagement rate (HIGHEST)
-2. **Poll Posts** - 200%+ higher reach (MOST UNDERUSED)
-3. **Video Posts** - 1.4x engagement (rising fast)
-4. **Image Posts** - 2x more comments than text
-5. **Carousel Posts** - Declining (keep to 5-10 slides)
+### 🚀 Professional CLI
+- **Multiple modes**: STDIO (Claude Desktop), HTTP (API), Auto-detect
+- **Debug logging**: Built-in logging and error handling
+- **Docker support**: Multi-stage builds, security hardened
+- **Entry points**: `linkedin-mcp` and `linkedin-mcp-server` commands
 
-### Key Insights
-- Polls achieve highest reach but are least used (opportunity!)
-- Document posts dominate engagement (carousel's successor)
-- Video usage up 69%, vertical format preferred
-- First 210 characters critical (before "see more")
-- First hour engagement determines algorithmic reach
-
-## Installation
-
-### Basic Installation
-
-```bash
-pip install chuk-mcp-linkedin
-```
-
-### With Document Preview Support
-
-For rendering actual document pages (PDF, PowerPoint, Word) in previews:
-
-```bash
-# Install with preview dependencies
-pip install chuk-mcp-linkedin[preview]
-
-# System requirements for PDF support (poppler)
-# macOS
-brew install poppler
-
-# Ubuntu/Debian
-sudo apt-get install poppler-utils
-
-# Windows
-# Download poppler from: https://github.com/oschwartz10612/poppler-windows/releases
-```
-
-The preview dependencies include:
-- `pdf2image` - PDF to image conversion
-- `Pillow` - Image processing
-- `python-pptx` - PowerPoint support
-- `python-docx` - Word document support
-- `PyPDF2` - PDF utilities
+### 🔧 Developer Experience
+- **94% test coverage** - 958 tests passing
+- **CI/CD ready** - GitHub Actions, pre-commit hooks
+- **Type-safe** - Full MyPy type annotations
+- **Well-documented** - Extensive docs and examples
 
 ## Quick Start
 
-### Preview Your First Post (60 seconds)
+### 1. Installation
 
 ```bash
-# 1. Try the preview example
-python examples/preview_example.py
+# Basic installation
+pip install chuk-mcp-linkedin
 
-# 2. Browser opens automatically showing your LinkedIn post preview
-#    with analytics and optimization tips
+# With HTTP server support
+pip install chuk-mcp-linkedin[http]
 
-# 3. Edit and preview your own drafts
-python preview_post.py --list    # See all drafts
-python preview_post.py           # Preview current draft
+# With document preview support
+pip install chuk-mcp-linkedin[preview]
+
+# For development
+pip install chuk-mcp-linkedin[dev]
 ```
 
-### Simple Text Post
+### 2. Run the Server
 
-```python
-from chuk_mcp_linkedin import LinkedInManager, ThemeManager
+```bash
+# STDIO mode (for Claude Desktop)
+linkedin-mcp stdio
 
-# Initialize
-manager = LinkedInManager()
-theme_mgr = ThemeManager()
+# HTTP mode (API server)
+linkedin-mcp http --port 8000
 
-# Create thought leadership post
-theme = theme_mgr.get_theme("thought_leader")
+# Auto-detect mode
+linkedin-mcp auto
 
-post = manager.create_text_post(
-    commentary="""80% of B2B decision makers prefer thought leadership content over ads.
-
-Yet most companies just promote.
-
-Here's what actually works:
-
-→ Lead with insights, not products
-→ Share frameworks, not features
-→ Tell stories, not sales pitches
-→ Build trust, not transactions
-
-The algorithm rewards value.""",
-    variant="insight",
-    tone="professional",
-    theme=theme
-)
-
-post.publish(visibility="PUBLIC")
+# With debug logging
+linkedin-mcp stdio --debug
 ```
 
-### Document Post (Highest Engagement)
-
-Document posts have the highest engagement rate (45.85%)! Upload an existing PDF/PPTX/DOCX:
+### 3. Create Your First Post
 
 ```python
 from chuk_mcp_linkedin.posts import ComposablePost
-from chuk_mcp_linkedin.documents import LinkedInDocumentsAPI, DocumentPostBuilder
 from chuk_mcp_linkedin.themes import ThemeManager
 
-# 1. Compose post text
-theme = theme_mgr.get_theme("data_driven")
-post = ComposablePost("document", theme=theme)
-post.add_hook("stat", "Document posts get 45.85% engagement")
-post.add_body("Our Q4 results are in. Here's what we learned 📊")
-post.add_cta("curiosity", "What's your biggest takeaway?")
-text = post.compose()
+# Get a theme
+theme = ThemeManager().get_theme("thought_leader")
 
-# 2. Upload existing document to LinkedIn
-# Note: Create the PDF/PPTX using chuk-mcp-pptx first
-api = LinkedInDocumentsAPI(access_token)
-doc = api.upload_document(
-    "Q4_Report.pdf",  # Your existing PDF
-    owner_urn="urn:li:person:abc123",
-    title="Q4 2024 Results"
-)
-
-# 3. Create post with document attached
-post_data = DocumentPostBuilder.create_document_post(
-    commentary=text,
-    document_urn=doc.urn,
-    document_title="Q4 2024 Results"
-)
-
-# 4. Publish
-from chuk_mcp_linkedin.api import LinkedInClient
-client = LinkedInClient(access_token)
-client.create_post(post_data)
-```
-
-**Creating PDF/PowerPoint**: Use [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx) to create the actual PDF/PowerPoint files first, then upload them with this MCP.
-
-### Poll Post (Highest Reach)
-
-```python
-# Create poll (200%+ higher reach!)
-poll = manager.create_poll_post(
-    commentary="Quick question for my network:\n\nWhat's your biggest LinkedIn challenge in 2025?",
-    question="Pick your top challenge:",
-    options=[
-        "Creating consistent content",
-        "Growing engagement",
-        "Converting leads",
-        "Building community"
-    ],
-    duration_days=3,
-    purpose="research",
-    theme=theme_mgr.get_theme("community_builder")
-)
-
-poll.publish()
-```
-
-### Composition Pattern (Advanced)
-
-```python
-from chuk_mcp_linkedin import ComposablePost
-
-# Build post using composition
-post = (ComposablePost("text", theme=theme)
-    .add_hook("stat", "95% of LinkedIn posts get zero comments")
-    .add_body("""
+# Compose a post
+post = ComposablePost("text", theme=theme)
+post.add_hook("stat", "95% of LinkedIn posts get zero comments")
+post.add_body("""
 Here's why (and how to fix it):
 
 Most posts lack these 3 elements:
@@ -212,581 +128,708 @@ Most posts lack these 3 elements:
 
 Start treating posts like conversations, not broadcasts.
 """, structure="listicle")
-    .add_cta("curiosity", "What's your biggest LinkedIn frustration?")
-    .add_hashtags(["LinkedInTips", "ContentStrategy"])
-    .optimize_for_engagement()
-    .compose())
+post.add_cta("curiosity", "What's your biggest LinkedIn frustration?")
+post.add_hashtags(["LinkedInTips", "ContentStrategy"])
 
-manager.publish_text(post)
+# Get the composed text
+text = post.compose()
+print(text)
 ```
 
-## Local Preview System
+## Installation
 
-Preview your LinkedIn posts locally in a pixel-perfect browser preview before publishing. See exactly how your post will appear on LinkedIn with real-time analytics and optimization recommendations.
+### Prerequisites
 
-### Features
+- Python 3.11 or higher
+- LinkedIn API access token ([get one here](https://www.linkedin.com/developers/))
 
-**Visual Preview**:
-- Authentic LinkedIn post card styling (avatar, header, actions)
-- Proper text formatting and line breaks
-- Hashtag highlighting
-- "See more" line indicator at 210 characters
-- **Document page rendering** - Actual PDF/PowerPoint/Word pages as images
-- Interactive carousel navigation for multi-page documents
+### Basic Installation
 
-**Analytics Dashboard**:
-- Character and word counts
-- Characters remaining (3000 max)
-- Optimal length indicators (warnings for too short/long)
-- Hashtag count analysis (optimal: 3-5)
-- Hook and CTA status indicators
-- Engagement optimization tips
+```bash
+pip install chuk-mcp-linkedin
+```
 
-**Document Preview** (with `[preview]` dependencies):
-- Converts PDF pages to images (exactly like LinkedIn does)
-- Renders PowerPoint slides as carousel
-- Displays Word document pages
-- Smart caching - converts once, reuses on subsequent previews
-- LinkedIn-style carousel with navigation controls
-- Page counter and indicators
+### Optional Dependencies
+
+**HTTP Server Mode:**
+```bash
+pip install chuk-mcp-linkedin[http]
+# Includes: uvicorn, starlette
+```
+
+**Document Preview:**
+```bash
+pip install chuk-mcp-linkedin[preview]
+# Includes: pdf2image, Pillow, python-pptx, python-docx, PyPDF2
+
+# Also requires poppler for PDF support:
+# macOS:
+brew install poppler
+
+# Ubuntu/Debian:
+sudo apt-get install poppler-utils
+```
+
+**Development:**
+```bash
+pip install chuk-mcp-linkedin[dev]
+# Includes: pytest, black, ruff, mypy, pre-commit
+```
+
+### From Source
+
+```bash
+git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
+cd chuk-mcp-linkedin
+uv pip install -e ".[dev,http,preview]"
+```
+
+## Usage
+
+### CLI Commands
+
+```bash
+# Get help
+linkedin-mcp --help
+
+# STDIO mode (for Claude Desktop)
+linkedin-mcp stdio
+
+# HTTP mode (API server on port 8000)
+linkedin-mcp http --host 0.0.0.0 --port 8000
+
+# Auto-detect best mode
+linkedin-mcp auto
+
+# Enable debug logging
+linkedin-mcp stdio --debug --log-level DEBUG
+```
 
 ### Python API
 
-```python
-from chuk_mcp_linkedin import LinkedInManager
-
-manager = LinkedInManager()
-
-# Create and compose your post
-draft = manager.create_draft("My Post", "text")
-# ... add content ...
-
-# Generate HTML preview - opens automatically in browser
-preview_path = manager.generate_html_preview(draft.draft_id)
-```
-
-#### Preview with Document Attachments
+#### Simple Text Post
 
 ```python
 from chuk_mcp_linkedin.posts import ComposablePost
-from chuk_mcp_linkedin.preview import LinkedInPreview
 from chuk_mcp_linkedin.themes import ThemeManager
 
-# Create post with document
+# Get theme
 theme_mgr = ThemeManager()
 theme = theme_mgr.get_theme("thought_leader")
 
-post = ComposablePost("document", theme=theme)
-post.add_hook("question", "How do you share detailed insights?")
-post.add_body("PDFs are perfect for sharing research and frameworks.")
-post.add_cta("curiosity", "What's your preferred format?")
-post.add_hashtags(["ContentStrategy", "ThoughtLeadership"])
+# Create post
+post = ComposablePost("text", theme=theme)
+post.add_hook("question", "What drives innovation in 2025?")
+post.add_body("Innovation comes from diverse perspectives...", structure="linear")
+post.add_cta("direct", "Share your thoughts!")
 
-# Compose text
-text = post.compose()
-
-# Create draft with document attachment
-draft_data = {
-    "name": "Q4 Strategy Report",
-    "post_type": "document",
-    "content": {
-        "composed_text": text,
-        "document_file": {
-            "filename": "strategy.pdf",
-            "filepath": "/path/to/strategy.pdf",
-            "title": "Q4 Strategy Framework",
-            "pages": 12,
-            "file_type": "pdf"
-        }
-    },
-    "theme": theme.name
-}
-
-# Generate preview with actual rendered pages
-html_preview = LinkedInPreview.generate_html(draft_data)
-preview_path = LinkedInPreview.save_preview(html_preview, ".linkedin_drafts/previews/my_post.html")
-
-# Preview opens with:
-# - Your post text
-# - Interactive carousel showing each PDF page as an image
-# - Navigation controls (prev/next, page indicators)
-# - Just like LinkedIn's actual document post preview!
+# Compose final text
+final_text = post.compose()
 ```
 
-**Note**: The preview system converts PDF/PPTX/DOCX pages to images (just like LinkedIn does). Create the actual documents using [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx), then preview them here.
+#### Document Post (Highest Engagement)
 
-### Quick Preview CLI
+Document posts have 45.85% engagement rate - the highest format in 2025!
 
-The fastest way to preview posts:
+```python
+from chuk_mcp_linkedin.api import LinkedInClient
+from chuk_mcp_linkedin.posts import ComposablePost
 
+# 1. Compose post text
+post = ComposablePost("document", theme=theme)
+post.add_hook("stat", "Document posts get 45.85% engagement")
+post.add_body("Our Q4 results are in. Here's what we learned 📊")
+post.add_cta("curiosity", "What's your biggest takeaway?")
+text = post.compose()
+
+# 2. Upload document to LinkedIn
+client = LinkedInClient(access_token="your_token")
+doc_urn = client.upload_document(
+    file_path="Q4_Report.pdf",
+    owner_urn="urn:li:person:abc123",
+    title="Q4 2024 Results"
+)
+
+# 3. Create post with document
+client.create_document_post(
+    commentary=text,
+    document_urn=doc_urn,
+    visibility="PUBLIC"
+)
+```
+
+#### Poll Post (Highest Reach)
+
+Polls get 200%+ higher reach than average posts!
+
+```python
+# Create poll
+post = ComposablePost("poll", theme=theme)
+post.add_hook("question", "Quick question for my network:")
+post.add_body("What's your biggest LinkedIn challenge in 2025?")
+
+# Note: Actual poll creation uses LinkedIn API
+# This creates the post text; poll options go via API
+```
+
+### Preview System
+
+Preview your posts locally before publishing:
+
+```python
+from chuk_mcp_linkedin.manager import LinkedInManager
+
+manager = LinkedInManager()
+
+# Create draft
+draft = manager.create_draft("My Post", "text")
+# ... compose post ...
+
+# Generate HTML preview (auto-opens in browser)
+preview_path = manager.generate_html_preview(draft.draft_id)
+```
+
+**CLI Preview:**
 ```bash
-# Preview current draft (auto-opens in browser)
+# Preview current draft
 python preview_post.py
 
 # Preview specific draft
 python preview_post.py draft_id_here
 
-# List all available drafts
+# List all drafts
 python preview_post.py --list
 ```
 
-### MCP Tool
+### Session Management & Artifact Storage
+
+The server includes enterprise-grade session management and artifact storage powered by [`chuk-artifacts`](https://github.com/chrishayuk/chuk-artifacts):
+
+**Features:**
+- 🔒 **Session isolation** - Each session only sees their own drafts
+- 📦 **Artifact storage** - Secure, session-based storage with grid architecture
+- 🔗 **Presigned URLs** - Time-limited, secure preview URLs
+- ☁️ **Multiple backends** - Memory, filesystem, S3, IBM Cloud Object Storage
+- 🧹 **Auto cleanup** - Automatic expiration of old previews
+
+#### Session-Based Drafts
 
 ```python
-# Via MCP server
-linkedin_preview_html(open_browser=True)
+from chuk_mcp_linkedin.manager import LinkedInManager
+
+# Create manager with session ID
+manager = LinkedInManager(
+    session_id="user_alice",
+    use_artifacts=True,
+    artifact_provider="memory"  # or "filesystem", "s3", "ibm-cos"
+)
+
+# Drafts are automatically locked to this session
+draft = manager.create_draft("My Post", "text")
+
+# Only this session can access the draft
+accessible = manager.is_draft_accessible(draft.draft_id)  # True for "user_alice"
+
+# Different session cannot access
+other_manager = LinkedInManager(session_id="user_bob")
+accessible = other_manager.is_draft_accessible(draft.draft_id)  # False
 ```
 
-**Preview Output**: All previews are saved to `.linkedin_drafts/previews/` as standalone HTML files you can share or archive.
+#### Artifact-Based Previews
 
-**Live Editing Workflow**: Keep the preview open in your browser and run the preview command again after edits to see changes instantly.
+Generate secure preview URLs with automatic expiration:
 
-## Component System
+```python
+from chuk_mcp_linkedin.preview import get_artifact_manager
 
-### Post Types
+# Initialize artifact manager
+async with await get_artifact_manager(provider="memory") as artifacts:
+    # Create session
+    session_id = artifacts.create_session(user_id="alice")
 
-- `TextPost` - Simple text updates with variants (story, insight, question, listicle, hot_take)
-- `DocumentPost` - PDF carousels (highest engagement format in 2025)
-- `PollPost` - Polls for engagement (highest reach - 200%+ above average)
-- `VideoPost` - Video content (1.4x engagement)
-- `CarouselPost` - Multi-image storytelling (keep under 10 slides)
-- `ImagePost` - Single image posts
-- `StoryPost` - Personal narratives with emotional arc
-- `ArticlePost` - Link sharing with commentary
-- Plus: `BehindTheScenesPost`, `HumorPost`, `AnnouncementPost`, `EventPost`, `ThoughtLeadershipPost`
+    # Store preview
+    artifact_id = await artifacts.store_preview(
+        html_content="<html>...</html>",
+        draft_id="draft_123",
+        draft_name="My Post",
+        session_id=session_id
+    )
 
-### Subcomponents
+    # Generate presigned URL (expires in 1 hour)
+    url = await artifacts.get_preview_url(
+        artifact_id=artifact_id,
+        session_id=session_id,
+        expires_in=3600
+    )
 
-- `Hook` - Opening hooks (question, stat, story, controversy, list, curiosity)
-- `Body` - Main content with structures (linear, listicle, framework, story_arc, comparison)
-- `CallToAction` - Engagement drivers (direct, curiosity, action, share, soft)
-- `Hashtags` - Hashtag strategies (minimal, optimal, branded, trending)
+    print(f"Preview URL: {url}")
+```
 
-### Themes
+#### MCP Tool: linkedin_preview_url
+
+The `linkedin_preview_url` tool generates session-isolated preview URLs:
+
+```python
+# Via MCP tool
+{
+    "tool": "linkedin_preview_url",
+    "arguments": {
+        "draft_id": "draft_123",           # Optional, uses current if not provided
+        "session_id": "user_alice",        # Optional, generates new session if not provided
+        "provider": "memory",              # Storage backend: memory, filesystem, s3, ibm-cos
+        "expires_in": 3600                 # URL expiration in seconds (default: 1 hour)
+    }
+}
+```
+
+**Response:**
+```
+Preview URL: http://artifacts.example.com/preview/abc123?expires=...
+
+Session ID: user_alice
+Artifact ID: abc123
+Expires in: 3600 seconds
+
+This URL is session-isolated and will expire automatically.
+```
+
+#### Storage Providers
+
+Configure storage backend based on your needs:
+
+**Memory (Default):**
+```python
+# Fast, ephemeral storage for development
+manager = LinkedInManager(use_artifacts=True, artifact_provider="memory")
+```
+
+**Filesystem:**
+```python
+# Persistent storage on disk
+manager = LinkedInManager(use_artifacts=True, artifact_provider="filesystem")
+# Stores in: .artifacts/linkedin-drafts/
+```
+
+**S3:**
+```bash
+# Configure via environment variables
+export ARTIFACT_PROVIDER=s3
+export ARTIFACT_S3_BUCKET=my-linkedin-artifacts
+export ARTIFACT_S3_REGION=us-east-1
+export AWS_ACCESS_KEY_ID=your_key
+export AWS_SECRET_ACCESS_KEY=your_secret
+```
+
+```python
+from chuk_artifacts.config import configure_s3
+
+# Or configure programmatically
+configure_s3(
+    bucket="my-linkedin-artifacts",
+    region="us-east-1",
+    access_key="your_key",
+    secret_key="your_secret"
+)
+
+manager = LinkedInManager(use_artifacts=True, artifact_provider="s3")
+```
+
+**IBM Cloud Object Storage:**
+```python
+from chuk_artifacts.config import configure_ibm_cos
+
+configure_ibm_cos(
+    bucket="my-linkedin-artifacts",
+    endpoint="https://s3.us-south.cloud-object-storage.appdomain.cloud",
+    access_key="your_key",
+    secret_key="your_secret"
+)
+```
+
+#### Grid Architecture
+
+Artifacts use a hierarchical grid structure:
+
+```
+grid/
+├── {sandbox_id}/              # "linkedin-mcp"
+│   ├── {session_id}/          # "user_alice"
+│   │   ├── {artifact_id}/     # "abc123"
+│   │   │   ├── metadata.json
+│   │   │   └── content
+│   │   └── {artifact_id}/
+│   └── {session_id}/
+└── {sandbox_id}/
+```
+
+This ensures:
+- ✅ Session isolation (users can't access each other's artifacts)
+- ✅ Multi-tenant support (different sandboxes)
+- ✅ Scalable storage (efficient organization)
+- ✅ Easy cleanup (delete by session or sandbox)
+
+#### Local Development
+
+For local development without cloud storage:
+
+```python
+# Use in-memory artifact storage
+from chuk_mcp_linkedin.manager import LinkedInManager
+
+manager = LinkedInManager(
+    use_artifacts=True,
+    artifact_provider="memory"  # Fast, ephemeral storage
+)
+
+# Or use filesystem for persistent local storage
+manager = LinkedInManager(
+    use_artifacts=True,
+    artifact_provider="filesystem"  # Stores in .artifacts/
+)
+```
+
+### Available Themes
 
 10 pre-built themes for different LinkedIn personas:
 
-- `thought_leader` - Establish expertise and authority
-- `personal_brand` - Build authentic personal connection
-- `technical_expert` - Deep technical knowledge
-- `community_builder` - Foster conversation and connection
-- `corporate_professional` - Polished corporate communication
-- `contrarian_voice` - Challenge status quo, spark debate
-- `storyteller` - Narrative-driven emotional connection
-- `data_driven` - Let numbers tell the story
-- `coach_mentor` - Guide and support your audience
-- `entertainer` - Make LinkedIn fun and memorable
+| Theme | Description | Use Case |
+|-------|-------------|----------|
+| `thought_leader` | Authority and expertise | Industry insights, frameworks |
+| `data_driven` | Let numbers tell story | Analytics, research, reports |
+| `storyteller` | Narrative-driven | Personal experiences, case studies |
+| `community_builder` | Foster conversation | Polls, questions, engagement |
+| `technical_expert` | Deep technical knowledge | Engineering, dev, technical topics |
+| `personal_brand` | Authentic connection | Behind-the-scenes, personal stories |
+| `corporate_professional` | Polished corporate | Official announcements, updates |
+| `contrarian_voice` | Challenge status quo | Controversial takes, debate |
+| `coach_mentor` | Guide and support | Tips, advice, mentorship |
+| `entertainer` | Make LinkedIn fun | Humor, memes, light content |
 
-## MCP Server Tools
+### MCP Server Integration
 
-### Draft Management
-- `linkedin_create` - Create new draft
-- `linkedin_list` - List all drafts
-- `linkedin_switch` - Switch between drafts
-- `linkedin_delete` - Delete draft
-- `linkedin_get_info` - Get draft details
+Add to your Claude Desktop config (`claude_desktop_config.json`):
 
-### Content Creation
-- `linkedin_text_post` - Create text post
-- `linkedin_document_post` - Create document post
-- `linkedin_poll_post` - Create poll post
-- `linkedin_video_post` - Create video post
-- `linkedin_carousel_post` - Create carousel post
-
-### Composition
-- `linkedin_add_hook` - Add opening hook
-- `linkedin_add_body` - Add main content
-- `linkedin_add_cta` - Add call-to-action
-- `linkedin_add_hashtags` - Add hashtags
-
-### Enhancement
-- `linkedin_optimize_length` - Optimize text length
-- `linkedin_suggest_emojis` - Suggest emoji placement
-- `linkedin_format_for_scannability` - Add formatting for readability
-- `linkedin_apply_theme` - Apply theme to draft
-
-### Publishing
-- `linkedin_publish` - Publish to LinkedIn
-- `linkedin_schedule` - Schedule for later
-- `linkedin_preview` - Get text preview (first 210 chars)
-- `linkedin_preview_html` - Generate HTML preview and open in browser
-- `linkedin_export_draft` - Export as JSON
-
-### Analytics
-- `linkedin_get_post_stats` - Get post analytics
-- `linkedin_get_suggestions` - Get content suggestions
-- `linkedin_analyze_draft` - Analyze draft performance potential
-
-## Design Token System
-
-A centralized design system that manages all visual and content decisions, similar to the PPTX MCP approach.
-
-### Why Token-Based Design?
-
-Instead of hardcoding values:
-```python
-❌ font_size = 24
-❌ color = '#000000'
-❌ margin = 60
+```json
+{
+  "mcpServers": {
+    "linkedin": {
+      "command": "linkedin-mcp",
+      "args": ["stdio"],
+      "env": {
+        "LINKEDIN_ACCESS_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
 ```
 
-Use design tokens:
-```python
-✓ font_size = DesignTokens.get_font_size('body')
-✓ color = DesignTokens.get_color('minimal', 'primary')
-✓ margin = DesignTokens.get_spacing('gaps', 'large')
+Or use UV:
+
+```json
+{
+  "mcpServers": {
+    "linkedin": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/path/to/chuk-mcp-linkedin",
+        "run",
+        "linkedin-mcp",
+        "stdio"
+      ],
+      "env": {
+        "LINKEDIN_ACCESS_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
 ```
 
-**Benefits:**
-- **Consistency**: All designs use same values
-- **Maintainability**: Change once, update everywhere
-- **Performance**: Values based on 1M+ posts analyzed
-- **Mobile-First**: All tokens optimized for mobile
-- **Platform-Aware**: LinkedIn-specific optimizations built-in
+## Docker
 
-### Token Categories
-
-#### 1. **Design Tokens** (`DesignTokens`)
-Visual design system for layouts, documents, and carousels:
-
-**Canvas Sizes:**
-- Document posts: 1920x1920 (square, highest engagement format)
-- Carousels: 1080x1080 (square) or 1080x1350 (portrait)
-
-**Typography:**
-- Font sizes: tiny (14pt) → massive (200pt)
-- Font weights: light → black
-- Line heights: tight (1.2) → loose (2.0)
-- Minimum 18pt for LinkedIn mobile readability
-
-**Colors:**
-- 5 color schemes: minimal, modern, vibrant, dark, linkedin
-- Semantic colors: success, error, warning, info
-- LinkedIn brand blue: #0A66C2
-
-**Spacing:**
-- Safe areas: minimal → spacious
-- Gaps: tiny (8px) → huge (120px)
-- Padding: tight (20px) → spacious (80px)
-
-#### 2. **Text Tokens** (`TextTokens`)
-Content formatting and structure:
-- Character limits (3000 max, 210 before "see more")
-- Ideal lengths (micro: 50-150, short: 150-300, medium: 300-800, long: 800-1500, story: 1000-3000)
-- Line break styles (dense, readable, scannable, dramatic, extreme)
-- Emoji levels: none → heavy (0-15% of text)
-- Hashtag strategy: optimal count 3-5
-
-#### 3. **Engagement Tokens** (`EngagementTokens`)
-Algorithm optimization patterns:
-- Hook types with power ratings (controversy: 0.95, stat: 0.9, story: 0.85)
-- CTA styles (direct, curiosity, action, share, soft)
-- First hour targets (minimum: 10, good: 50, viral: 100 engagements)
-- Timing optimization (Tuesday-Thursday, 7-9 AM / 12-2 PM / 5-6 PM)
-
-#### 4. **Structure Tokens** (`StructureTokens`)
-Content structure patterns:
-- Formats: linear, listicle, framework, story_arc, comparison
-- Visual formatting: symbols (→, •, ✓), separators
-- Hook patterns and templates
-
-### LinkedIn-Specific Optimizations (2025 Data)
-
-Based on 1M+ posts analyzed:
-
-**Document Posts (PDF):**
-- Engagement rate: 45.85% (HIGHEST)
-- Optimal slides: 5-10
-- Format: 1920x1920 square
-- Font min: 18pt
-
-**Poll Posts:**
-- Reach multiplier: 3.0x (200%+ higher!)
-- Most underused format (opportunity!)
-
-**Carousels:**
-- Declining (-18% reach, -25% engagement vs 2024)
-- Keep to 5-10 slides maximum
-
-### Example: Token Usage
-
-```python
-from chuk_mcp_linkedin.tokens import DesignTokens, TextTokens, EngagementTokens
-
-# Get canvas size for document
-canvas = DesignTokens.get_canvas_size("document_square")  # (1920, 1920)
-
-# Get optimal font size
-title_size = DesignTokens.get_font_size("title")  # 56pt
-
-# Check if mobile-friendly
-min_font = DesignTokens.LINKEDIN_SPECIFIC["mobile"]["min_font_size"]  # 18pt
-
-# Get optimal post length
-ideal_length = TextTokens.IDEAL_LENGTH["medium"]  # (300, 800)
-
-# Get hook power rating
-stat_power = EngagementTokens.HOOKS["stat"]["power"]  # 0.9
-
-# Get best posting time
-best_days = EngagementTokens.TIMING["best_days"]  # ['tuesday', 'wednesday', 'thursday']
-```
-
-### Try the Showcase
-
-Run the complete token and layout showcase:
-```bash
-python examples/layout_token_showcase.py
-```
-
-This demonstrates:
-- All token categories with examples
-- How layouts reference tokens
-- 2025 LinkedIn-specific optimizations
-- Mobile-first design principles
-
-## Component Architecture
-
-### Visual Component Library
-
-The design system includes a comprehensive library of reusable visual components for creating LinkedIn documents and carousels.
-
-#### ✅ **Fully Implemented Components**
-
-**Visual Elements** (38 total variants across 5 categories):
-
-1. **Dividers** (6 variants)
-   - `horizontal_line()` - Simple line separators
-   - `gradient_fade()` - Subtle gradient dividers
-   - `decorative_accent()` - LinkedIn-style accent lines
-   - `section_break()` - Visual section separators (•••)
-   - `spacer()` - Invisible spacing elements
-   - `title_underline()` - Title underlines (single/double/thick)
-
-2. **Badges** (7 variants)
-   - `pill_badge()` - Rounded pill-shaped badges
-   - `status_badge()` - Semantic status indicators (NEW, TRENDING, etc.)
-   - `number_badge()` - Notification-style number badges
-   - `percentage_change()` - Change indicators with ↑↓ arrows
-   - `category_tag()` - Topic/category tags
-   - `icon_badge()` - Icon+text badges
-   - `corner_ribbon()` - Diagonal corner ribbons
-
-3. **Backgrounds** (8 variants)
-   - `solid()` - Solid color backgrounds
-   - `gradient()` - Linear gradients (vertical/horizontal/diagonal)
-   - `subtle_pattern()` - Subtle texture patterns
-   - `card()` - Card containers with shadows
-   - `highlight_box()` - Highlighted content boxes
-   - `branded_header()` - Branded header sections
-   - `split_background()` - Split backgrounds for comparisons
-   - `image_overlay()` - Semi-transparent overlays for images
-
-4. **Borders** (8 variants)
-   - `simple()` - Basic borders
-   - `accent()` - Accent borders (left/right/top/bottom)
-   - `double()` - Double-line borders
-   - `gradient()` - Gradient borders
-   - `corner_brackets()` - Corner bracket decoration
-   - `callout()` - Callout boxes (success/warning/error/info)
-   - `shadow_frame()` - Elevated frames with shadows
-   - `inset_panel()` - Inset panels
-
-5. **Shapes** (9 variants)
-   - `circle()` - Circles (filled/outline)
-   - `rectangle()` - Rectangles and squares
-   - `icon_container()` - Icon container boxes
-   - `arrow()` - Directional arrows
-   - `checkmark()` - Checkmarks and crosses
-   - `bullet_point()` - Custom bullet points
-   - `decorative_element()` - Decorative shapes
-   - `progress_ring()` - Progress indicators
-   - `divider_ornament()` - Decorative divider elements
-
-**Document Layouts** (11 types):
-- Title Slide, Content Slide, Split Content, Big Number
-- Quote Slide, Comparison, Two Column, Checklist
-- Timeline, Icon Grid, Data Visual
-
-All components use the design token system for consistent styling and are mobile-optimized.
-
-#### Usage Example
-
-```python
-from chuk_mcp_linkedin.components import Dividers, Badges, Backgrounds, Borders, Shapes
-
-# Create visual elements
-accent = Dividers.decorative_accent()
-new_badge = Badges.pill_badge("NEW", size="medium")
-card_bg = Backgrounds.card()
-highlight = Borders.callout(type="success")
-icon = Shapes.icon_container("🚀", size="large")
-
-# Use in document layouts
-from chuk_mcp_linkedin.components.layouts import DocumentLayouts
-
-layout = DocumentLayouts.content_slide()
-# Add components to layout zones
-```
-
-#### ⚠️ **Placeholder Components** (Not Yet Implemented)
-
-The following component categories are defined in `__init__.py` files but implementation files don't exist yet:
-
-**Typography Components** (5 needed):
-- `Headers` - H1, H2, H3 with token-based sizing
-- `BodyText` - Paragraph text with line height/spacing
-- `Captions` - Small descriptive text
-- `Quotes` - Pull quotes and blockquotes
-- `Lists` - Bulleted and numbered lists
-
-**Data Visualization** (5 needed):
-- `Charts` - Bar, line, pie, donut charts
-- `Metrics` - KPI metric cards with icons
-- `Progress` - Progress bars and rings
-- `Tables` - Data tables with styling
-- `Infographics` - Visual data representations
-
-**Content Blocks** (6 needed):
-- `CTA` - Call-to-action blocks
-- `Testimonials` - Customer testimonial cards
-- `FeatureCards` - Product/service feature cards
-- `TimelineItems` - Timeline event blocks
-- `ChecklistItems` - Checklist/task items
-- `StatCards` - Statistic display cards
-
-**Media Components** (4 needed):
-- `Images` - Image handling with crops/filters
-- `Avatars` - Profile avatars and logos
-- `VideoFrames` - Video thumbnails and frames
-- `IconSets` - Icon libraries and sets
-
-**Interactive Components** (3 needed):
-- `Buttons` - CTA buttons with hover states
-- `PollOptions` - Poll option styling
-- `FormElements` - Input elements for forms
-
-**Additional Needed**:
-- `CarouselLayouts` - Layouts for carousel posts (mentioned but not implemented)
-- `LayoutRenderer` - Render layouts to actual visual output (mentioned but not implemented)
-
-### Component Development Status
-
-| Category | Status | Count | Progress |
-|----------|--------|-------|----------|
-| Tokens | ✅ Complete | 4 | 100% |
-| Document Layouts | ✅ Complete | 11 | 100% |
-| Visual Elements | ✅ Complete | 38 variants | 100% |
-| Preview System | ✅ Complete | 1 | 100% |
-| Typography | ⚠️ Placeholder | 0/5 | 0% |
-| Data Viz | ⚠️ Placeholder | 0/5 | 0% |
-| Content Blocks | ⚠️ Placeholder | 0/6 | 0% |
-| Media | ⚠️ Placeholder | 0/4 | 0% |
-| Interactive | ⚠️ Placeholder | 0/3 | 0% |
-| Carousel Layouts | ⚠️ Placeholder | 0 | 0% |
-| Layout Renderer | ⚠️ Placeholder | 0 | 0% |
-
-**Overall Progress**: 58 implemented / 85 total components (68% complete)
-
-## Architecture
-
-Clean, focused architecture with clear separation of concerns:
-
-```
-src/chuk_mcp_linkedin/
-├── /preview/                      # Post preview generation
-│   ├── __init__.py               # Exports: LinkedInPreview
-│   ├── post_preview.py           # Generate HTML previews of posts
-│   └── /utils/
-│       └── document_converter.py # Convert docs to images for preview
-│
-├── /documents/                    # LinkedIn Documents API
-│   ├── __init__.py               # Exports: API classes, attachment helpers
-│   ├── api.py                    # Upload documents to LinkedIn
-│   └── attachment.py             # Attach documents to posts
-│
-├── /posts/                        # Post text composition
-│   ├── __init__.py
-│   ├── composition.py            # ComposablePost
-│   └── /components/              # Hook, Body, CTA, Hashtags
-│
-├── /components/                   # HTML rendering helpers (shared)
-│   ├── component_renderer.py    # Simple HTML rendering
-│   ├── /visual_elements/         # Badges, callouts, etc.
-│   └── /data_viz/                # Charts, metrics
-│
-├── /themes/                       # Post themes and tone
-├── /api/                          # LinkedIn API client
-├── /utils/                        # Shared utilities
-└── server.py                      # MCP server
-
-preview_post.py                    # Quick CLI preview utility
-```
-
-**See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.**
-
-## Development
+### Quick Start
 
 ```bash
-# Install dev dependencies
-pip install -e ".[dev]"
+# Build image
+docker build -t chuk-mcp-linkedin:latest .
 
-# Run tests
-pytest
+# Run in STDIO mode
+docker-compose --profile stdio up -d
 
-# Format code
-black src tests
+# Run in HTTP mode
+docker-compose --profile http up -d
 
-# Type checking
-mypy src
-
-# Try the preview example
-python examples/preview_example.py
+# View logs
+docker-compose logs -f
 ```
+
+### Makefile Commands
+
+```bash
+make docker-build      # Build Docker image
+make docker-run-stdio  # Run in STDIO mode
+make docker-run-http   # Run in HTTP mode on port 8000
+make docker-test       # Build and test image
+make docker-logs       # View container logs
+make docker-stop       # Stop containers
+make docker-clean      # Clean up Docker resources
+```
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+LINKEDIN_ACCESS_TOKEN=your_access_token_here
+DEBUG=0
+HTTP_PORT=8000
+```
+
+See [docs/DOCKER.md](docs/DOCKER.md) for detailed Docker documentation.
+
+## Documentation
+
+- **[Getting Started](docs/GETTING_STARTED.md)** - Complete beginner's guide
+- **[API Reference](docs/API.md)** - Full API documentation
+- **[Themes Guide](docs/THEMES.md)** - All themes and customization
+- **[Design Tokens](docs/TOKENS.md)** - Token system reference
+- **[Docker Guide](docs/DOCKER.md)** - Docker deployment
+- **[CI/CD Guide](docs/CI_CD.md)** - Continuous integration
+- **[Development Guide](docs/DEVELOPMENT.md)** - Contributing and development
+- **[Architecture](docs/ARCHITECTURE.md)** - System architecture
 
 ## Examples
 
-Check out the `examples/` directory:
+Comprehensive examples in the `examples/` directory:
 
-**`layout_token_showcase.py`** - Complete design token and layout system demonstration
 ```bash
-python examples/layout_token_showcase.py
-```
-Comprehensive showcase of the entire token system:
-- All design tokens (typography, colors, spacing, layouts)
-- Text and engagement tokens
-- LinkedIn-specific 2025 optimizations
-- How layouts reference tokens
-- Mobile-first design principles
+# Complete post composition examples
+python examples/complete_example.py
 
-**`preview_example.py`** - Complete preview workflow demonstration
-```bash
-python examples/preview_example.py
-```
-Creates a sample thought leadership post and generates a browser preview with analytics.
-
-**`complete_example.py`** - Comprehensive usage examples covering all post types and features.
-
-**Quick Start**:
-```bash
-# See the token system in action
-python examples/layout_token_showcase.py
-
-# Try the preview system
+# Preview system demonstration
 python examples/preview_example.py
 
-# Or use the CLI utility for your drafts
-python preview_post.py --list
+# Design token showcase
+python examples/layout_token_showcase.py
+
+# Document upload example
+python examples/demo_document_upload.py
+```
+
+## Development
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
+cd chuk-mcp-linkedin
+
+# Install dependencies
+make install
+make dev
+
+# Install pre-commit hooks
+make hooks-install
+```
+
+### Run Tests
+
+```bash
+# Run all tests
+make test
+
+# Run with coverage
+make coverage
+
+# Run specific test
+uv run pytest tests/test_composition.py -v
+```
+
+### Code Quality
+
+```bash
+# Format code
+make format
+
+# Run linter
+make lint
+
+# Type checking
+make typecheck
+
+# Security check
+make security
+
+# All quality checks
+make quality
+```
+
+### CI/CD
+
+```bash
+# Run full CI pipeline locally
+make ci
+
+# Quick CI check
+make ci-quick
+
+# Pre-commit checks
+make pre-commit
+```
+
+## 2025 LinkedIn Performance Data
+
+Based on analysis of 1M+ posts across 9K company pages:
+
+### Top Performing Formats
+
+1. **Document Posts (PDF)** - 45.85% engagement (HIGHEST)
+   - Optimal: 5-10 pages
+   - Format: 1920x1920 square
+   - Min font: 18pt for mobile
+
+2. **Poll Posts** - 200%+ higher reach (MOST UNDERUSED)
+   - Opportunity: Least used format
+   - Engagement: 3x average reach
+   - Duration: 3-7 days optimal
+
+3. **Video Posts** - 1.4x engagement (GROWING)
+   - Usage up 69% from 2024
+   - Vertical format preferred
+   - Keep under 3 minutes
+
+4. **Image Posts** - 2x more comments than text
+   - Square format (1080x1080) performs best
+   - Infographics and data viz trending
+
+5. **Carousel Posts** - Declining format
+   - Down 18% reach, 25% engagement vs 2024
+   - Keep to 5-10 slides maximum
+
+### Optimal Post Structure
+
+- **First 210 characters** - Critical hook window
+- **Ideal length**: 300-800 characters
+- **Hashtags**: 3-5 optimal (not 10+)
+- **Line breaks**: Use for scannability
+- **Best times**: Tue-Thu, 7-9 AM / 12-2 PM / 5-6 PM
+
+### First Hour Engagement
+
+- **Minimum**: 10 engagements (baseline)
+- **Good**: 50 engagements (algorithm boost)
+- **Viral**: 100+ engagements (maximum reach)
+
+## Architecture
+
+```
+chuk-mcp-linkedin/
+├── src/chuk_mcp_linkedin/
+│   ├── api/              # LinkedIn API client
+│   ├── models/           # Data models (Pydantic)
+│   ├── posts/            # Post composition
+│   │   ├── composition.py    # ComposablePost class
+│   │   └── components/       # Hook, Body, CTA, Hashtags
+│   ├── preview/          # Preview system
+│   │   ├── post_preview.py       # HTML preview generation
+│   │   ├── artifact_preview.py   # Artifact storage & URLs
+│   │   └── component_renderer.py # Component rendering
+│   ├── themes/           # Theme system
+│   ├── tokens/           # Design token system
+│   ├── tools/            # MCP tools
+│   ├── utils/            # Utilities
+│   ├── manager.py        # Draft & session management
+│   ├── cli.py            # CLI implementation
+│   ├── server.py         # MCP server (legacy)
+│   └── async_server.py   # Async MCP server
+├── tests/                # Comprehensive test suite (94% coverage)
+├── examples/             # Usage examples
+├── docs/                 # Documentation
+├── .github/workflows/    # CI/CD workflows
+├── Dockerfile            # Multi-stage Docker build
+├── docker-compose.yml    # Docker Compose config
+├── Makefile              # Development automation
+└── pyproject.toml        # Project configuration
+```
+
+## Contributing
+
+Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Make changes and add tests
+4. Run quality checks (`make check`)
+5. Commit changes (`git commit -m 'Add amazing feature'`)
+6. Push to branch (`git push origin feature/amazing-feature`)
+7. Open Pull Request
+
+## Testing
+
+- **94% test coverage** - 958 tests passing
+- **Multiple test types** - Unit, integration, component tests
+- **Artifact system tests** - Session isolation, preview URLs
+- **CI/CD** - GitHub Actions on every push
+- **Pre-commit hooks** - Automatic quality checks
+
+```bash
+# Run all tests
+make test
+
+# Run with coverage
+make coverage
+
+# Open coverage report
+make coverage-html
 ```
 
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Credits
 
-Built by [Christopher Hay](https://github.com/chrishayuk)
+**Built by** [Christopher Hay](https://github.com/chrishayuk)
 
-Based on 2025 LinkedIn performance data from analysis of 1M+ posts across 9K company pages.
+**Data Sources:**
+- 2025 LinkedIn performance data from analysis of 1M+ posts
+- 9K company page benchmarks
+- LinkedIn API documentation
 
-Design system principles inspired by [shadcn/ui](https://ui.shadcn.com/) and [CVA](https://cva.style/).
+**Inspired by:**
+- [shadcn/ui](https://ui.shadcn.com/) - Component philosophy
+- [CVA](https://cva.style/) - Variant system
+- [Model Context Protocol](https://modelcontextprotocol.io) - MCP standard
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/chrishayuk/chuk-mcp-linkedin/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/chrishayuk/chuk-mcp-linkedin/discussions)
+- **Email**: chris@chuk.ai
+
+## Roadmap
+
+- [ ] Additional post types (events, newsletters)
+- [ ] LinkedIn analytics integration
+- [ ] A/B testing framework
+- [ ] Multi-account support
+- [ ] Scheduling and automation
+- [ ] Enhanced preview with real API data
+- [ ] Webhook support for notifications
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
+---
+
+<div align="center">
+
+**[⬆ back to top](#linkedin-mcp-server)**
+
+Made with ❤️ by [Christopher Hay](https://github.com/chrishayuk)
+
+</div>

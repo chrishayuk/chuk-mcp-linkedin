@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/poll_preview.py
 """
 Poll preview component for engagement.
 

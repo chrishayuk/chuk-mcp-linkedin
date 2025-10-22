@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/__init__.py
 """
 LinkedIn posts module.
 

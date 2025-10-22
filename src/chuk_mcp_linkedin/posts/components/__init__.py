@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/__init__.py
 """
 LinkedIn post components.
 

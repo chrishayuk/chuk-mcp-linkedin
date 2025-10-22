@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/utils/document_converter.py
 """
 Document to image converter for LinkedIn post previews.
 
@@ -148,7 +149,6 @@ class DocumentConverter:
         try:
             from pptx import Presentation
             from PIL import Image
-            import io
         except ImportError:
             raise ImportError(
                 "python-pptx and Pillow are required for PowerPoint conversion. "
@@ -202,7 +202,7 @@ class DocumentConverter:
         """Convert Word document to images"""
         try:
             from docx import Document
-            from PIL import Image, ImageDraw, ImageFont
+            from PIL import Image
         except ImportError:
             raise ImportError(
                 "python-docx and Pillow are required for Word conversion. "

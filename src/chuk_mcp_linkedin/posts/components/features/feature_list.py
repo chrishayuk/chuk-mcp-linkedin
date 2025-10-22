@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/feature_list.py
 """
 Feature list component with icons and descriptions.
 

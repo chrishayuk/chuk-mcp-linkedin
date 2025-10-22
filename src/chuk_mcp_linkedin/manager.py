@@ -1,13 +1,18 @@
 """
 Draft management system for LinkedIn posts.
 
-Handles CRUD operations for draft posts.
+Handles CRUD operations for draft posts with session-based locking.
+Integrates with chuk-artifacts for session-isolated storage.
 """
 
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
+import uuid
 from pathlib import Path
+
+from chuk_artifacts import ArtifactStore
+from chuk_artifacts.config import configure_memory, configure_filesystem
 
 
 class Draft:
@@ -69,14 +74,23 @@ class Draft:
 
 
 class LinkedInManager:
-    """Manager for LinkedIn post drafts"""
+    """Manager for LinkedIn post drafts with session-based locking"""
 
-    def __init__(self, storage_path: Optional[str] = None):
+    def __init__(
+        self,
+        storage_path: Optional[str] = None,
+        session_id: Optional[str] = None,
+        use_artifacts: bool = False,
+        artifact_provider: str = "memory",
+    ):
         """
-        Initialize manager with optional storage path.
+        Initialize manager with optional storage path and session ID.
 
         Args:
             storage_path: Path to store drafts (defaults to .linkedin_drafts)
+            session_id: Optional session ID for session-based locking
+            use_artifacts: Whether to use chuk-artifacts for storage (default: False)
+            artifact_provider: Storage provider if using artifacts (memory, filesystem, s3, ibm-cos)
         """
         self.storage_path = Path(storage_path or ".linkedin_drafts")
         self.storage_path.mkdir(exist_ok=True)
@@ -84,8 +98,183 @@ class LinkedInManager:
         self.drafts: Dict[str, Draft] = {}
         self.current_draft_id: Optional[str] = None
 
+        # Session management
+        self.session_id = session_id or str(uuid.uuid4())
+        self.draft_sessions: Dict[str, str] = {}  # draft_id -> session_id mapping
+
+        # Artifact storage
+        self.use_artifacts = use_artifacts
+        self.artifact_provider = artifact_provider
+        self._artifact_store: Optional[ArtifactStore] = None
+        self._artifact_initialized = False
+
         # Load existing drafts
         self._load_drafts()
+
+    async def __aenter__(self):
+        """Async context manager entry."""
+        if self.use_artifacts and not self._artifact_initialized:
+            # Configure provider
+            if self.artifact_provider == "memory":
+                configure_memory()
+            elif self.artifact_provider == "filesystem":
+                configure_filesystem(root=".artifacts/linkedin-drafts")
+            elif self.artifact_provider in ("s3", "ibm-cos"):
+                # S3 configuration should be done via environment variables
+                pass
+
+            self._artifact_store = ArtifactStore()
+            await self._artifact_store.__aenter__()
+            self._artifact_initialized = True
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit."""
+        if self._artifact_store:
+            await self._artifact_store.__aexit__(exc_type, exc_val, exc_tb)
+            self._artifact_initialized = False
+
+    async def _ensure_artifact_store(self):
+        """Ensure artifact store is initialized."""
+        if self.use_artifacts and not self._artifact_initialized:
+            # Configure provider
+            if self.artifact_provider == "memory":
+                configure_memory()
+            elif self.artifact_provider == "filesystem":
+                configure_filesystem(root=".artifacts/linkedin-drafts")
+            elif self.artifact_provider in ("s3", "ibm-cos"):
+                # S3 configuration should be done via environment variables
+                pass
+
+            self._artifact_store = ArtifactStore()
+            await self._artifact_store.__aenter__()
+            self._artifact_initialized = True
+
+    async def store_draft_as_artifact(self, draft_id: str) -> Optional[str]:
+        """
+        Store a draft as an artifact.
+
+        Args:
+            draft_id: Draft ID to store
+
+        Returns:
+            Artifact ID or None if not using artifacts or draft not found
+        """
+        if not self.use_artifacts:
+            return None
+
+        draft = self.get_draft(draft_id)
+        if not draft:
+            return None
+
+        await self._ensure_artifact_store()
+
+        # Serialize draft to JSON
+        draft_json = json.dumps(draft.to_dict(), indent=2)
+
+        # Store as artifact
+        artifact_id = await self._artifact_store.store(
+            data=draft_json.encode("utf-8"),
+            mime="application/json",
+            summary=f"LinkedIn Draft: {draft.name}",
+            filename=f"{draft_id}.json",
+            user_id=self.session_id,
+            meta={
+                "draft_id": draft_id,
+                "draft_name": draft.name,
+                "post_type": draft.post_type,
+                "type": "draft",
+            },
+        )
+
+        return artifact_id
+
+    async def retrieve_draft_from_artifact(self, artifact_id: str) -> Optional[Draft]:
+        """
+        Retrieve a draft from an artifact.
+
+        Args:
+            artifact_id: Artifact ID to retrieve
+
+        Returns:
+            Draft object or None if not found
+        """
+        if not self.use_artifacts:
+            return None
+
+        await self._ensure_artifact_store()
+
+        try:
+            # Retrieve artifact
+            data = await self._artifact_store.retrieve(artifact_id)
+            if not data:
+                return None
+
+            # Deserialize draft
+            draft_data = json.loads(data.decode("utf-8"))
+            draft = Draft.from_dict(draft_data)
+
+            return draft
+        except Exception:
+            return None
+
+    def set_session(self, session_id: str):
+        """
+        Set the current session ID.
+
+        Args:
+            session_id: Session ID to use
+        """
+        self.session_id = session_id
+
+    def get_session(self) -> str:
+        """
+        Get the current session ID.
+
+        Returns:
+            Current session ID
+        """
+        return self.session_id
+
+    def lock_draft_to_session(self, draft_id: str, session_id: Optional[str] = None) -> bool:
+        """
+        Lock a draft to a specific session.
+
+        Args:
+            draft_id: Draft ID to lock
+            session_id: Session ID to lock to (uses current if not provided)
+
+        Returns:
+            True if locked, False if draft not found
+        """
+        if draft_id not in self.drafts:
+            return False
+
+        session = session_id or self.session_id
+        self.draft_sessions[draft_id] = session
+        return True
+
+    def is_draft_accessible(self, draft_id: str, session_id: Optional[str] = None) -> bool:
+        """
+        Check if a draft is accessible by the current session.
+
+        Args:
+            draft_id: Draft ID to check
+            session_id: Session ID to check (uses current if not provided)
+
+        Returns:
+            True if accessible, False otherwise
+        """
+        if draft_id not in self.drafts:
+            return False
+
+        # If draft not locked to any session, it's accessible
+        if draft_id not in self.draft_sessions:
+            return True
+
+        # Check if session matches
+        session = session_id or self.session_id
+        return self.draft_sessions[draft_id] == session
 
     def create_draft(
         self,
@@ -95,7 +284,7 @@ class LinkedInManager:
         theme: Optional[str] = None,
         variant_config: Optional[Dict[str, Any]] = None,
     ) -> Draft:
-        """Create a new draft"""
+        """Create a new draft and lock it to the current session"""
         draft_id = f"draft_{len(self.drafts) + 1}_{datetime.now().timestamp()}"
 
         draft = Draft(
@@ -109,6 +298,9 @@ class LinkedInManager:
 
         self.drafts[draft_id] = draft
         self.current_draft_id = draft_id
+
+        # Lock draft to current session
+        self.lock_draft_to_session(draft_id)
 
         self._save_draft(draft)
 
@@ -124,20 +316,42 @@ class LinkedInManager:
             return self.drafts.get(self.current_draft_id)
         return None
 
-    def list_drafts(self) -> List[Dict[str, Any]]:
-        """List all drafts"""
-        return [
-            {
-                "draft_id": draft.draft_id,
-                "name": draft.name,
-                "post_type": draft.post_type,
-                "theme": draft.theme,
-                "created_at": draft.created_at,
-                "updated_at": draft.updated_at,
-                "is_current": draft.draft_id == self.current_draft_id,
-            }
-            for draft in self.drafts.values()
-        ]
+    def list_drafts(
+        self, session_id: Optional[str] = None, include_all: bool = False
+    ) -> List[Dict[str, Any]]:
+        """
+        List drafts accessible by the current session.
+
+        Args:
+            session_id: Optional session ID (uses current if not provided)
+            include_all: If True, include all drafts regardless of session (default: False)
+
+        Returns:
+            List of draft metadata dictionaries
+        """
+        session = session_id or self.session_id
+
+        drafts_list = []
+        for draft in self.drafts.values():
+            # Skip if not accessible and not including all
+            if not include_all and not self.is_draft_accessible(draft.draft_id, session):
+                continue
+
+            drafts_list.append(
+                {
+                    "draft_id": draft.draft_id,
+                    "name": draft.name,
+                    "post_type": draft.post_type,
+                    "theme": draft.theme,
+                    "created_at": draft.created_at,
+                    "updated_at": draft.updated_at,
+                    "is_current": draft.draft_id == self.current_draft_id,
+                    "session_id": self.draft_sessions.get(draft.draft_id),
+                    "is_locked": draft.draft_id in self.draft_sessions,
+                }
+            )
+
+        return drafts_list
 
     def switch_draft(self, draft_id: str) -> bool:
         """Switch to a different draft"""

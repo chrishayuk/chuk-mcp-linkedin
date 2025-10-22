@@ -359,3 +359,224 @@ class TestLinkedInManager:
         assert loaded_draft.theme == "thought_leader"
         assert loaded_draft.content["text"] == "Hello"
         assert loaded_draft.variant_config["style"] == "insight"
+
+    def test_update_draft_with_variant_config(self, manager):
+        """Test updating draft with variant config"""
+        draft = manager.create_draft("My Post", "text", variant_config={"style": "insight"})
+
+        # Update variant config
+        manager.update_draft(draft.draft_id, variant_config={"tone": "professional"})
+
+        updated_draft = manager.get_draft(draft.draft_id)
+        assert updated_draft.variant_config["style"] == "insight"
+        assert updated_draft.variant_config["tone"] == "professional"
+
+    def test_get_draft_preview_with_text_fallback(self, manager):
+        """Test getting draft preview falls back to text field"""
+        draft = manager.create_draft("My Post", "text", content={"text": "x" * 300})
+
+        preview = manager.get_draft_preview(draft.draft_id, chars=210)
+        assert len(preview) <= 213  # 210 + "..."
+
+    def test_get_draft_preview_short_content(self, manager):
+        """Test getting draft preview with short content"""
+        draft = manager.create_draft("My Post", "text", content={"commentary": "Short"})
+
+        preview = manager.get_draft_preview(draft.draft_id, chars=210)
+        assert preview == "Short"
+
+    def test_load_drafts_with_corrupted_file(self, temp_storage):
+        """Test loading drafts skips corrupted files"""
+        manager1 = LinkedInManager(storage_path=temp_storage)
+        manager1.create_draft("Valid Post", "text")
+
+        # Create a corrupted JSON file
+        corrupted_file = Path(temp_storage) / "corrupted.json"
+        with open(corrupted_file, "w") as f:
+            f.write("invalid json{")
+
+        # Load in new manager - should skip corrupted file
+        manager2 = LinkedInManager(storage_path=temp_storage)
+        assert len(manager2.drafts) == 1  # Only the valid draft loaded
+
+    def test_generate_html_preview(self, manager):
+        """Test generating HTML preview for a draft"""
+        draft = manager.create_draft(
+            "My Post",
+            "text",
+            content={"commentary": "Hello world", "hook": "Test", "cta": "Engage!"},
+        )
+
+        html_path = manager.generate_html_preview(draft.draft_id)
+        assert html_path is not None
+        assert Path(html_path).exists()
+        assert Path(html_path).suffix == ".html"
+
+    def test_generate_html_preview_custom_path(self, manager, temp_storage):
+        """Test generating HTML preview with custom output path"""
+        draft = manager.create_draft("My Post", "text", content={"commentary": "Test"})
+
+        custom_path = str(Path(temp_storage) / "custom_preview.html")
+        html_path = manager.generate_html_preview(draft.draft_id, output_path=custom_path)
+
+        assert html_path == custom_path
+        assert Path(html_path).exists()
+
+    def test_generate_html_preview_not_found(self, manager):
+        """Test generating HTML preview for non-existent draft"""
+        html_path = manager.generate_html_preview("nonexistent")
+        assert html_path is None
+
+    def test_session_id_generation(self, temp_storage):
+        """Test that manager generates a session ID"""
+        manager = LinkedInManager(storage_path=temp_storage)
+        assert manager.session_id is not None
+        assert isinstance(manager.session_id, str)
+
+    def test_custom_session_id(self, temp_storage):
+        """Test manager with custom session ID"""
+        manager = LinkedInManager(storage_path=temp_storage, session_id="custom_session")
+        assert manager.session_id == "custom_session"
+
+    def test_session_management(self, manager):
+        """Test session get/set"""
+        original_session = manager.get_session()
+        assert original_session is not None
+
+        # Set new session
+        manager.set_session("new_session")
+        assert manager.get_session() == "new_session"
+
+    def test_lock_draft_to_session(self, manager):
+        """Test locking draft to session"""
+        draft = manager.create_draft("Test", "text")
+
+        # Draft should be auto-locked to current session on creation
+        assert manager.is_draft_accessible(draft.draft_id)
+
+        # Lock to different session
+        success = manager.lock_draft_to_session(draft.draft_id, "other_session")
+        assert success is True
+
+        # Should not be accessible from current session
+        assert manager.is_draft_accessible(draft.draft_id) is False
+
+        # But accessible from other session
+        assert manager.is_draft_accessible(draft.draft_id, "other_session") is True
+
+    def test_lock_nonexistent_draft(self, manager):
+        """Test locking non-existent draft"""
+        success = manager.lock_draft_to_session("nonexistent", "session")
+        assert success is False
+
+    def test_is_draft_accessible_unlocked(self, manager):
+        """Test checking accessibility of unlocked draft"""
+        draft = manager.create_draft("Test", "text")
+
+        # Remove from session lock
+        if draft.draft_id in manager.draft_sessions:
+            del manager.draft_sessions[draft.draft_id]
+
+        # Should be accessible to any session
+        assert manager.is_draft_accessible(draft.draft_id) is True
+        assert manager.is_draft_accessible(draft.draft_id, "any_session") is True
+
+    def test_is_draft_accessible_nonexistent(self, manager):
+        """Test checking accessibility of non-existent draft"""
+        assert manager.is_draft_accessible("nonexistent") is False
+
+    def test_list_drafts_session_filtering(self, temp_storage):
+        """Test listing drafts with session filtering"""
+        manager = LinkedInManager(storage_path=temp_storage, session_id="session1")
+
+        # Create drafts in session 1
+        _ = manager.create_draft("Draft 1", "text")
+        _ = manager.create_draft("Draft 2", "text")
+
+        # List drafts for session 1
+        drafts = manager.list_drafts()
+        assert len(drafts) == 2
+
+        # List drafts for different session (should be empty)
+        drafts_other = manager.list_drafts(session_id="session2")
+        assert len(drafts_other) == 0
+
+        # List all drafts
+        all_drafts = manager.list_drafts(include_all=True)
+        assert len(all_drafts) == 2
+
+    def test_list_drafts_includes_session_metadata(self, manager):
+        """Test draft list includes session metadata"""
+        _ = manager.create_draft("Test", "text")
+
+        drafts = manager.list_drafts()
+        assert len(drafts) == 1
+
+        draft_info = drafts[0]
+        assert "session_id" in draft_info
+        assert "is_locked" in draft_info
+        assert draft_info["is_locked"] is True
+
+
+class TestLinkedInManagerWithArtifacts:
+    """Test LinkedInManager with artifact storage"""
+
+    @pytest.mark.asyncio
+    async def test_artifact_storage_initialization(self):
+        """Test artifact storage initialization"""
+        async with LinkedInManager(use_artifacts=True, artifact_provider="memory") as manager:
+            assert manager.use_artifacts is True
+            assert manager.artifact_provider == "memory"
+
+    @pytest.mark.asyncio
+    async def test_store_draft_as_artifact(self):
+        """Test storing draft as artifact"""
+        async with LinkedInManager(use_artifacts=True, artifact_provider="memory") as manager:
+            draft = manager.create_draft(
+                name="Test Draft", post_type="text", content={"commentary": "Test"}
+            )
+
+            artifact_id = await manager.store_draft_as_artifact(draft.draft_id)
+            assert artifact_id is not None
+
+    @pytest.mark.asyncio
+    async def test_store_nonexistent_draft_as_artifact(self):
+        """Test storing non-existent draft as artifact"""
+        async with LinkedInManager(use_artifacts=True, artifact_provider="memory") as manager:
+            artifact_id = await manager.store_draft_as_artifact("nonexistent")
+            assert artifact_id is None
+
+    @pytest.mark.asyncio
+    async def test_retrieve_draft_from_artifact(self):
+        """Test retrieving draft from artifact"""
+        async with LinkedInManager(use_artifacts=True, artifact_provider="memory") as manager:
+            # Create and store draft
+            original = manager.create_draft(
+                name="Test Draft", post_type="text", content={"commentary": "Test content"}
+            )
+
+            artifact_id = await manager.store_draft_as_artifact(original.draft_id)
+
+            # Retrieve from artifact
+            retrieved = await manager.retrieve_draft_from_artifact(artifact_id)
+            assert retrieved is not None
+            assert retrieved.name == "Test Draft"
+            assert retrieved.content["commentary"] == "Test content"
+
+    @pytest.mark.asyncio
+    async def test_retrieve_nonexistent_artifact(self):
+        """Test retrieving non-existent artifact"""
+        async with LinkedInManager(use_artifacts=True, artifact_provider="memory") as manager:
+            retrieved = await manager.retrieve_draft_from_artifact("nonexistent")
+            assert retrieved is None
+
+    @pytest.mark.asyncio
+    async def test_artifact_storage_disabled(self):
+        """Test that artifact storage is disabled by default"""
+        manager = LinkedInManager(use_artifacts=False)
+        assert manager.use_artifacts is False
+
+        # Store should return None when artifacts disabled
+        draft = manager.create_draft("Test", "text")
+        artifact_id = await manager.store_draft_as_artifact(draft.draft_id)
+        assert artifact_id is None

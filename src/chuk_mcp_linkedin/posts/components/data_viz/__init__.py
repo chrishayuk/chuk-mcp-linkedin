@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/data_viz/__init__.py
 """
 Data visualization components for LinkedIn posts.
 

@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/pro_con.py
 """
 Pros & Cons comparison component for LinkedIn posts.
 

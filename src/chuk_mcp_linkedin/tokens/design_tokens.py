@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/tokens/design_tokens.py
 """
 Design tokens for visual layouts (documents, carousels, images).
 

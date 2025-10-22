@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/theme_manager/__init__.py
 """
 Theme management system for LinkedIn posts.
 

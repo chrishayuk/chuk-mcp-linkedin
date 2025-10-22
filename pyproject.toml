@@ -34,7 +34,12 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "httpx>=0.24.0",
     "chuk-mcp-server>=0.4.4",
+    "chuk-artifacts>=0.1.0",
 ]
+
+[project.scripts]
+linkedin-mcp = "chuk_mcp_linkedin.cli:main"
+linkedin-mcp-server = "chuk_mcp_linkedin.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -44,6 +49,12 @@ dev = [
     "black>=23.7.0",
     "ruff>=0.0.285",
     "mypy>=1.5.0",
+    "pre-commit>=3.0.0",
+]
+# HTTP server dependencies
+http = [
+    "uvicorn>=0.24.0",
+    "starlette>=0.27.0",
 ]
 # Document preview dependencies
 # Install with: pip install chuk-mcp-linkedin[preview]
@@ -89,7 +100,9 @@ asyncio_mode = "auto"
 
 [tool.coverage.run]
 omit = [
-    "src/chuk_mcp_linkedin/server.py",  # MCP server - requires special testing infrastructure
+    "src/chuk_mcp_linkedin/server.py",         # MCP server - requires special testing infrastructure
+    "src/chuk_mcp_linkedin/async_server.py",   # Async MCP server - requires special testing infrastructure
+    "src/chuk_mcp_linkedin/cli.py",            # CLI entry point - requires integration tests
 ]
 
 [dependency-groups]

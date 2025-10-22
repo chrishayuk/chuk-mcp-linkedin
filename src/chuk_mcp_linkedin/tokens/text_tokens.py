@@ -1,4 +1,4 @@
-# src/chuk_mcp_linkedin/text_tokens.py
+# src/chuk_mcp_linkedin/tokens/text_tokens.py
 """
 Text formatting tokens for LinkedIn posts.
 

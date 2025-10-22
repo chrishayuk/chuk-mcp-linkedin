@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/data_viz/progress_chart.py
 """
 Progress bars chart component for tracking completion.
 

@@ -8,6 +8,11 @@ a design system approach with components, themes, and variants.
 from chuk_mcp_server import ChukMCPServer
 from .manager import LinkedInManager
 from .api import LinkedInClient
+from .tools.draft_tools import register_draft_tools
+from .tools.composition_tools import register_composition_tools
+from .tools.theme_tools import register_theme_tools
+from .tools.registry_tools import register_registry_tools
+from .tools.publishing_tools import register_publishing_tools
 
 # Initialize the MCP server
 mcp = ChukMCPServer("chuk-mcp-linkedin")
@@ -15,13 +20,6 @@ mcp = ChukMCPServer("chuk-mcp-linkedin")
 # Initialize manager and client
 manager = LinkedInManager()
 linkedin_client = LinkedInClient()
-
-# Register all tool modules
-from .tools.draft_tools import register_draft_tools
-from .tools.composition_tools import register_composition_tools
-from .tools.theme_tools import register_theme_tools
-from .tools.registry_tools import register_registry_tools
-from .tools.publishing_tools import register_publishing_tools
 
 # Register tools with the server
 draft_tools = register_draft_tools(mcp, manager)

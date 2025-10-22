@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/content/hook.py
 """
 Opening hook component for LinkedIn posts.
 

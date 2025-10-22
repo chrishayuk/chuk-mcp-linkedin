@@ -1,3 +1,4 @@
+# src/chuk_mcp_linkedin/posts/components/features/big_stat.py
 """
 Big statistic display component for LinkedIn posts.
 

@@ -31,9 +31,7 @@ def generate_preview(post: ComposablePost, name: str, description: str) -> str:
         "name": name,
         "post_type": "text",
         "theme": None,
-        "content": {
-            "composed_text": text
-        }
+        "content": {"composed_text": text},
     }
 
     # Create stats
@@ -75,15 +73,13 @@ def demo_bar_chart():
     post.add_bar_chart(
         data={"AI-Assisted": 12, "Code Review": 6, "Documentation": 4, "Debugging": 8},
         title="TIME SAVED PER WEEK",
-        unit="hours"
+        unit="hours",
     )
     post.add_cta("curiosity", "How much time do you save?")
     post.add_hashtags(["DeveloperProductivity", "AI", "TechTrends"])
 
     return generate_preview(
-        post,
-        "Bar Chart Demo",
-        "Horizontal bar chart with colored emoji squares"
+        post, "Bar Chart Demo", "Horizontal bar chart with colored emoji squares"
     )
 
 
@@ -96,18 +92,14 @@ def demo_metrics_chart():
         data={
             "Faster problem-solving": "67%",
             "Fewer bugs in production": "54%",
-            "Better learning & upskilling": "89%"
+            "Better learning & upskilling": "89%",
         },
-        title="KEY FINDINGS"
+        title="KEY FINDINGS",
     )
     post.add_cta("curiosity", "What impact are you seeing?")
     post.add_hashtags(["AI", "Development", "Productivity"])
 
-    return generate_preview(
-        post,
-        "Metrics Chart Demo",
-        "KPI metrics with ✅/❌ indicators"
-    )
+    return generate_preview(post, "Metrics Chart Demo", "KPI metrics with ✅/❌ indicators")
 
 
 def demo_progress_chart():
@@ -116,22 +108,13 @@ def demo_progress_chart():
     post.add_hook("story", "🚀 Our AI Platform Launch Update")
     post.add_body("Here's where we stand 2 weeks before launch:")
     post.add_progress_chart(
-        data={
-            "Backend API": 85,
-            "Frontend UI": 70,
-            "Testing": 45,
-            "Documentation": 30
-        },
-        title="PROJECT STATUS"
+        data={"Backend API": 85, "Frontend UI": 70, "Testing": 45, "Documentation": 30},
+        title="PROJECT STATUS",
     )
     post.add_cta("curiosity", "Which area should we focus on next?")
     post.add_hashtags(["Startup", "ProductDevelopment", "AI"])
 
-    return generate_preview(
-        post,
-        "Progress Chart Demo",
-        "Progress bars showing 0-100% completion"
-    )
+    return generate_preview(post, "Progress Chart Demo", "Progress bars showing 0-100% completion")
 
 
 def demo_ranking_chart():
@@ -145,19 +128,15 @@ def demo_ranking_chart():
             "JavaScript": "1.1M developers",
             "TypeScript": "850K developers",
             "Go": "420K developers",
-            "Rust": "380K developers"
+            "Rust": "380K developers",
         },
         title="TOP 5 LANGUAGES",
-        show_medals=True
+        show_medals=True,
     )
     post.add_cta("curiosity", "What language are you focusing on?")
     post.add_hashtags(["Programming", "TechTrends", "Developers"])
 
-    return generate_preview(
-        post,
-        "Ranking Chart Demo",
-        "Ranked list with medals for top 3"
-    )
+    return generate_preview(post, "Ranking Chart Demo", "Ranked list with medals for top 3")
 
 
 def demo_quote():
@@ -168,17 +147,13 @@ def demo_quote():
     post.add_quote(
         text="AI has reduced our deployment time by 80% and improved code quality dramatically.",
         author="Sarah Chen",
-        source="CTO at TechCorp"
+        source="CTO at TechCorp",
     )
     post.add_body("Today, they're shipping 10x faster with fewer bugs.")
     post.add_cta("curiosity", "What's your biggest deployment challenge?")
     post.add_hashtags(["CustomerSuccess", "DevOps", "AI"])
 
-    return generate_preview(
-        post,
-        "Quote Demo",
-        "Quote/testimonial with attribution"
-    )
+    return generate_preview(post, "Quote Demo", "Quote/testimonial with attribution")
 
 
 def demo_big_stat():
@@ -188,7 +163,7 @@ def demo_big_stat():
     post.add_big_stat(
         number="2.5M",
         label="developers using AI tools daily",
-        context="↑ 340% growth year-over-year"
+        context="↑ 340% growth year-over-year",
     )
     post.add_body("This explosive growth is transforming how we build software.")
     post.add_body("The question isn't if you should adopt AI tools...")
@@ -196,11 +171,7 @@ def demo_big_stat():
     post.add_cta("action", "Join the AI revolution")
     post.add_hashtags(["AI", "Development", "FutureTech"])
 
-    return generate_preview(
-        post,
-        "Big Stat Demo",
-        "Eye-catching statistic display"
-    )
+    return generate_preview(post, "Big Stat Demo", "Eye-catching statistic display")
 
 
 def demo_timeline():
@@ -213,20 +184,16 @@ def demo_timeline():
             "Jun 2023": "Reached 1,000 paying customers",
             "Dec 2023": "Hit $1M ARR milestone",
             "Jun 2024": "Raised Series A ($5M)",
-            "Dec 2024": "Crossed $10M ARR"
+            "Dec 2024": "Crossed $10M ARR",
         },
         title="OUR JOURNEY",
-        style="arrow"
+        style="arrow",
     )
     post.add_body("Key lesson: Focus on solving real problems, not chasing trends.")
     post.add_cta("curiosity", "What milestone are you working toward?")
     post.add_hashtags(["Startup", "SaaS", "Entrepreneurship"])
 
-    return generate_preview(
-        post,
-        "Timeline Demo",
-        "Timeline with arrow-separated steps"
-    )
+    return generate_preview(post, "Timeline Demo", "Timeline with arrow-separated steps")
 
 
 def demo_key_takeaway():
@@ -235,21 +202,19 @@ def demo_key_takeaway():
     post.add_hook("question", "Why do 90% of startups fail?")
     post.add_body("I analyzed 500 failed startups over the past 5 years.")
     post.add_body("The pattern was clear:")
-    post.add_body("❌ They built solutions looking for problems\n❌ They optimized for vanity metrics\n❌ They ignored customer feedback")
+    post.add_body(
+        "❌ They built solutions looking for problems\n❌ They optimized for vanity metrics\n❌ They ignored customer feedback"
+    )
     post.add_separator("line")
     post.add_key_takeaway(
         message="Focus on solving real problems, not chasing trends. Listen to your customers, not your ego.",
         title="KEY TAKEAWAY",
-        style="box"
+        style="box",
     )
     post.add_cta("soft", "What lessons have you learned?")
     post.add_hashtags(["Startups", "Entrepreneurship", "Lessons"])
 
-    return generate_preview(
-        post,
-        "Key Takeaway Demo",
-        "Highlighted insight/TLDR box"
-    )
+    return generate_preview(post, "Key Takeaway Demo", "Highlighted insight/TLDR box")
 
 
 def demo_pro_con():
@@ -262,25 +227,21 @@ def demo_pro_con():
             "40% faster development cycle",
             "Fewer production bugs",
             "Better code documentation",
-            "Improved developer satisfaction"
+            "Improved developer satisfaction",
         ],
         cons=[
             "Initial learning curve (2-3 weeks)",
             "Cost: $20-40 per developer/month",
-            "Requires code review process updates"
+            "Requires code review process updates",
         ],
-        title="AI CODING TOOLS"
+        title="AI CODING TOOLS",
     )
     post.add_separator("dots")
     post.add_body("Our verdict: The ROI is clear. We're going all-in.")
     post.add_cta("curiosity", "Have you tried AI coding tools?")
     post.add_hashtags(["AI", "Development", "TechLeadership"])
 
-    return generate_preview(
-        post,
-        "Pro-Con Demo",
-        "Pros & cons comparison for decisions"
-    )
+    return generate_preview(post, "Pro-Con Demo", "Pros & cons comparison for decisions")
 
 
 def demo_combined_features():
@@ -290,9 +251,7 @@ def demo_combined_features():
 
     # Big stat
     post.add_big_stat(
-        number="95%",
-        label="of Fortune 500 companies using AI tools",
-        context="Up from 23% in 2023"
+        number="95%", label="of Fortune 500 companies using AI tools", context="Up from 23% in 2023"
     )
 
     # Timeline
@@ -300,32 +259,30 @@ def demo_combined_features():
         steps={
             "2023": "Early adopters experiment",
             "2024": "Mainstream adoption begins",
-            "2025": "AI becomes standard practice"
+            "2025": "AI becomes standard practice",
         },
         title="ADOPTION CURVE",
-        style="arrow"
+        style="arrow",
     )
 
     # Quote
     post.add_quote(
         text="AI tools have fundamentally changed how we approach software development.",
         author="Emily Rodriguez",
-        source="VP Engineering at Scale AI"
+        source="VP Engineering at Scale AI",
     )
 
     # Key takeaway
     post.add_key_takeaway(
         message="The question isn't whether to adopt AI tools, but how quickly you can integrate them effectively.",
-        style="box"
+        style="box",
     )
 
     post.add_cta("action", "Start your AI journey today")
     post.add_hashtags(["AI", "Development", "FutureTech"])
 
     return generate_preview(
-        post,
-        "Combined Features Demo",
-        "Multiple feature components in one post"
+        post, "Combined Features Demo", "Multiple feature components in one post"
     )
 
 
@@ -388,7 +345,7 @@ def main():
                 time.sleep(0.5)  # Small delay between opens
     elif choice.isdigit() and 1 <= int(choice) <= 10:
         idx = int(choice) - 1
-        print(f"\nOpening preview in browser...")
+        print("\nOpening preview in browser...")
         webbrowser.open(f"file://{previews[idx]}")
     else:
         print("Invalid choice. Opening first preview...")

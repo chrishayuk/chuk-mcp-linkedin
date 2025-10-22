@@ -7,6 +7,7 @@ the actual pages/slides are rendered as images (like LinkedIn does).
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.composition import ComposablePost
@@ -24,24 +25,21 @@ def create_pdf_preview():
 
     post = ComposablePost("document", theme=theme)
 
-    post.add_hook(
-        "question",
-        "How do you share detailed insights with your network?"
-    )
+    post.add_hook("question", "How do you share detailed insights with your network?")
 
-    post.add_body("""PDFs are perfect for sharing:
+    post.add_body(
+        """PDFs are perfect for sharing:
 
 → Research findings
 → Case studies
 → Technical reports
 → Strategic frameworks
 
-LinkedIn converts each page to an image carousel.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What's your preferred format for long-form content?"
+LinkedIn converts each page to an image carousel.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What's your preferred format for long-form content?")
 
     post.add_hashtags(["ContentStrategy", "ThoughtLeadership", "PDFs"])
 
@@ -59,7 +57,7 @@ LinkedIn converts each page to an image carousel.""", structure="linear")
     print("=" * 60)
     print(f"Document: {pdf_path.name}")
     print(f"Pages: {page_count}")
-    print(f"Type: PDF")
+    print("Type: PDF")
     print()
 
     # Create preview with document metadata
@@ -73,10 +71,10 @@ LinkedIn converts each page to an image carousel.""", structure="linear")
                 "filepath": str(pdf_path),
                 "title": "Strategy Framework",
                 "pages": page_count,
-                "file_type": "pdf"
-            }
+                "file_type": "pdf",
+            },
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     stats = {
@@ -90,10 +88,7 @@ LinkedIn converts each page to an image carousel.""", structure="linear")
 
     # Generate preview (this will convert PDF to images automatically)
     print("Converting PDF pages to images...")
-    html_preview = LinkedInPreview.generate_html(
-        draft_data,
-        stats=stats
-    )
+    html_preview = LinkedInPreview.generate_html(draft_data, stats=stats)
 
     # Save preview
     preview_dir = Path.home() / ".linkedin_drafts" / "previews" / "documents"
@@ -121,24 +116,21 @@ def create_pptx_preview():
 
     post = ComposablePost("document", theme=theme)
 
-    post.add_hook(
-        "stat",
-        "70% of B2B buyers prefer visual content"
-    )
+    post.add_hook("stat", "70% of B2B buyers prefer visual content")
 
-    post.add_body("""That's why I use slide decks to share:
+    post.add_body(
+        """That's why I use slide decks to share:
 
 📊 Data insights
 📈 Performance metrics
 🎯 Strategic roadmaps
 💡 Framework breakdowns
 
-Each slide becomes part of an interactive carousel.""", structure="linear")
-
-    post.add_cta(
-        "action",
-        "Save this for your next presentation"
+Each slide becomes part of an interactive carousel.""",
+        structure="linear",
     )
+
+    post.add_cta("action", "Save this for your next presentation")
 
     post.add_hashtags(["Presentations", "DataViz", "B2B"])
 
@@ -156,7 +148,7 @@ Each slide becomes part of an interactive carousel.""", structure="linear")
     print("=" * 60)
     print(f"Document: {pptx_path.name}")
     print(f"Slides: {slide_count}")
-    print(f"Type: PPTX")
+    print("Type: PPTX")
     print()
 
     # Create preview with document metadata
@@ -170,10 +162,10 @@ Each slide becomes part of an interactive carousel.""", structure="linear")
                 "filepath": str(pptx_path),
                 "title": "Q4 Performance Review",
                 "pages": slide_count,
-                "file_type": "pptx"
-            }
+                "file_type": "pptx",
+            },
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     stats = {
@@ -187,10 +179,7 @@ Each slide becomes part of an interactive carousel.""", structure="linear")
 
     # Generate preview
     print("Converting PowerPoint slides to images...")
-    html_preview = LinkedInPreview.generate_html(
-        draft_data,
-        stats=stats
-    )
+    html_preview = LinkedInPreview.generate_html(draft_data, stats=stats)
 
     # Save preview
     preview_dir = Path.home() / ".linkedin_drafts" / "previews" / "documents"
@@ -249,6 +238,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

@@ -5,10 +5,8 @@ Converts PDF, PowerPoint, and Word documents to images for preview rendering.
 """
 
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 import hashlib
-import os
-import tempfile
 
 
 class DocumentConverter:
@@ -261,6 +259,7 @@ class DocumentConverter:
             if file_ext == ".pdf":
                 try:
                     import PyPDF2
+
                     with open(filepath, "rb") as f:
                         pdf = PyPDF2.PdfReader(f)
                         return len(pdf.pages)
@@ -268,6 +267,7 @@ class DocumentConverter:
                     # Fallback: try pdf2image
                     try:
                         from pdf2image import pdfinfo_from_path
+
                         info = pdfinfo_from_path(filepath)
                         return info.get("Pages", 0)
                     except ImportError:
@@ -275,6 +275,7 @@ class DocumentConverter:
 
             elif file_ext in [".pptx", ".ppt"]:
                 from pptx import Presentation
+
                 prs = Presentation(filepath)
                 return len(prs.slides)
 
@@ -282,6 +283,7 @@ class DocumentConverter:
                 # Word documents don't have clear page boundaries
                 # Return estimated count
                 from docx import Document
+
                 doc = Document(filepath)
                 total_chars = sum(len(p.text) for p in doc.paragraphs)
                 return max(1, total_chars // 3000)
@@ -299,9 +301,11 @@ class DocumentConverter:
             cache_dir = DocumentConverter.CACHE_DIR / cache_key
             if cache_dir.exists():
                 import shutil
+
                 shutil.rmtree(cache_dir)
         else:
             # Clear all cache
             if DocumentConverter.CACHE_DIR.exists():
                 import shutil
+
                 shutil.rmtree(DocumentConverter.CACHE_DIR)

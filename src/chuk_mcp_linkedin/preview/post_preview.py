@@ -547,11 +547,11 @@ class LinkedInPreview:
             img_path = img.get("filepath", img.get("url", ""))
             alt_text = img.get("alt_text", "Image")
 
-            return f'''
+            return f"""
             <div class="media-attachment">
                 <img src="file://{img_path}" alt="{html.escape(alt_text)}" class="media-image">
             </div>
-            '''
+            """
 
         # For multiple images
         images_html = []
@@ -560,11 +560,11 @@ class LinkedInPreview:
             alt_text = img.get("alt_text", "Image")
             images_html.append(f'<img src="file://{img_path}" alt="{html.escape(alt_text)}">')
 
-        return f'''
+        return f"""
         <div class="multi-image-grid {grid_class}">
             {''.join(images_html)}
         </div>
-        '''
+        """
 
     @staticmethod
     def _render_video(video: Dict[str, Any]) -> str:
@@ -574,23 +574,23 @@ class LinkedInPreview:
         thumbnail = video.get("thumbnail", "")
 
         if thumbnail:
-            return f'''
+            return f"""
             <div class="media-attachment media-video">
                 <div class="video-placeholder" style="background-image: url('file://{thumbnail}'); background-size: cover;">
                     <div class="video-play-button"></div>
                     <div class="video-duration">{duration}</div>
                 </div>
             </div>
-            '''
+            """
         else:
-            return f'''
+            return f"""
             <div class="media-attachment media-video">
                 <div class="video-placeholder">
                     <div class="video-play-button"></div>
                     <div class="video-duration">{duration}</div>
                 </div>
             </div>
-            '''
+            """
 
     @staticmethod
     def _render_document_file(doc_file: Dict[str, Any]) -> str:
@@ -611,7 +611,7 @@ class LinkedInPreview:
             page_images = DocumentConverter.convert_to_images(
                 filepath,
                 max_pages=20,  # LinkedIn limit
-                dpi=150  # Good balance of quality and performance
+                dpi=150,  # Good balance of quality and performance
             )
 
             # Update page count based on actual conversion
@@ -628,17 +628,20 @@ class LinkedInPreview:
             if i < len(page_images):
                 # Render with actual page image
                 page_img_path = page_images[i]
-                slides_html.append(f'''
+                slides_html.append(
+                    f"""
             <div class="carousel-item" data-slide="{i}">
                 <div class="document-page-preview">
                     <div class="page-number">Page {i + 1} of {pages}</div>
                     <img src="file://{page_img_path}" alt="Page {i + 1}" class="document-page-image">
                 </div>
             </div>
-                ''')
+                """
+                )
             else:
                 # Render placeholder if image not available
-                slides_html.append(f'''
+                slides_html.append(
+                    f"""
             <div class="carousel-item" data-slide="{i}">
                 <div class="document-page-preview">
                     <div class="page-number">Page {i + 1} of {pages}</div>
@@ -649,11 +652,12 @@ class LinkedInPreview:
                     </div>
                 </div>
             </div>
-                ''')
+                """
+                )
 
         slides_html_str = "\n".join(slides_html)
 
-        return f'''
+        return f"""
         <style>
             .document-carousel {{
                 margin-top: -12px;
@@ -891,7 +895,7 @@ class LinkedInPreview:
             updateCarousel();
         }})();
         </script>
-        '''
+        """
 
     @staticmethod
     def _extract_text_content(content: Dict[str, Any]) -> str:
@@ -929,12 +933,12 @@ class LinkedInPreview:
 
         # First, find and mark hashtags BEFORE escaping
         # Replace hashtags with a placeholder
-        hashtag_pattern = r'#(\w+)'
+        hashtag_pattern = r"#(\w+)"
         hashtags = []
 
         def replace_hashtag(match):
             hashtags.append(match.group(1))
-            return f'__HASHTAG_{len(hashtags)-1}__'
+            return f"__HASHTAG_{len(hashtags)-1}__"
 
         text = re.sub(hashtag_pattern, replace_hashtag, text)
 
@@ -943,21 +947,18 @@ class LinkedInPreview:
 
         # Restore hashtags with proper HTML formatting
         for idx, tag in enumerate(hashtags):
-            text = text.replace(
-                f'__HASHTAG_{idx}__',
-                f'<span class="hashtag">#{tag}</span>'
-            )
+            text = text.replace(f"__HASHTAG_{idx}__", f'<span class="hashtag">#{tag}</span>')
 
         # Split at 210 characters for "see more" indicator (LinkedIn's truncation point)
         if len(text) > 210:
             # Find a good break point near 210 chars (end of line if possible)
             preview_text = text[:210]
             # Try to break at a newline
-            last_newline = preview_text.rfind('\n')
+            last_newline = preview_text.rfind("\n")
             if last_newline > 150:  # If there's a newline reasonably close
                 preview_text = preview_text[:last_newline]
 
-            rest_text = text[len(preview_text):]
+            rest_text = text[len(preview_text) :]
 
             # Trim trailing whitespace/newlines from preview_text to reduce gap before "see more"
             preview_text = preview_text.rstrip()

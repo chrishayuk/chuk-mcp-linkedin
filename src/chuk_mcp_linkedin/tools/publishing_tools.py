@@ -38,9 +38,7 @@ def register_publishing_tools(mcp, manager, linkedin_client):
             )
 
         # Get post text
-        post_text = draft.content.get("composed_text") or draft.content.get(
-            "commentary", ""
-        )
+        post_text = draft.content.get("composed_text") or draft.content.get("commentary", "")
         if not post_text:
             return "No post content to publish. Add content first or compose the post."
 
@@ -62,9 +60,7 @@ def register_publishing_tools(mcp, manager, linkedin_client):
 
         # Publish!
         try:
-            result = await linkedin_client.create_text_post(
-                text=post_text, visibility=visibility
-            )
+            result = await linkedin_client.create_text_post(text=post_text, visibility=visibility)
 
             # Extract post ID from response
             post_id = result.get("id", "unknown")
@@ -119,9 +115,7 @@ def register_publishing_tools(mcp, manager, linkedin_client):
 
         status = {
             "configured": is_configured,
-            "access_token": (
-                "✓ set" if linkedin_config.linkedin_access_token else "✗ missing"
-            ),
+            "access_token": ("✓ set" if linkedin_config.linkedin_access_token else "✗ missing"),
             "person_urn": linkedin_config.linkedin_person_urn or "✗ missing",
             "publishing_enabled": linkedin_config.enable_publishing,
             "missing_fields": missing,

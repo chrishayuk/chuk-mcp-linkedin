@@ -30,7 +30,7 @@ def test_bar_chart():
     chart_data = BarChartData(
         data={"AI-Assisted": 12, "Code Review": 6, "Documentation": 4, "Debugging": 8},
         title="TIME SAVED PER WEEK",
-        unit="hours"
+        unit="hours",
     )
 
     post = ComposablePost("text")
@@ -55,9 +55,9 @@ def test_metrics_chart():
         data={
             "Faster problem-solving": "67%",
             "Fewer bugs in production": "54%",
-            "Better learning & upskilling": "89%"
+            "Better learning & upskilling": "89%",
         },
-        title="KEY FINDINGS"
+        title="KEY FINDINGS",
     )
 
     post = ComposablePost("text")
@@ -82,15 +82,15 @@ def test_comparison_chart():
             "Traditional Development": [
                 "Slower iterations",
                 "Manual testing",
-                "Limited code suggestions"
+                "Limited code suggestions",
             ],
             "AI-Assisted Development": [
                 "Faster prototyping",
                 "Automated tests",
-                "Intelligent completions"
-            ]
+                "Intelligent completions",
+            ],
         },
-        title="DEVELOPMENT APPROACHES"
+        title="DEVELOPMENT APPROACHES",
     )
 
     post = ComposablePost("text")
@@ -111,13 +111,8 @@ def test_progress_chart():
 
     # Validate with Pydantic
     chart_data = ProgressChartData(
-        data={
-            "Backend API": 85,
-            "Frontend UI": 70,
-            "Testing": 45,
-            "Documentation": 30
-        },
-        title="PROJECT STATUS"
+        data={"Backend API": 85, "Frontend UI": 70, "Testing": 45, "Documentation": 30},
+        title="PROJECT STATUS",
     )
 
     post = ComposablePost("text")
@@ -145,10 +140,10 @@ def test_ranking_chart():
             "JavaScript": "1.1M developers",
             "TypeScript": "850K developers",
             "Go": "420K developers",
-            "Rust": "380K developers"
+            "Rust": "380K developers",
         },
         title="TOP 5 LANGUAGES IN 2025",
-        show_medals=True
+        show_medals=True,
     )
 
     post = ComposablePost("text")
@@ -182,7 +177,7 @@ def test_combined_charts():
     post.add_bar_chart(
         data={"AI Coding": 12, "Code Review": 6, "Debugging": 8},
         title="HOURS SAVED PER WEEK",
-        unit="hours"
+        unit="hours",
     )
 
     # Metrics - impact
@@ -191,9 +186,9 @@ def test_combined_charts():
         data={
             "Faster problem-solving": "67%",
             "Better code quality": "54%",
-            "Improved learning": "89%"
+            "Improved learning": "89%",
         },
-        title="DEVELOPER IMPACT"
+        title="DEVELOPER IMPACT",
     )
 
     # Progress - adoption
@@ -203,9 +198,9 @@ def test_combined_charts():
             "Code completion": 95,
             "Bug detection": 78,
             "Test generation": 62,
-            "Architecture design": 23
+            "Architecture design": 23,
         },
-        title="ADOPTION RATES"
+        title="ADOPTION RATES",
     )
 
     # CTA

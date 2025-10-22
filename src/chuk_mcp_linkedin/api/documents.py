@@ -56,7 +56,7 @@ class DocumentsAPIMixin:
             raise LinkedInAPIError(f"File not found: {file_path}")
 
         # Validate file type
-        supported_types = {'.pdf', '.ppt', '.pptx', '.doc', '.docx'}
+        supported_types = {".pdf", ".ppt", ".pptx", ".doc", ".docx"}
         if file_path.suffix.lower() not in supported_types:
             raise LinkedInAPIError(
                 f"Unsupported file type: {file_path.suffix}. "
@@ -68,25 +68,20 @@ class DocumentsAPIMixin:
         max_size = 100 * 1024 * 1024  # 100MB
         if file_size > max_size:
             raise LinkedInAPIError(
-                f"File too large: {file_size / 1024 / 1024:.1f}MB. "
-                f"Maximum: 100MB"
+                f"File too large: {file_size / 1024 / 1024:.1f}MB. " f"Maximum: 100MB"
             )
 
         async with httpx.AsyncClient() as client:
             # Step 1: Initialize upload
             init_url = "https://api.linkedin.com/rest/documents?action=initializeUpload"
-            init_payload = {
-                "initializeUploadRequest": {
-                    "owner": self.person_urn
-                }
-            }
+            init_payload = {"initializeUploadRequest": {"owner": self.person_urn}}
 
             try:
                 response = await client.post(
                     init_url,
                     json=init_payload,
                     headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    timeout=30.0,
                 )
 
                 if response.status_code not in (200, 201):
@@ -103,22 +98,23 @@ class DocumentsAPIMixin:
 
             # Step 2: Upload file
             try:
-                with open(file_path, 'rb') as f:
+                with open(file_path, "rb") as f:
                     file_data = f.read()
 
                 # Determine MIME type
                 import mimetypes
+
                 mime_type, _ = mimetypes.guess_type(str(file_path))
                 if not mime_type:
                     # Default MIME types for supported formats
                     mime_types = {
-                        '.pdf': 'application/pdf',
-                        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                        '.ppt': 'application/vnd.ms-powerpoint',
-                        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        '.doc': 'application/msword'
+                        ".pdf": "application/pdf",
+                        ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                        ".ppt": "application/vnd.ms-powerpoint",
+                        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        ".doc": "application/msword",
                     }
-                    mime_type = mime_types.get(file_path.suffix.lower(), 'application/octet-stream')
+                    mime_type = mime_types.get(file_path.suffix.lower(), "application/octet-stream")
 
                 upload_response = await client.put(
                     upload_url,
@@ -127,7 +123,7 @@ class DocumentsAPIMixin:
                         "Authorization": f"Bearer {self.access_token}",
                         "Content-Type": mime_type,
                     },
-                    timeout=120.0  # Longer timeout for file upload
+                    timeout=120.0,  # Longer timeout for file upload
                 )
 
                 if upload_response.status_code not in (200, 201):
@@ -176,16 +172,9 @@ class DocumentsAPIMixin:
             "author": self.person_urn,
             "commentary": text,
             "visibility": visibility,
-            "content": {
-                "media": {
-                    "id": document_urn,
-                    "title": title
-                }
-            },
+            "content": {"media": {"id": document_urn, "title": title}},
             "lifecycleState": "PUBLISHED",
-            "distribution": {
-                "feedDistribution": "MAIN_FEED"
-            }
+            "distribution": {"feedDistribution": "MAIN_FEED"},
         }
 
         url = "https://api.linkedin.com/rest/posts"
@@ -193,10 +182,7 @@ class DocumentsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url,
-                    json=payload,
-                    headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0
                 )
 
                 if response.status_code not in (200, 201):
@@ -211,7 +197,7 @@ class DocumentsAPIMixin:
                 # Handle response - may be JSON or empty
                 response_data = {
                     "status_code": response.status_code,
-                    "headers": dict(response.headers)
+                    "headers": dict(response.headers),
                 }
 
                 # Try to parse JSON response if present

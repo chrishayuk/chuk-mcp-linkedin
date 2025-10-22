@@ -6,27 +6,16 @@ Use for pro tips, warnings, important notes, best practices.
 
 from typing import Optional, Any
 from ..base import PostComponent
-from ....tokens.text_tokens import TextTokens
 
 
 class TipBox(PostComponent):
     """Highlighted tip/note box - for important insights"""
 
     # Style to emoji mapping
-    STYLE_EMOJIS = {
-        "info": "ℹ️",
-        "tip": "💡",
-        "warning": "⚠️",
-        "success": "✅"
-    }
+    STYLE_EMOJIS = {"info": "ℹ️", "tip": "💡", "warning": "⚠️", "success": "✅"}
 
     # Style to default title mapping
-    STYLE_TITLES = {
-        "info": "INFO",
-        "tip": "PRO TIP",
-        "warning": "WARNING",
-        "success": "SUCCESS"
-    }
+    STYLE_TITLES = {"info": "INFO", "tip": "PRO TIP", "warning": "WARNING", "success": "SUCCESS"}
 
     def __init__(
         self,
@@ -58,7 +47,4 @@ class TipBox(PostComponent):
         return "\n".join(lines)
 
     def validate(self) -> bool:
-        return (
-            len(self.message.strip()) > 0
-            and self.style in self.STYLE_EMOJIS
-        )
+        return len(self.message.strip()) > 0 and self.style in self.STYLE_EMOJIS

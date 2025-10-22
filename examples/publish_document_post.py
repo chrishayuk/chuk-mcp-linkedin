@@ -12,6 +12,7 @@ import sys
 import os
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -46,7 +47,7 @@ async def main():
             print("  open scripts/get_member_id.html")
             return
 
-        print(f"✓ Client initialized")
+        print("✓ Client initialized")
         print(f"  Person URN: {client.person_urn[:30]}...")
 
     except Exception as e:
@@ -60,7 +61,7 @@ async def main():
         print(f"\n❌ Test document not found: {test_doc}")
         return
 
-    print(f"\n✓ Test document found")
+    print("\n✓ Test document found")
     print(f"  File: {test_doc.name}")
     print(f"  Size: {test_doc.stat().st_size / 1024:.1f} KB")
 
@@ -69,23 +70,20 @@ async def main():
     theme = theme_manager.get_theme("thought_leader")
 
     post = ComposablePost("document", theme=theme)
-    post.add_hook(
-        "question",
-        "Ever wonder how to share detailed insights on LinkedIn?"
-    )
-    post.add_body("""Documents are perfect for:
+    post.add_hook("question", "Ever wonder how to share detailed insights on LinkedIn?")
+    post.add_body(
+        """Documents are perfect for:
 
 → Research findings
 → Case studies
 → Strategic frameworks
 → Technical reports
 
-LinkedIn converts each page to an interactive carousel.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What's your preferred format for sharing long-form content?"
+LinkedIn converts each page to an interactive carousel.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What's your preferred format for sharing long-form content?")
     post.add_hashtags(["ContentStrategy", "ThoughtLeadership", "Documents"])
 
     post_text = post.compose()
@@ -124,31 +122,31 @@ LinkedIn converts each page to an interactive carousel.""", structure="linear")
             text=post_text,
             document_path=test_doc,
             document_title="LinkedIn API Test Document",
-            visibility="PUBLIC"
+            visibility="PUBLIC",
         )
 
         print("\n" + "=" * 60)
         print("✓ SUCCESS!")
         print("=" * 60)
 
-        post_urn = result.get('id', '')
-        post_status = result.get('status_code', 'N/A')
+        post_urn = result.get("id", "")
+        post_status = result.get("status_code", "N/A")
 
         print(f"\nPost URN: {post_urn}")
         print(f"HTTP Status: {post_status}")
 
         # Format post URL for easy access
-        if post_urn and ('ugcPost' in post_urn or 'share' in post_urn):
+        if post_urn and ("ugcPost" in post_urn or "share" in post_urn):
             post_url = f"https://www.linkedin.com/feed/update/{post_urn}"
-            print(f"\n🔗 View your post:")
+            print("\n🔗 View your post:")
             print(f"   {post_url}")
-            print(f"\nOr check your LinkedIn feed:")
-            print(f"   https://www.linkedin.com/feed/")
+            print("\nOr check your LinkedIn feed:")
+            print("   https://www.linkedin.com/feed/")
 
         print("\n📊 Details:")
         print(f"   Document: {test_doc.name} uploaded")
         print(f"   Text: {len(post_text)} characters")
-        print(f"   Visibility: PUBLIC")
+        print("   Visibility: PUBLIC")
 
     except LinkedInAPIError as e:
         print("\n" + "=" * 60)
@@ -167,6 +165,7 @@ LinkedIn converts each page to an interactive carousel.""", structure="linear")
         print("=" * 60)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
 
 

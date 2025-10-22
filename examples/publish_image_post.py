@@ -10,6 +10,7 @@ import sys
 import os
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -42,7 +43,7 @@ async def main():
             print("  export LINKEDIN_PERSON_URN='urn:li:person:YOUR_ID'")
             return
 
-        print(f"✓ Client initialized")
+        print("✓ Client initialized")
         print(f"  Person URN: {client.person_urn[:30]}...")
 
     except Exception as e:
@@ -56,7 +57,7 @@ async def main():
         print(f"\n❌ Test image not found: {test_image}")
         return
 
-    print(f"\n✓ Test image found")
+    print("\n✓ Test image found")
     print(f"  File: {test_image.name}")
     print(f"  Size: {test_image.stat().st_size / 1024:.1f} KB")
 
@@ -67,23 +68,22 @@ async def main():
     post = ComposablePost("image", theme=theme)
 
     post.add_hook(
-        "insight",
-        "A picture is worth a thousand words. But the right caption? Priceless."
+        "insight", "A picture is worth a thousand words. But the right caption? Priceless."
     )
 
-    post.add_body("""Visual content on LinkedIn performs 2x better than text alone:
+    post.add_body(
+        """Visual content on LinkedIn performs 2x better than text alone:
 
 → Higher engagement rates
 → More shares and comments
 → Better storytelling
 → Stronger emotional connection
 
-The key is combining compelling imagery with meaningful context.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "How do you use visuals in your LinkedIn content strategy?"
+The key is combining compelling imagery with meaningful context.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "How do you use visuals in your LinkedIn content strategy?")
 
     post.add_hashtags(["VisualContent", "ContentStrategy", "LinkedIn"])
 
@@ -122,32 +122,32 @@ The key is combining compelling imagery with meaningful context.""", structure="
             text=post_text,
             image_path=test_image,
             alt_text="Example image for LinkedIn API testing",
-            visibility="PUBLIC"
+            visibility="PUBLIC",
         )
 
         print("\n" + "=" * 60)
         print("✓ SUCCESS!")
         print("=" * 60)
 
-        post_urn = result.get('id', '')
-        post_status = result.get('status_code', 'N/A')
+        post_urn = result.get("id", "")
+        post_status = result.get("status_code", "N/A")
 
         print(f"\nPost URN: {post_urn}")
         print(f"HTTP Status: {post_status}")
 
         # Format post URL for easy access
-        if post_urn and ('ugcPost' in post_urn or 'share' in post_urn):
+        if post_urn and ("ugcPost" in post_urn or "share" in post_urn):
             post_url = f"https://www.linkedin.com/feed/update/{post_urn}"
-            print(f"\n🔗 View your post:")
+            print("\n🔗 View your post:")
             print(f"   {post_url}")
-            print(f"\nOr check your LinkedIn feed:")
-            print(f"   https://www.linkedin.com/feed/")
+            print("\nOr check your LinkedIn feed:")
+            print("   https://www.linkedin.com/feed/")
 
         print("\n📊 Details:")
-        print(f"   Type: Single image post")
+        print("   Type: Single image post")
         print(f"   Image: {test_image.name} uploaded")
         print(f"   Text: {len(post_text)} characters")
-        print(f"   Visibility: PUBLIC")
+        print("   Visibility: PUBLIC")
 
     except LinkedInAPIError as e:
         print("\n" + "=" * 60)
@@ -167,6 +167,7 @@ The key is combining compelling imagery with meaningful context.""", structure="
         print("=" * 60)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
 
 

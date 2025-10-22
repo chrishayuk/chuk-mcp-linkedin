@@ -300,7 +300,11 @@ class ComparisonChart(PostComponent):
 
         if len(items) >= 2:
             for idx, (label, points) in enumerate(items):
-                emoji = TextTokens.INDICATORS.get("positive", "✅") if idx == len(items) - 1 else TextTokens.INDICATORS.get("negative", "❌")
+                emoji = (
+                    TextTokens.INDICATORS.get("positive", "✅")
+                    if idx == len(items) - 1
+                    else TextTokens.INDICATORS.get("negative", "❌")
+                )
                 lines.append(f"{emoji} {label}:")
                 if isinstance(points, list):
                     for point in points:
@@ -388,7 +392,7 @@ class RankingChart(PostComponent):
         medals = [
             TextTokens.INDICATORS.get("gold_medal", "🥇"),
             TextTokens.INDICATORS.get("silver_medal", "🥈"),
-            TextTokens.INDICATORS.get("bronze_medal", "🥉")
+            TextTokens.INDICATORS.get("bronze_medal", "🥉"),
         ]
 
         for idx, (label, value) in enumerate(self.data.items()):
@@ -439,10 +443,7 @@ class Quote(PostComponent):
         return "\n".join(lines)
 
     def validate(self) -> bool:
-        return (
-            len(self.text) > 0 and len(self.text) <= 500 and
-            len(self.author) > 0
-        )
+        return len(self.text) > 0 and len(self.text) <= 500 and len(self.author) > 0
 
 
 class BigStat(PostComponent):
@@ -566,8 +567,9 @@ class KeyTakeaway(PostComponent):
 
     def validate(self) -> bool:
         return (
-            len(self.message) > 0 and len(self.message) <= 500 and
-            self.style in ["box", "highlight", "simple"]
+            len(self.message) > 0
+            and len(self.message) <= 500
+            and self.style in ["box", "highlight", "simple"]
         )
 
 
@@ -616,9 +618,10 @@ class ProCon(PostComponent):
 
     def validate(self) -> bool:
         return (
-            len(self.pros) > 0 and len(self.cons) > 0 and
-            all(len(p.strip()) > 0 for p in self.pros) and
-            all(len(c.strip()) > 0 for c in self.cons)
+            len(self.pros) > 0
+            and len(self.cons) > 0
+            and all(len(p.strip()) > 0 for p in self.pros)
+            and all(len(c.strip()) > 0 for c in self.cons)
         )
 
 
@@ -660,7 +663,6 @@ class DocumentAttachment(PostComponent):
 
     def render(self, theme: Optional[Any] = None) -> str:
         """Render document reference for text-only view"""
-        import os
         from pathlib import Path
 
         path = Path(self.filepath)
@@ -687,7 +689,7 @@ class DocumentAttachment(PostComponent):
         if not path.exists():
             return False
 
-        supported_extensions = ['.pdf', '.ppt', '.pptx', '.doc', '.docx']
+        supported_extensions = [".pdf", ".ppt", ".pptx", ".doc", ".docx"]
         return path.suffix.lower() in supported_extensions
 
 
@@ -781,9 +783,7 @@ class ComposablePost:
         self.components.append(RankingChart(data, title, show_medals, self.theme))
         return self
 
-    def add_quote(
-        self, text: str, author: str, source: Optional[str] = None
-    ) -> "ComposablePost":
+    def add_quote(self, text: str, author: str, source: Optional[str] = None) -> "ComposablePost":
         """Add quote/testimonial
 
         Args:
@@ -857,10 +857,7 @@ class ComposablePost:
         return self
 
     def add_document(
-        self,
-        filepath: str,
-        title: Optional[str] = None,
-        caption: Optional[str] = None
+        self, filepath: str, title: Optional[str] = None, caption: Optional[str] = None
     ) -> "ComposablePost":
         """Add document attachment (PDF/PPTX/DOCX file)
 

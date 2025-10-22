@@ -52,9 +52,7 @@ class PostsAPIMixin:
             "commentary": text,
             "visibility": visibility,
             "lifecycleState": "PUBLISHED",
-            "distribution": {
-                "feedDistribution": "MAIN_FEED"
-            }
+            "distribution": {"feedDistribution": "MAIN_FEED"},
         }
 
         # Use new Posts API endpoint
@@ -63,10 +61,7 @@ class PostsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url,
-                    json=payload,
-                    headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0
                 )
 
                 # Check for errors
@@ -82,7 +77,7 @@ class PostsAPIMixin:
                 # Handle response - may be JSON or empty
                 response_data = {
                     "status_code": response.status_code,
-                    "headers": dict(response.headers)
+                    "headers": dict(response.headers),
                 }
 
                 # Try to parse JSON response if present
@@ -127,7 +122,7 @@ class PostsAPIMixin:
             https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/images-api
         """
         # Step 1: Upload image (requires MediaAPIMixin)
-        if not hasattr(self, 'upload_image'):
+        if not hasattr(self, "upload_image"):
             raise LinkedInAPIError(
                 "upload_image method not available. Ensure MediaAPIMixin is included."
             )
@@ -139,16 +134,9 @@ class PostsAPIMixin:
             "author": self.person_urn,
             "commentary": text,
             "visibility": visibility,
-            "content": {
-                "media": {
-                    "id": image_urn,
-                    "altText": alt_text or ""
-                }
-            },
+            "content": {"media": {"id": image_urn, "altText": alt_text or ""}},
             "lifecycleState": "PUBLISHED",
-            "distribution": {
-                "feedDistribution": "MAIN_FEED"
-            }
+            "distribution": {"feedDistribution": "MAIN_FEED"},
         }
 
         return await self._create_post(payload)
@@ -189,7 +177,7 @@ class PostsAPIMixin:
             raise LinkedInAPIError("Multi-image posts support maximum 20 images")
 
         # Upload all images
-        if not hasattr(self, 'upload_image'):
+        if not hasattr(self, "upload_image"):
             raise LinkedInAPIError(
                 "upload_image method not available. Ensure MediaAPIMixin is included."
             )
@@ -204,25 +192,16 @@ class PostsAPIMixin:
         images = []
         for image_path, alt_text in zip(image_paths, alt_texts):
             image_urn = await self.upload_image(image_path, alt_text)
-            images.append({
-                "id": image_urn,
-                "altText": alt_text
-            })
+            images.append({"id": image_urn, "altText": alt_text})
 
         # Create post with multiple images
         payload = {
             "author": self.person_urn,
             "commentary": text,
             "visibility": visibility,
-            "content": {
-                "multiImage": {
-                    "images": images
-                }
-            },
+            "content": {"multiImage": {"images": images}},
             "lifecycleState": "PUBLISHED",
-            "distribution": {
-                "feedDistribution": "MAIN_FEED"
-            }
+            "distribution": {"feedDistribution": "MAIN_FEED"},
         }
 
         return await self._create_post(payload)
@@ -258,7 +237,7 @@ class PostsAPIMixin:
             - Size: 75kb - 500MB
         """
         # Step 1: Upload video (requires MediaAPIMixin)
-        if not hasattr(self, 'upload_video'):
+        if not hasattr(self, "upload_video"):
             raise LinkedInAPIError(
                 "upload_video method not available. Ensure MediaAPIMixin is included."
             )
@@ -273,16 +252,9 @@ class PostsAPIMixin:
             "author": self.person_urn,
             "commentary": text,
             "visibility": visibility,
-            "content": {
-                "media": {
-                    "id": video_urn,
-                    "title": video_title
-                }
-            },
+            "content": {"media": {"id": video_urn, "title": video_title}},
             "lifecycleState": "PUBLISHED",
-            "distribution": {
-                "feedDistribution": "MAIN_FEED"
-            }
+            "distribution": {"feedDistribution": "MAIN_FEED"},
         }
 
         return await self._create_post(payload)
@@ -364,15 +336,11 @@ class PostsAPIMixin:
                 "poll": {
                     "question": question,
                     "options": poll_options,
-                    "settings": {
-                        "duration": duration
-                    }
+                    "settings": {"duration": duration},
                 }
             },
             "lifecycleState": "PUBLISHED",
-            "distribution": {
-                "feedDistribution": "MAIN_FEED"
-            }
+            "distribution": {"feedDistribution": "MAIN_FEED"},
         }
 
         return await self._create_post(payload)
@@ -395,10 +363,7 @@ class PostsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url,
-                    json=payload,
-                    headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0
                 )
 
                 if response.status_code not in (200, 201):
@@ -413,7 +378,7 @@ class PostsAPIMixin:
                 # Handle response - may be JSON or empty
                 response_data = {
                     "status_code": response.status_code,
-                    "headers": dict(response.headers)
+                    "headers": dict(response.headers),
                 }
 
                 # Try to parse JSON response if present

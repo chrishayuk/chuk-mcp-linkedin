@@ -37,7 +37,7 @@ class RankingChart(PostComponent):
         medals = [
             TextTokens.INDICATORS.get("gold_medal", "🥇"),
             TextTokens.INDICATORS.get("silver_medal", "🥈"),
-            TextTokens.INDICATORS.get("bronze_medal", "🥉")
+            TextTokens.INDICATORS.get("bronze_medal", "🥉"),
         ]
 
         for idx, (label, value) in enumerate(self.data.items()):

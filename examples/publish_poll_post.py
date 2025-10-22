@@ -10,6 +10,7 @@ import sys
 import os
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -42,7 +43,7 @@ async def main():
             print("  export LINKEDIN_PERSON_URN='urn:li:person:YOUR_ID'")
             return
 
-        print(f"✓ Client initialized")
+        print("✓ Client initialized")
         print(f"  Person URN: {client.person_urn[:30]}...")
 
     except Exception as e:
@@ -55,21 +56,18 @@ async def main():
 
     post = ComposablePost("poll", theme=theme)
 
-    post.add_hook(
-        "question",
-        "Quick poll for my developer network:"
-    )
+    post.add_hook("question", "Quick poll for my developer network:")
 
-    post.add_body("""I'm curious about the state of API development in 2025.
+    post.add_body(
+        """I'm curious about the state of API development in 2025.
 
 Whether you're building microservices, integrations, or full platforms - your experience matters.
 
-Vote below and drop a comment with your reasoning!""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What makes your choice the best for modern development?"
+Vote below and drop a comment with your reasoning!""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What makes your choice the best for modern development?")
 
     post.add_hashtags(["APIs", "DeveloperTools", "SoftwareEngineering"])
 
@@ -91,7 +89,7 @@ Vote below and drop a comment with your reasoning!""", structure="linear")
     print("POLL CONFIGURATION")
     print("=" * 60)
     print(f"Question: {poll_question}")
-    print(f"Options:")
+    print("Options:")
     for i, option in enumerate(poll_options, 1):
         print(f"  {i}. {option}")
     print(f"Duration: {poll_duration}")
@@ -122,34 +120,34 @@ Vote below and drop a comment with your reasoning!""", structure="linear")
             question=poll_question,
             options=poll_options,
             duration=poll_duration,
-            visibility="PUBLIC"
+            visibility="PUBLIC",
         )
 
         print("\n" + "=" * 60)
         print("✓ SUCCESS!")
         print("=" * 60)
 
-        post_urn = result.get('id', '')
-        post_status = result.get('status_code', 'N/A')
+        post_urn = result.get("id", "")
+        post_status = result.get("status_code", "N/A")
 
         print(f"\nPost URN: {post_urn}")
         print(f"HTTP Status: {post_status}")
 
         # Format post URL for easy access
-        if post_urn and ('ugcPost' in post_urn or 'share' in post_urn):
+        if post_urn and ("ugcPost" in post_urn or "share" in post_urn):
             post_url = f"https://www.linkedin.com/feed/update/{post_urn}"
-            print(f"\n🔗 View your post:")
+            print("\n🔗 View your post:")
             print(f"   {post_url}")
-            print(f"\nOr check your LinkedIn feed:")
-            print(f"   https://www.linkedin.com/feed/")
+            print("\nOr check your LinkedIn feed:")
+            print("   https://www.linkedin.com/feed/")
 
         print("\n📊 Details:")
-        print(f"   Type: Poll post")
+        print("   Type: Poll post")
         print(f"   Question: {len(poll_question)} characters")
         print(f"   Options: {len(poll_options)}")
         print(f"   Duration: {poll_duration}")
         print(f"   Text: {len(post_text)} characters")
-        print(f"   Visibility: PUBLIC")
+        print("   Visibility: PUBLIC")
 
     except LinkedInAPIError as e:
         print("\n" + "=" * 60)
@@ -171,6 +169,7 @@ Vote below and drop a comment with your reasoning!""", structure="linear")
         print("=" * 60)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
 
 

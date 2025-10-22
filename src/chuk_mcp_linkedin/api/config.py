@@ -55,10 +55,7 @@ class LinkedInConfig(BaseSettings):
 
     def is_configured(self) -> bool:
         """Check if LinkedIn API is properly configured"""
-        return bool(
-            self.linkedin_access_token
-            and self.linkedin_person_urn
-        )
+        return bool(self.linkedin_access_token and self.linkedin_person_urn)
 
     def get_missing_config(self) -> list[str]:
         """Get list of missing required configuration"""

@@ -8,12 +8,29 @@ from .composition import ComposablePost, PostBuilder
 from .components import (
     PostComponent,
     # Content
-    Hook, Body, CallToAction, Hashtags,
+    Hook,
+    Body,
+    CallToAction,
+    Hashtags,
     # Data viz
-    BarChart, MetricsChart, ComparisonChart, ProgressChart, RankingChart,
+    BarChart,
+    MetricsChart,
+    ComparisonChart,
+    ProgressChart,
+    RankingChart,
     # Features
-    Quote, BigStat, Timeline, KeyTakeaway, ProCon,
-    Checklist, BeforeAfter, TipBox, StatsGrid, PollPreview, FeatureList, NumberedList,
+    Quote,
+    BigStat,
+    Timeline,
+    KeyTakeaway,
+    ProCon,
+    Checklist,
+    BeforeAfter,
+    TipBox,
+    StatsGrid,
+    PollPreview,
+    FeatureList,
+    NumberedList,
     # Layout
     Separator,
 )

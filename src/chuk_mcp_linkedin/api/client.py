@@ -7,7 +7,6 @@ Handles authentication, configuration, and common functionality.
 from typing import Dict, Optional
 import httpx
 from .config import LinkedInConfig
-from .errors import LinkedInAPIError
 
 
 class LinkedInClient:
@@ -26,6 +25,7 @@ class LinkedInClient:
             config: LinkedIn configuration (uses default if not provided)
         """
         from .config import config as default_config
+
         self.config = config or default_config
 
         self.base_url = self.config.linkedin_api_base_url
@@ -86,9 +86,7 @@ class LinkedInClient:
 
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    url,
-                    headers={"Authorization": f"Bearer {self.access_token}"},
-                    timeout=10.0
+                    url, headers={"Authorization": f"Bearer {self.access_token}"}, timeout=10.0
                 )
                 return response.status_code == 200
 

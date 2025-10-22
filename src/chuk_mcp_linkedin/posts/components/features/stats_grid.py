@@ -39,7 +39,7 @@ class StatsGrid(PostComponent):
         # Render in grid format
         # For simplicity in text, we'll just do rows with visual grouping
         for i in range(0, len(stat_items), self.columns):
-            row_items = stat_items[i:i + self.columns]
+            row_items = stat_items[i : i + self.columns]
             row_parts = []
             for label, value in row_items:
                 row_parts.append(f"{label}: {value}")

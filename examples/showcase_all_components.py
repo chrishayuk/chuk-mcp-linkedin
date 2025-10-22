@@ -27,11 +27,7 @@ def save_preview(post: ComposablePost, name: str, description: str) -> str:
     text = post.compose()
 
     # Create draft data
-    draft_data = {
-        "name": name,
-        "post_type": "text",
-        "content": {"composed_text": text}
-    }
+    draft_data = {"name": name, "post_type": "text", "content": {"composed_text": text}}
 
     # Create stats
     stats = {
@@ -68,11 +64,12 @@ def save_preview(post: ComposablePost, name: str, description: str) -> str:
 # POST STRUCTURE COMPONENTS
 # ==============================================================================
 
+
 def demo_post_structure():
     """Showcase all post structure components"""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("POST STRUCTURE COMPONENTS")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     theme_mgr = ThemeManager()
     theme = theme_mgr.get_theme("thought_leader")
@@ -85,10 +82,13 @@ def demo_post_structure():
     # Body with different structures
     post.add_body("Here's what actually works in 2025:", structure="linear")
 
-    post.add_body("""Strong opening hook
+    post.add_body(
+        """Strong opening hook
 Clear value proposition
 Scannable format
-Compelling CTA""", structure="listicle")
+Compelling CTA""",
+        structure="listicle",
+    )
 
     # Separators
     post.add_separator("line")
@@ -107,13 +107,14 @@ Compelling CTA""", structure="listicle")
     return save_preview(
         post,
         "Post Structure Showcase",
-        "Hook, Body (listicle), Separators (line/dots), CTA, Hashtags"
+        "Hook, Body (listicle), Separators (line/dots), CTA, Hashtags",
     )
 
 
 # ==============================================================================
 # CHART COMPONENTS
 # ==============================================================================
+
 
 def demo_bar_chart():
     """Bar chart with colored emoji squares"""
@@ -126,10 +127,10 @@ def demo_bar_chart():
             "Code Review": 6,
             "Documentation": 4,
             "Debugging": 8,
-            "Meetings": 10
+            "Meetings": 10,
         },
         title="HOURS SAVED PER WEEK",
-        unit="hours"
+        unit="hours",
     )
     post.add_cta("curiosity", "How much time do AI tools save you?")
     post.add_hashtags(["AI", "Productivity", "Development"])
@@ -147,9 +148,9 @@ def demo_metrics_chart():
             "Faster problem-solving": "67%",
             "Fewer bugs in production": "54%",
             "Better code documentation": "89%",
-            "Improved team collaboration": "72%"
+            "Improved team collaboration": "72%",
         },
-        title="KEY IMPROVEMENTS"
+        title="KEY IMPROVEMENTS",
     )
     post.add_separator("line")
     post.add_body("These aren't marginal gains. They're fundamental shifts.")
@@ -170,16 +171,16 @@ def demo_comparison_chart():
                 "Manual code completion",
                 "Slower debugging",
                 "Limited context awareness",
-                "Manual test writing"
+                "Manual test writing",
             ],
             "AI-Assisted Approach": [
                 "Intelligent completions",
                 "Faster bug detection",
                 "Context-aware suggestions",
-                "Automated test generation"
-            ]
+                "Automated test generation",
+            ],
         },
-        title="DEVELOPMENT APPROACHES"
+        title="DEVELOPMENT APPROACHES",
     )
     post.add_separator("dots")
     post.add_body("The verdict: AI-assisted is 40% faster with better quality.")
@@ -200,9 +201,9 @@ def demo_progress_chart():
             "Frontend UI": 85,
             "Testing Suite": 70,
             "Documentation": 60,
-            "Marketing Site": 45
+            "Marketing Site": 45,
         },
-        title="LAUNCH READINESS"
+        title="LAUNCH READINESS",
     )
     post.add_separator("line")
     post.add_body("The team is crushing it. Launch day: January 15th.")
@@ -223,10 +224,10 @@ def demo_ranking_chart():
             "JavaScript": "28% of all postings",
             "TypeScript": "22% of all postings",
             "Go": "8% of all postings",
-            "Rust": "7% of all postings"
+            "Rust": "7% of all postings",
         },
         title="TOP 5 LANGUAGES",
-        show_medals=True
+        show_medals=True,
     )
     post.add_separator("line")
     post.add_body("Python dominates, but TypeScript is growing fastest (+40% YoY).")
@@ -240,6 +241,7 @@ def demo_ranking_chart():
 # FEATURE COMPONENTS
 # ==============================================================================
 
+
 def demo_quote():
     """Quote/testimonial"""
     post = ComposablePost("text")
@@ -249,7 +251,7 @@ def demo_quote():
     post.add_quote(
         text="AI-assisted development has transformed our team. We're shipping 10x faster with 50% fewer bugs. It's not hype - it's measurable impact.",
         author="Sarah Chen",
-        source="CTO at TechCorp"
+        source="CTO at TechCorp",
     )
     post.add_separator("line")
     post.add_body("Today, they deploy 20+ times per day with confidence.")
@@ -267,7 +269,7 @@ def demo_big_stat():
     post.add_big_stat(
         number="2.5M",
         label="developers using AI coding tools daily",
-        context="↑ 340% growth year-over-year (2024 → 2025)"
+        context="↑ 340% growth year-over-year (2024 → 2025)",
     )
     post.add_separator("dots")
     post.add_body("This explosive growth is fundamentally changing software development.")
@@ -293,10 +295,10 @@ def demo_timeline():
             "Dec 2023": "Hit $100K MRR milestone",
             "Apr 2024": "Crossed $500K MRR",
             "Aug 2024": "Raised Series A ($5M)",
-            "Dec 2024": "$10M ARR achieved"
+            "Dec 2024": "$10M ARR achieved",
         },
         title="OUR GROWTH JOURNEY",
-        style="arrow"
+        style="arrow",
     )
     post.add_separator("line")
     post.add_body("Key lesson: Focus on solving real problems, not chasing trends.")
@@ -321,7 +323,7 @@ def demo_key_takeaway():
     post.add_key_takeaway(
         message="Focus on solving REAL problems for REAL customers. Revenue beats vanity metrics every time. Listen to your customers, not your ego.",
         title="THE KEY LESSON",
-        style="box"
+        style="box",
     )
     post.add_separator("line")
     post.add_cta("soft", "What's the hardest lesson you've learned?")
@@ -343,15 +345,15 @@ def demo_pro_con():
             "Fewer production bugs (-30%)",
             "Better code documentation",
             "Improved developer satisfaction",
-            "Faster onboarding for new hires"
+            "Faster onboarding for new hires",
         ],
         cons=[
             "Initial learning curve (2-3 weeks)",
             "Cost: $20-40 per developer/month",
             "Requires updated code review process",
-            "Occasional incorrect suggestions"
+            "Occasional incorrect suggestions",
         ],
-        title="AI CODING TOOLS"
+        title="AI CODING TOOLS",
     )
     post.add_separator("line")
     post.add_body("Our verdict: The ROI is undeniable. We're going all-in.")
@@ -364,6 +366,7 @@ def demo_pro_con():
 # ==============================================================================
 # COMBINED EXAMPLES
 # ==============================================================================
+
 
 def demo_combined_comprehensive():
     """Comprehensive post using multiple component types"""
@@ -385,7 +388,7 @@ def demo_combined_comprehensive():
     post.add_big_stat(
         number="95%",
         label="of Fortune 500 engineering teams now use AI tools",
-        context="Up from 23% in 2023"
+        context="Up from 23% in 2023",
     )
 
     post.add_separator("dots")
@@ -396,10 +399,10 @@ def demo_combined_comprehensive():
             "2022": "Early adopters experiment (5%)",
             "2023": "Mainstream awareness (23%)",
             "2024": "Rapid adoption begins (67%)",
-            "2025": "AI becomes standard (95%)"
+            "2025": "AI becomes standard (95%)",
         },
         title="ADOPTION CURVE",
-        style="arrow"
+        style="arrow",
     )
 
     post.add_separator("line")
@@ -411,9 +414,9 @@ def demo_combined_comprehensive():
             "Faster development": "67%",
             "Fewer bugs": "54%",
             "Better documentation": "89%",
-            "Higher job satisfaction": "72%"
+            "Higher job satisfaction": "72%",
         },
-        title="MEASURED IMPROVEMENTS"
+        title="MEASURED IMPROVEMENTS",
     )
 
     post.add_separator("line")
@@ -422,7 +425,7 @@ def demo_combined_comprehensive():
     post.add_quote(
         text="AI tools have fundamentally changed how we approach software development. It's not about replacing developers - it's about amplifying their capabilities.",
         author="Emily Rodriguez",
-        source="VP Engineering at Scale AI"
+        source="VP Engineering at Scale AI",
     )
 
     post.add_separator("dots")
@@ -430,7 +433,7 @@ def demo_combined_comprehensive():
     # Key takeaway
     post.add_key_takeaway(
         message="The question isn't WHETHER to adopt AI development tools. It's HOW QUICKLY you can integrate them to stay competitive.",
-        style="box"
+        style="box",
     )
 
     post.add_separator("line")
@@ -444,7 +447,7 @@ def demo_combined_comprehensive():
     return save_preview(
         post,
         "Comprehensive Showcase",
-        "Multiple components: BigStat, Timeline, Metrics, Quote, KeyTakeaway"
+        "Multiple components: BigStat, Timeline, Metrics, Quote, KeyTakeaway",
     )
 
 
@@ -460,14 +463,9 @@ def demo_data_driven_story():
     # Show time savings
     post.add_body("1. Time Saved Per Developer:")
     post.add_bar_chart(
-        data={
-            "Code Generation": 15,
-            "Bug Detection": 8,
-            "Code Review": 6,
-            "Documentation": 5
-        },
+        data={"Code Generation": 15, "Bug Detection": 8, "Code Review": 6, "Documentation": 5},
         title="HOURS SAVED PER WEEK",
-        unit="hours"
+        unit="hours",
     )
 
     post.add_separator("dots")
@@ -475,13 +473,8 @@ def demo_data_driven_story():
     # Show adoption progress
     post.add_body("2. Tool Adoption Across Team:")
     post.add_progress_chart(
-        data={
-            "GitHub Copilot": 100,
-            "ChatGPT": 95,
-            "Cursor": 80,
-            "Claude Code": 60
-        },
-        title="TEAM ADOPTION RATES"
+        data={"GitHub Copilot": 100, "ChatGPT": 95, "Cursor": 80, "Claude Code": 60},
+        title="TEAM ADOPTION RATES",
     )
 
     post.add_separator("dots")
@@ -493,10 +486,10 @@ def demo_data_driven_story():
             "Faster prototyping": "10x improvement",
             "Better code quality": "5x improvement",
             "Faster debugging": "4x improvement",
-            "Team morale": "3x improvement"
+            "Team morale": "3x improvement",
         },
         title="TOP IMPROVEMENTS",
-        show_medals=True
+        show_medals=True,
     )
 
     post.add_separator("line")
@@ -504,28 +497,25 @@ def demo_data_driven_story():
     # Conclusion
     post.add_key_takeaway(
         message="The ROI is undeniable: $40/dev/month for 34 hours saved per week. That's a 170:1 return.",
-        title="THE BOTTOM LINE"
+        title="THE BOTTOM LINE",
     )
 
     post.add_cta("curiosity", "What's your biggest productivity bottleneck?")
     post.add_hashtags(["Productivity", "AI", "Development", "ROI"])
 
-    return save_preview(
-        post,
-        "Data-Driven Story",
-        "Multiple charts telling a complete story"
-    )
+    return save_preview(post, "Data-Driven Story", "Multiple charts telling a complete story")
 
 
 # ==============================================================================
 # MAIN
 # ==============================================================================
 
+
 def main():
     """Generate all component showcases"""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("LINKEDIN POST COMPONENTS - COMPLETE SHOWCASE")
-    print("="*70)
+    print("=" * 70)
     print("\nGenerating HTML previews for every component type...")
     print()
 
@@ -535,7 +525,7 @@ def main():
     previews.append(demo_post_structure())
 
     print("\n📊 CHART COMPONENTS")
-    print("-"*70 + "\n")
+    print("-" * 70 + "\n")
     previews.append(demo_bar_chart())
     previews.append(demo_metrics_chart())
     previews.append(demo_comparison_chart())
@@ -543,7 +533,7 @@ def main():
     previews.append(demo_ranking_chart())
 
     print("\n🎨 FEATURE COMPONENTS")
-    print("-"*70 + "\n")
+    print("-" * 70 + "\n")
     previews.append(demo_quote())
     previews.append(demo_big_stat())
     previews.append(demo_timeline())
@@ -551,13 +541,13 @@ def main():
     previews.append(demo_pro_con())
 
     print("\n🔥 COMBINED EXAMPLES")
-    print("-"*70 + "\n")
+    print("-" * 70 + "\n")
     previews.append(demo_combined_comprehensive())
     previews.append(demo_data_driven_story())
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(f"✅ COMPLETE! Generated {len(previews)} HTML previews")
-    print("="*70)
+    print("=" * 70)
     print(f"\nSaved to: {Path.home() / '.linkedin_drafts' / 'previews' / 'showcase'}")
     print("\nOpen any preview in your browser to see LinkedIn-style formatting!")
     print("\nComponent types demonstrated:")
@@ -565,7 +555,7 @@ def main():
     print("  ✓ Charts (Bar, Metrics, Comparison, Progress, Ranking)")
     print("  ✓ Features (Quote, BigStat, Timeline, KeyTakeaway, ProCon)")
     print("  ✓ Combined examples with multiple components")
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
 
     return previews
 

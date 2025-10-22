@@ -11,6 +11,7 @@ Demonstrates:
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.composition import ComposablePost
@@ -21,21 +22,21 @@ import time
 
 def create_single_image_post():
     """Example 1: Post with single image"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING: Single Image Post")
-    print("="*60)
+    print("=" * 60)
 
     theme_manager = ThemeManager()
     theme = theme_manager.get_theme("thought_leader")
 
     post = ComposablePost("text", theme=theme)
 
-    post.add_hook(
-        "insight",
-        "This is what a LinkedIn post with an image looks like."
-    )
+    post.add_hook("insight", "This is what a LinkedIn post with an image looks like.")
 
-    post.add_body("Images make your posts 2.3x more engaging.\n\nUse high-quality visuals that support your message.", structure="linear")
+    post.add_body(
+        "Images make your posts 2.3x more engaging.\n\nUse high-quality visuals that support your message.",
+        structure="linear",
+    )
 
     post.add_hashtags(["ContentStrategy", "VisualContent"])
 
@@ -48,12 +49,16 @@ def create_single_image_post():
         "post_type": "image",
         "content": {
             "composed_text": text_content,
-            "images": [{
-                "filepath": str(Path(__file__).parent.parent / "test_files" / "test_image_1.png"),
-                "alt_text": "LinkedIn post image example"
-            }]
+            "images": [
+                {
+                    "filepath": str(
+                        Path(__file__).parent.parent / "test_files" / "test_image_1.png"
+                    ),
+                    "alt_text": "LinkedIn post image example",
+                }
+            ],
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     return post, theme, draft_data, "single_image_post"
@@ -61,28 +66,28 @@ def create_single_image_post():
 
 def create_multiple_images_post():
     """Example 2: Post with multiple images (grid layout)"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING: Multiple Images Post (4-image grid)")
-    print("="*60)
+    print("=" * 60)
 
     theme_manager = ThemeManager()
     theme = theme_manager.get_theme("personal_brand")
 
     post = ComposablePost("text", theme=theme)
 
-    post.add_hook(
-        "story",
-        "Behind the scenes of our product launch 🚀"
-    )
+    post.add_hook("story", "Behind the scenes of our product launch 🚀")
 
-    post.add_body("""Swipe through to see:
+    post.add_body(
+        """Swipe through to see:
 
 → The team brainstorming
 → Design iterations
 → Beta testing phase
 → Launch day celebration
 
-It takes a village to ship great products.""", structure="linear")
+It takes a village to ship great products.""",
+        structure="linear",
+    )
 
     post.add_hashtags(["ProductLaunch", "Teamwork", "BehindTheScenes"])
 
@@ -96,13 +101,22 @@ It takes a village to ship great products.""", structure="linear")
         "content": {
             "composed_text": text_content,
             "images": [
-                {"filepath": str(test_files_dir / "test_image_1.png"), "alt_text": "Brainstorming session"},
-                {"filepath": str(test_files_dir / "test_image_2.png"), "alt_text": "Design iterations"},
+                {
+                    "filepath": str(test_files_dir / "test_image_1.png"),
+                    "alt_text": "Brainstorming session",
+                },
+                {
+                    "filepath": str(test_files_dir / "test_image_2.png"),
+                    "alt_text": "Design iterations",
+                },
                 {"filepath": str(test_files_dir / "test_image_3.png"), "alt_text": "Beta testing"},
-                {"filepath": str(test_files_dir / "test_image_4.png"), "alt_text": "Launch celebration"},
-            ]
+                {
+                    "filepath": str(test_files_dir / "test_image_4.png"),
+                    "alt_text": "Launch celebration",
+                },
+            ],
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     return post, theme, draft_data, "multiple_images_post"
@@ -110,25 +124,25 @@ It takes a village to ship great products.""", structure="linear")
 
 def create_video_post():
     """Example 3: Post with video"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING: Video Post")
-    print("="*60)
+    print("=" * 60)
 
     theme_manager = ThemeManager()
     theme = theme_manager.get_theme("storyteller")
 
     post = ComposablePost("text", theme=theme)
 
-    post.add_hook(
-        "bold",
-        "Watch this 2-minute demo that changed everything."
-    )
+    post.add_hook("bold", "Watch this 2-minute demo that changed everything.")
 
-    post.add_body("""We spent 6 months building this feature.
+    post.add_body(
+        """We spent 6 months building this feature.
 
 The result? Our users can now accomplish in 30 seconds what used to take 10 minutes.
 
-Video shows the before vs. after.""", structure="linear")
+Video shows the before vs. after.""",
+        structure="linear",
+    )
 
     post.add_cta("action", "What feature would save you the most time?")
 
@@ -145,10 +159,12 @@ Video shows the before vs. after.""", structure="linear")
             "video": {
                 "title": "Product Demo",
                 "duration": "2:15",
-                "thumbnail": str(Path(__file__).parent.parent / "test_files" / "video_thumbnail.png"),
-            }
+                "thumbnail": str(
+                    Path(__file__).parent.parent / "test_files" / "video_thumbnail.png"
+                ),
+            },
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     return post, theme, draft_data, "video_post"
@@ -156,21 +172,19 @@ Video shows the before vs. after.""", structure="linear")
 
 def create_document_file_post():
     """Example 4: Post with document file attachment"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING: Document File Post")
-    print("="*60)
+    print("=" * 60)
 
     theme_manager = ThemeManager()
     theme = theme_manager.get_theme("data_driven")
 
     post = ComposablePost("text", theme=theme)
 
-    post.add_hook(
-        "value",
-        "I'm sharing our complete 2025 content strategy framework."
-    )
+    post.add_hook("value", "I'm sharing our complete 2025 content strategy framework.")
 
-    post.add_body("""12 months of research distilled into one actionable guide.
+    post.add_body(
+        """12 months of research distilled into one actionable guide.
 
 Inside you'll find:
 
@@ -179,7 +193,9 @@ Inside you'll find:
 → Distribution checklist
 → Performance metrics
 
-100% free. No email required.""", structure="linear")
+100% free. No email required.""",
+        structure="linear",
+    )
 
     post.add_cta("value", "Download it and let me know what you think!")
 
@@ -199,9 +215,9 @@ Inside you'll find:
                 "pages": 24,
                 "size": "2.4 MB",
                 "filepath": str(Path(__file__).parent.parent / "test_files" / "test_document.pdf"),
-            }
+            },
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     return post, theme, draft_data, "document_file_post"
@@ -209,21 +225,19 @@ Inside you'll find:
 
 def create_presentation_file_post():
     """Example 5: Post with PowerPoint presentation"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING: Presentation File Post")
-    print("="*60)
+    print("=" * 60)
 
     theme_manager = ThemeManager()
     theme = theme_manager.get_theme("coach_mentor")
 
     post = ComposablePost("text", theme=theme)
 
-    post.add_hook(
-        "how_to",
-        "My exact pitch deck template that raised $2M."
-    )
+    post.add_hook("how_to", "My exact pitch deck template that raised $2M.")
 
-    post.add_body("""After 50+ investor meetings, here's what works:
+    post.add_body(
+        """After 50+ investor meetings, here's what works:
 
 ✓ Problem slide (1 slide)
 ✓ Solution slide (1 slide)
@@ -233,7 +247,9 @@ def create_presentation_file_post():
 
 That's it. 5 slides.
 
-Download the template below.""", structure="linear")
+Download the template below.""",
+        structure="linear",
+    )
 
     post.add_hashtags(["Startups", "Fundraising", "PitchDeck"])
 
@@ -250,10 +266,12 @@ Download the template below.""", structure="linear")
                 "file_type": "PPTX",
                 "pages": 5,
                 "size": "892 KB",
-                "filepath": str(Path(__file__).parent.parent / "test_files" / "test_presentation.pptx"),
-            }
+                "filepath": str(
+                    Path(__file__).parent.parent / "test_files" / "test_presentation.pptx"
+                ),
+            },
         },
-        "theme": theme.name
+        "theme": theme.name,
     }
 
     return post, theme, draft_data, "presentation_file_post"
@@ -280,15 +298,12 @@ def generate_preview(post, theme, draft_data, name):
         "char_count": len(text_content),
         "word_count": len(text_content.split()),
         "char_remaining": 3000 - len(text_content),
-        "hashtag_count": len([line for line in text_content.split('\n') if '#' in line]),
+        "hashtag_count": len([line for line in text_content.split("\n") if "#" in line]),
         "has_hook": True,
         "has_cta": True,
     }
 
-    html_preview = LinkedInPreview.generate_html(
-        draft_data,
-        stats=stats
-    )
+    html_preview = LinkedInPreview.generate_html(draft_data, stats=stats)
 
     preview_path = f".linkedin_drafts/previews/media/{name}_{int(time.time())}.html"
     saved_path = LinkedInPreview.save_preview(html_preview, preview_path)
@@ -299,9 +314,9 @@ def generate_preview(post, theme, draft_data, name):
 
 def main():
     """Generate all media type examples"""
-    print("="*60)
+    print("=" * 60)
     print("LINKEDIN MEDIA TYPES SHOWCASE")
-    print("="*60)
+    print("=" * 60)
     print("Generating previews for different media types...")
 
     # Create media directory
@@ -322,18 +337,18 @@ def main():
         preview_path = generate_preview(post, theme, draft_data, name)
         preview_paths.append(preview_path)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ALL MEDIA PREVIEWS GENERATED")
-    print("="*60)
+    print("=" * 60)
     print(f"\nGenerated {len(preview_paths)} preview files:\n")
 
     for i, path in enumerate(preview_paths, 1):
         filename = Path(path).name
         print(f"{i}. {filename}")
 
-    print(f"\nOpen them in your browser:")
-    print(f"  cd .linkedin_drafts/previews/media")
-    print(f"  open *.html")
+    print("\nOpen them in your browser:")
+    print("  cd .linkedin_drafts/previews/media")
+    print("  open *.html")
 
     return preview_paths
 

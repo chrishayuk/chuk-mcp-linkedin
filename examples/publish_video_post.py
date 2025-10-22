@@ -12,6 +12,7 @@ import sys
 import os
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -44,7 +45,7 @@ async def main():
             print("  export LINKEDIN_PERSON_URN='urn:li:person:YOUR_ID'")
             return
 
-        print(f"✓ Client initialized")
+        print("✓ Client initialized")
         print(f"  Person URN: {client.person_urn[:30]}...")
 
     except Exception as e:
@@ -57,7 +58,7 @@ async def main():
     if not test_video.exists():
         print(f"\n❌ Test video not found: {test_video}")
         print("\nTo use this example, add a test video:")
-        print(f"  1. Create or find an MP4 video (75KB-500MB, 3sec-30min)")
+        print("  1. Create or find an MP4 video (75KB-500MB, 3sec-30min)")
         print(f"  2. Save it as: {test_video}")
         print("\nVideo requirements:")
         print("  • Format: MP4 only")
@@ -66,7 +67,7 @@ async def main():
         print("  • Aspect ratio: 16:9 recommended")
         return
 
-    print(f"\n✓ Test video found")
+    print("\n✓ Test video found")
     print(f"  File: {test_video.name}")
     print(f"  Size: {test_video.stat().st_size / 1024 / 1024:.1f} MB")
 
@@ -76,24 +77,21 @@ async def main():
 
     post = ComposablePost("video", theme=theme)
 
-    post.add_hook(
-        "insight",
-        "Video content gets 5x more engagement than static posts."
-    )
+    post.add_hook("insight", "Video content gets 5x more engagement than static posts.")
 
-    post.add_body("""Here's what makes video powerful on LinkedIn:
+    post.add_body(
+        """Here's what makes video powerful on LinkedIn:
 
 → Captures attention in the feed
 → Explains complex ideas simply
 → Builds personal connection
 → Algorithm favors native video
 
-Whether it's a demo, tutorial, or thought piece - video lets you connect with your audience in ways text can't match.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What type of video content resonates most with your audience?"
+Whether it's a demo, tutorial, or thought piece - video lets you connect with your audience in ways text can't match.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What type of video content resonates most with your audience?")
 
     post.add_hashtags(["VideoContent", "LinkedInVideo", "ContentCreation"])
 
@@ -134,33 +132,33 @@ Whether it's a demo, tutorial, or thought piece - video lets you connect with yo
             text=post_text,
             video_path=test_video,
             title="LinkedIn API Test Video",
-            visibility="PUBLIC"
+            visibility="PUBLIC",
         )
 
         print("\n" + "=" * 60)
         print("✓ SUCCESS!")
         print("=" * 60)
 
-        post_urn = result.get('id', '')
-        post_status = result.get('status_code', 'N/A')
+        post_urn = result.get("id", "")
+        post_status = result.get("status_code", "N/A")
 
         print(f"\nPost URN: {post_urn}")
         print(f"HTTP Status: {post_status}")
 
         # Format post URL for easy access
-        if post_urn and ('ugcPost' in post_urn or 'share' in post_urn):
+        if post_urn and ("ugcPost" in post_urn or "share" in post_urn):
             post_url = f"https://www.linkedin.com/feed/update/{post_urn}"
-            print(f"\n🔗 View your post:")
+            print("\n🔗 View your post:")
             print(f"   {post_url}")
-            print(f"\nOr check your LinkedIn feed:")
-            print(f"   https://www.linkedin.com/feed/")
+            print("\nOr check your LinkedIn feed:")
+            print("   https://www.linkedin.com/feed/")
 
         print("\n📊 Details:")
-        print(f"   Type: Video post")
+        print("   Type: Video post")
         print(f"   Video: {test_video.name} uploaded")
         print(f"   Size: {test_video.stat().st_size / 1024 / 1024:.1f} MB")
         print(f"   Text: {len(post_text)} characters")
-        print(f"   Visibility: PUBLIC")
+        print("   Visibility: PUBLIC")
 
     except LinkedInAPIError as e:
         print("\n" + "=" * 60)
@@ -183,6 +181,7 @@ Whether it's a demo, tutorial, or thought piece - video lets you connect with yo
         print("=" * 60)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
 
 

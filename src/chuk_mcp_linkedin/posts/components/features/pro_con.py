@@ -54,7 +54,8 @@ class ProCon(PostComponent):
 
     def validate(self) -> bool:
         return (
-            len(self.pros) > 0 and len(self.cons) > 0 and
-            all(len(p.strip()) > 0 for p in self.pros) and
-            all(len(c.strip()) > 0 for c in self.cons)
+            len(self.pros) > 0
+            and len(self.cons) > 0
+            and all(len(p.strip()) > 0 for p in self.pros)
+            and all(len(c.strip()) > 0 for c in self.cons)
         )

@@ -7,10 +7,27 @@ Shadcn-style atomic composition with type-safe components.
 from typing import List, Optional, Dict, Any
 from .components import (
     PostComponent,
-    Hook, Body, CallToAction, Hashtags,
-    BarChart, MetricsChart, ComparisonChart, ProgressChart, RankingChart,
-    Quote, BigStat, Timeline, KeyTakeaway, ProCon,
-    Checklist, BeforeAfter, TipBox, StatsGrid, PollPreview, FeatureList, NumberedList,
+    Hook,
+    Body,
+    CallToAction,
+    Hashtags,
+    BarChart,
+    MetricsChart,
+    ComparisonChart,
+    ProgressChart,
+    RankingChart,
+    Quote,
+    BigStat,
+    Timeline,
+    KeyTakeaway,
+    ProCon,
+    Checklist,
+    BeforeAfter,
+    TipBox,
+    StatsGrid,
+    PollPreview,
+    FeatureList,
+    NumberedList,
     Separator,
 )
 from ..tokens.text_tokens import TextTokens
@@ -87,9 +104,7 @@ class ComposablePost:
         return self
 
     # Feature components
-    def add_quote(
-        self, text: str, author: str, source: Optional[str] = None
-    ) -> "ComposablePost":
+    def add_quote(self, text: str, author: str, source: Optional[str] = None) -> "ComposablePost":
         """Add quote/testimonial"""
         self.components.append(Quote(text, author, source, self.theme))
         return self
@@ -130,7 +145,11 @@ class ComposablePost:
         return self
 
     def add_before_after(
-        self, before: List[str], after: List[str], title: Optional[str] = None, labels: Optional[Dict[str, str]] = None
+        self,
+        before: List[str],
+        after: List[str],
+        title: Optional[str] = None,
+        labels: Optional[Dict[str, str]] = None,
     ) -> "ComposablePost":
         """Add before/after transformation comparison"""
         self.components.append(BeforeAfter(before, after, title, labels, self.theme))
@@ -150,9 +169,7 @@ class ComposablePost:
         self.components.append(StatsGrid(stats, title, columns, self.theme))
         return self
 
-    def add_poll_preview(
-        self, question: str, options: List[str]
-    ) -> "ComposablePost":
+    def add_poll_preview(self, question: str, options: List[str]) -> "ComposablePost":
         """Add poll preview for engagement"""
         self.components.append(PollPreview(question, options, self.theme))
         return self

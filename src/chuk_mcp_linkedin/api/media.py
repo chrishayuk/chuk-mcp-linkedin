@@ -4,7 +4,7 @@ LinkedIn Media API operations.
 Handles uploading images and videos to LinkedIn.
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Optional
 from pathlib import Path
 import httpx
 from .errors import LinkedInAPIError
@@ -56,7 +56,7 @@ class MediaAPIMixin:
             raise LinkedInAPIError(f"File not found: {file_path}")
 
         # Validate file type
-        supported_types = {'.jpg', '.jpeg', '.png', '.gif'}
+        supported_types = {".jpg", ".jpeg", ".png", ".gif"}
         if file_path.suffix.lower() not in supported_types:
             raise LinkedInAPIError(
                 f"Unsupported file type: {file_path.suffix}. "
@@ -76,18 +76,14 @@ class MediaAPIMixin:
         async with httpx.AsyncClient() as client:
             # Step 1: Initialize upload
             init_url = "https://api.linkedin.com/rest/images?action=initializeUpload"
-            init_payload = {
-                "initializeUploadRequest": {
-                    "owner": self.person_urn
-                }
-            }
+            init_payload = {"initializeUploadRequest": {"owner": self.person_urn}}
 
             try:
                 response = await client.post(
                     init_url,
                     json=init_payload,
                     headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    timeout=30.0,
                 )
 
                 if response.status_code not in (200, 201):
@@ -104,20 +100,21 @@ class MediaAPIMixin:
 
             # Step 2: Upload image
             try:
-                with open(file_path, 'rb') as f:
+                with open(file_path, "rb") as f:
                     file_data = f.read()
 
                 # Determine MIME type
                 import mimetypes
+
                 mime_type, _ = mimetypes.guess_type(str(file_path))
                 if not mime_type:
                     mime_types = {
-                        '.jpg': 'image/jpeg',
-                        '.jpeg': 'image/jpeg',
-                        '.png': 'image/png',
-                        '.gif': 'image/gif'
+                        ".jpg": "image/jpeg",
+                        ".jpeg": "image/jpeg",
+                        ".png": "image/png",
+                        ".gif": "image/gif",
                     }
-                    mime_type = mime_types.get(file_path.suffix.lower(), 'application/octet-stream')
+                    mime_type = mime_types.get(file_path.suffix.lower(), "application/octet-stream")
 
                 upload_response = await client.put(
                     upload_url,
@@ -126,7 +123,7 @@ class MediaAPIMixin:
                         "Authorization": f"Bearer {self.access_token}",
                         "Content-Type": mime_type,
                     },
-                    timeout=120.0
+                    timeout=120.0,
                 )
 
                 if upload_response.status_code not in (200, 201):
@@ -183,10 +180,9 @@ class MediaAPIMixin:
             raise LinkedInAPIError(f"File not found: {file_path}")
 
         # Validate file type (MP4 only)
-        if file_path.suffix.lower() != '.mp4':
+        if file_path.suffix.lower() != ".mp4":
             raise LinkedInAPIError(
-                f"Unsupported file type: {file_path.suffix}. "
-                f"LinkedIn only supports MP4 videos"
+                f"Unsupported file type: {file_path.suffix}. " f"LinkedIn only supports MP4 videos"
             )
 
         # Validate file size (75kb - 500MB)
@@ -209,7 +205,7 @@ class MediaAPIMixin:
                     "owner": self.person_urn,
                     "fileSizeBytes": file_size,
                     "uploadCaptions": False,
-                    "uploadThumbnail": False
+                    "uploadThumbnail": False,
                 }
             }
 
@@ -218,7 +214,7 @@ class MediaAPIMixin:
                     init_url,
                     json=init_payload,
                     headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    timeout=30.0,
                 )
 
                 if response.status_code not in (200, 201):
@@ -250,7 +246,7 @@ class MediaAPIMixin:
 
             # Step 2: Upload video
             try:
-                with open(file_path, 'rb') as f:
+                with open(file_path, "rb") as f:
                     file_data = f.read()
 
                 upload_response = await client.put(
@@ -260,7 +256,7 @@ class MediaAPIMixin:
                         "Authorization": f"Bearer {self.access_token}",
                         "Content-Type": "video/mp4",
                     },
-                    timeout=300.0  # 5 minutes for video upload
+                    timeout=300.0,  # 5 minutes for video upload
                 )
 
                 if upload_response.status_code not in (200, 201):
@@ -281,7 +277,7 @@ class MediaAPIMixin:
                     "finalizeUploadRequest": {
                         "video": video_urn,
                         "uploadToken": upload_token,
-                        "uploadedPartIds": [etag] if etag else []
+                        "uploadedPartIds": [etag] if etag else [],
                     }
                 }
 
@@ -289,7 +285,7 @@ class MediaAPIMixin:
                     finalize_url,
                     json=finalize_payload,
                     headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0
+                    timeout=30.0,
                 )
 
                 if finalize_response.status_code not in (200, 201):
@@ -305,6 +301,7 @@ class MediaAPIMixin:
             # For small videos, this usually takes 5-15 seconds
             # We'll wait a reasonable amount of time before proceeding
             import asyncio
+
             wait_time = 10  # Wait 10 seconds for processing
 
             await asyncio.sleep(wait_time)

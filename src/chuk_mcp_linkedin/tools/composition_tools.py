@@ -4,7 +4,6 @@ Composition tools for building LinkedIn posts.
 Handles post composition, component assembly, and preview generation.
 """
 
-import json
 from ..models import (
     BarChartData,
     MetricsChartData,
@@ -46,9 +45,7 @@ def register_composition_tools(mcp, manager):
             return "No active draft. Create one first with linkedin_create."
 
         hook_data = {"type": hook_type, "content": content}
-        draft.content.setdefault("components", []).append(
-            {"component": "hook", **hook_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "hook", **hook_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added {hook_type} hook to draft"
@@ -70,9 +67,7 @@ def register_composition_tools(mcp, manager):
             return "No active draft"
 
         body_data = {"content": content, "structure": structure}
-        draft.content.setdefault("components", []).append(
-            {"component": "body", **body_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "body", **body_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added body with {structure} structure"
@@ -100,9 +95,7 @@ def register_composition_tools(mcp, manager):
         return f"Added {cta_type} CTA"
 
     @mcp.tool
-    async def linkedin_add_bar_chart(
-        data: dict, title: str = None, unit: str = ""
-    ) -> str:
+    async def linkedin_add_bar_chart(data: dict, title: str = None, unit: str = "") -> str:
         """
         Add horizontal bar chart using colored emoji squares.
 
@@ -130,19 +123,15 @@ def register_composition_tools(mcp, manager):
         chart_data = {
             "data": chart_model.data,
             "title": chart_model.title,
-            "unit": chart_model.unit
+            "unit": chart_model.unit,
         }
-        draft.content.setdefault("components", []).append(
-            {"component": "bar_chart", **chart_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "bar_chart", **chart_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added bar chart with {len(data)} bars"
 
     @mcp.tool
-    async def linkedin_add_metrics_chart(
-        data: dict, title: str = None
-    ) -> str:
+    async def linkedin_add_metrics_chart(data: dict, title: str = None) -> str:
         """
         Add key metrics chart with emoji indicators (✅/❌).
 
@@ -166,10 +155,7 @@ def register_composition_tools(mcp, manager):
         except Exception as e:
             return f"Validation error: {str(e)}"
 
-        chart_data = {
-            "data": chart_model.data,
-            "title": chart_model.title
-        }
+        chart_data = {"data": chart_model.data, "title": chart_model.title}
         draft.content.setdefault("components", []).append(
             {"component": "metrics_chart", **chart_data}
         )
@@ -178,9 +164,7 @@ def register_composition_tools(mcp, manager):
         return f"Added metrics chart with {len(data)} metrics"
 
     @mcp.tool
-    async def linkedin_add_comparison_chart(
-        data: dict, title: str = None
-    ) -> str:
+    async def linkedin_add_comparison_chart(data: dict, title: str = None) -> str:
         """
         Add side-by-side A vs B comparison chart.
 
@@ -207,10 +191,7 @@ def register_composition_tools(mcp, manager):
         except Exception as e:
             return f"Validation error: {str(e)}"
 
-        chart_data = {
-            "data": chart_model.data,
-            "title": chart_model.title
-        }
+        chart_data = {"data": chart_model.data, "title": chart_model.title}
         draft.content.setdefault("components", []).append(
             {"component": "comparison_chart", **chart_data}
         )
@@ -219,9 +200,7 @@ def register_composition_tools(mcp, manager):
         return f"Added comparison chart with {len(data)} options"
 
     @mcp.tool
-    async def linkedin_add_progress_chart(
-        data: dict, title: str = None
-    ) -> str:
+    async def linkedin_add_progress_chart(data: dict, title: str = None) -> str:
         """
         Add progress bars chart for tracking completion (0-100%).
 
@@ -245,10 +224,7 @@ def register_composition_tools(mcp, manager):
         except Exception as e:
             return f"Validation error: {str(e)}"
 
-        chart_data = {
-            "data": chart_model.data,
-            "title": chart_model.title
-        }
+        chart_data = {"data": chart_model.data, "title": chart_model.title}
         draft.content.setdefault("components", []).append(
             {"component": "progress_chart", **chart_data}
         )
@@ -287,7 +263,7 @@ def register_composition_tools(mcp, manager):
         chart_data = {
             "data": chart_model.data,
             "title": chart_model.title,
-            "show_medals": chart_model.show_medals
+            "show_medals": chart_model.show_medals,
         }
         draft.content.setdefault("components", []).append(
             {"component": "ranking_chart", **chart_data}
@@ -297,9 +273,7 @@ def register_composition_tools(mcp, manager):
         return f"Added ranking chart with {len(data)} items"
 
     @mcp.tool
-    async def linkedin_add_quote(
-        text: str, author: str, source: str = None
-    ) -> str:
+    async def linkedin_add_quote(text: str, author: str, source: str = None) -> str:
         """
         Add a quote or testimonial to current draft.
 
@@ -329,19 +303,15 @@ def register_composition_tools(mcp, manager):
         quote_data = {
             "text": quote_model.text,
             "author": quote_model.author,
-            "source": quote_model.source
+            "source": quote_model.source,
         }
-        draft.content.setdefault("components", []).append(
-            {"component": "quote", **quote_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "quote", **quote_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added quote from {author}"
 
     @mcp.tool
-    async def linkedin_add_big_stat(
-        number: str, label: str, context: str = None
-    ) -> str:
+    async def linkedin_add_big_stat(number: str, label: str, context: str = None) -> str:
         """
         Add a big eye-catching statistic to current draft.
 
@@ -371,19 +341,15 @@ def register_composition_tools(mcp, manager):
         stat_data = {
             "number": stat_model.number,
             "label": stat_model.label,
-            "context": stat_model.context
+            "context": stat_model.context,
         }
-        draft.content.setdefault("components", []).append(
-            {"component": "big_stat", **stat_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "big_stat", **stat_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added big stat: {number}"
 
     @mcp.tool
-    async def linkedin_add_timeline(
-        steps: dict, title: str = None, style: str = "arrow"
-    ) -> str:
+    async def linkedin_add_timeline(steps: dict, title: str = None, style: str = "arrow") -> str:
         """
         Add a timeline or step-by-step process to current draft.
 
@@ -413,7 +379,7 @@ def register_composition_tools(mcp, manager):
         timeline_data = {
             "steps": timeline_model.steps,
             "title": timeline_model.title,
-            "style": timeline_model.style
+            "style": timeline_model.style,
         }
         draft.content.setdefault("components", []).append(
             {"component": "timeline", **timeline_data}
@@ -455,19 +421,17 @@ def register_composition_tools(mcp, manager):
         takeaway_data = {
             "message": takeaway_model.message,
             "title": takeaway_model.title,
-            "style": takeaway_model.style
+            "style": takeaway_model.style,
         }
         draft.content.setdefault("components", []).append(
             {"component": "key_takeaway", **takeaway_data}
         )
         manager.update_draft(draft.draft_id, content=draft.content)
 
-        return f"Added key takeaway"
+        return "Added key takeaway"
 
     @mcp.tool
-    async def linkedin_add_pro_con(
-        pros: list[str], cons: list[str], title: str = None
-    ) -> str:
+    async def linkedin_add_pro_con(pros: list[str], cons: list[str], title: str = None) -> str:
         """
         Add a pros & cons comparison to current draft.
 
@@ -497,11 +461,9 @@ def register_composition_tools(mcp, manager):
         procon_data = {
             "pros": procon_model.pros,
             "cons": procon_model.cons,
-            "title": procon_model.title
+            "title": procon_model.title,
         }
-        draft.content.setdefault("components", []).append(
-            {"component": "pro_con", **procon_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "pro_con", **procon_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added pro/con comparison ({len(pros)} pros, {len(cons)} cons)"
@@ -556,7 +518,7 @@ def register_composition_tools(mcp, manager):
         checklist_data = {
             "items": checklist_model.items,
             "title": checklist_model.title,
-            "show_progress": checklist_model.show_progress
+            "show_progress": checklist_model.show_progress,
         }
         draft.content.setdefault("components", []).append(
             {"component": "checklist", **checklist_data}
@@ -586,7 +548,9 @@ def register_composition_tools(mcp, manager):
             return "No active draft"
 
         try:
-            before_after_model = BeforeAfterData(before=before, after=after, title=title, labels=labels)
+            before_after_model = BeforeAfterData(
+                before=before, after=after, title=title, labels=labels
+            )
         except Exception as e:
             return f"Validation error: {str(e)}"
 
@@ -594,19 +558,17 @@ def register_composition_tools(mcp, manager):
             "before": before_after_model.before,
             "after": before_after_model.after,
             "title": before_after_model.title,
-            "labels": before_after_model.labels
+            "labels": before_after_model.labels,
         }
         draft.content.setdefault("components", []).append(
             {"component": "before_after", **before_after_data}
         )
         manager.update_draft(draft.draft_id, content=draft.content)
 
-        return f"Added before/after comparison"
+        return "Added before/after comparison"
 
     @mcp.tool
-    async def linkedin_add_tip_box(
-        message: str, title: str = None, style: str = "info"
-    ) -> str:
+    async def linkedin_add_tip_box(message: str, title: str = None, style: str = "info") -> str:
         """
         Add highlighted tip/note box.
 
@@ -630,19 +592,15 @@ def register_composition_tools(mcp, manager):
         tip_data = {
             "message": tip_model.message,
             "title": tip_model.title,
-            "style": tip_model.style
+            "style": tip_model.style,
         }
-        draft.content.setdefault("components", []).append(
-            {"component": "tip_box", **tip_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "tip_box", **tip_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added {style} tip box"
 
     @mcp.tool
-    async def linkedin_add_stats_grid(
-        stats: dict, title: str = None, columns: int = 2
-    ) -> str:
+    async def linkedin_add_stats_grid(stats: dict, title: str = None, columns: int = 2) -> str:
         """
         Add multi-stat grid display.
 
@@ -666,19 +624,15 @@ def register_composition_tools(mcp, manager):
         stats_data = {
             "stats": stats_model.stats,
             "title": stats_model.title,
-            "columns": stats_model.columns
+            "columns": stats_model.columns,
         }
-        draft.content.setdefault("components", []).append(
-            {"component": "stats_grid", **stats_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "stats_grid", **stats_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added stats grid with {len(stats)} stats"
 
     @mcp.tool
-    async def linkedin_add_poll_preview(
-        question: str, options: list[str]
-    ) -> str:
+    async def linkedin_add_poll_preview(question: str, options: list[str]) -> str:
         """
         Add poll preview for engagement.
 
@@ -698,10 +652,7 @@ def register_composition_tools(mcp, manager):
         except Exception as e:
             return f"Validation error: {str(e)}"
 
-        poll_data = {
-            "question": poll_model.question,
-            "options": poll_model.options
-        }
+        poll_data = {"question": poll_model.question, "options": poll_model.options}
         draft.content.setdefault("components", []).append(
             {"component": "poll_preview", **poll_data}
         )
@@ -710,9 +661,7 @@ def register_composition_tools(mcp, manager):
         return f"Added poll with {len(options)} options"
 
     @mcp.tool
-    async def linkedin_add_feature_list(
-        features: list[dict], title: str = None
-    ) -> str:
+    async def linkedin_add_feature_list(features: list[dict], title: str = None) -> str:
         """
         Add feature list with icons and descriptions.
 
@@ -732,10 +681,7 @@ def register_composition_tools(mcp, manager):
         except Exception as e:
             return f"Validation error: {str(e)}"
 
-        feature_data = {
-            "features": feature_model.features,
-            "title": feature_model.title
-        }
+        feature_data = {"features": feature_model.features, "title": feature_model.title}
         draft.content.setdefault("components", []).append(
             {"component": "feature_list", **feature_data}
         )
@@ -772,7 +718,7 @@ def register_composition_tools(mcp, manager):
             "items": list_model.items,
             "title": list_model.title,
             "style": list_model.style,
-            "start": list_model.start
+            "start": list_model.start,
         }
         draft.content.setdefault("components", []).append(
             {"component": "numbered_list", **list_data}
@@ -798,9 +744,7 @@ def register_composition_tools(mcp, manager):
             return "No active draft"
 
         hashtag_data = {"tags": tags, "placement": placement}
-        draft.content.setdefault("components", []).append(
-            {"component": "hashtags", **hashtag_data}
-        )
+        draft.content.setdefault("components", []).append({"component": "hashtags", **hashtag_data})
         manager.update_draft(draft.draft_id, content=draft.content)
 
         return f"Added {len(tags)} hashtags"
@@ -848,7 +792,9 @@ def register_composition_tools(mcp, manager):
             elif comp_type == "progress_chart":
                 post.add_progress_chart(comp["data"], comp.get("title"))
             elif comp_type == "ranking_chart":
-                post.add_ranking_chart(comp["data"], comp.get("title"), comp.get("show_medals", True))
+                post.add_ranking_chart(
+                    comp["data"], comp.get("title"), comp.get("show_medals", True)
+                )
             elif comp_type == "quote":
                 post.add_quote(comp["text"], comp["author"], comp.get("source"))
             elif comp_type == "big_stat":
@@ -856,13 +802,19 @@ def register_composition_tools(mcp, manager):
             elif comp_type == "timeline":
                 post.add_timeline(comp["steps"], comp.get("title"), comp.get("style", "arrow"))
             elif comp_type == "key_takeaway":
-                post.add_key_takeaway(comp["message"], comp.get("title", "KEY TAKEAWAY"), comp.get("style", "box"))
+                post.add_key_takeaway(
+                    comp["message"], comp.get("title", "KEY TAKEAWAY"), comp.get("style", "box")
+                )
             elif comp_type == "pro_con":
                 post.add_pro_con(comp["pros"], comp["cons"], comp.get("title"))
             elif comp_type == "checklist":
-                post.add_checklist(comp["items"], comp.get("title"), comp.get("show_progress", False))
+                post.add_checklist(
+                    comp["items"], comp.get("title"), comp.get("show_progress", False)
+                )
             elif comp_type == "before_after":
-                post.add_before_after(comp["before"], comp["after"], comp.get("title"), comp.get("labels"))
+                post.add_before_after(
+                    comp["before"], comp["after"], comp.get("title"), comp.get("labels")
+                )
             elif comp_type == "tip_box":
                 post.add_tip_box(comp["message"], comp.get("title"), comp.get("style", "info"))
             elif comp_type == "stats_grid":
@@ -872,7 +824,12 @@ def register_composition_tools(mcp, manager):
             elif comp_type == "feature_list":
                 post.add_feature_list(comp["features"], comp.get("title"))
             elif comp_type == "numbered_list":
-                post.add_numbered_list(comp["items"], comp.get("title"), comp.get("style", "numbers"), comp.get("start", 1))
+                post.add_numbered_list(
+                    comp["items"],
+                    comp.get("title"),
+                    comp.get("style", "numbers"),
+                    comp.get("start", 1),
+                )
             elif comp_type == "separator":
                 post.add_separator(comp.get("style", "line"))
             elif comp_type == "cta":

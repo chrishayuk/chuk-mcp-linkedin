@@ -10,6 +10,7 @@ import sys
 import os
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -42,7 +43,7 @@ async def main():
             print("  export LINKEDIN_PERSON_URN='urn:li:person:YOUR_ID'")
             return
 
-        print(f"✓ Client initialized")
+        print("✓ Client initialized")
         print(f"  Person URN: {client.person_urn[:30]}...")
 
     except Exception as e:
@@ -74,8 +75,8 @@ async def main():
         "Step 1: Planning and research",
         "Step 2: Implementation",
         "Step 3: Testing and validation",
-        "Step 4: Launch and iterate"
-    ][:len(existing_images)]
+        "Step 4: Launch and iterate",
+    ][: len(existing_images)]
 
     # Create post using composition
     theme_manager = ThemeManager()
@@ -83,24 +84,21 @@ async def main():
 
     post = ComposablePost("carousel", theme=theme)
 
-    post.add_hook(
-        "insight",
-        "The best stories unfold one frame at a time. Swipe to see how →"
-    )
+    post.add_hook("insight", "The best stories unfold one frame at a time. Swipe to see how →")
 
-    post.add_body("""Carousel posts on LinkedIn are powerful for:
+    post.add_body(
+        """Carousel posts on LinkedIn are powerful for:
 
 → Step-by-step guides
 → Before/after transformations
 → Portfolio showcases
 → Multi-part narratives
 
-Each slide keeps your audience engaged, building toward your key message.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What's your favorite type of visual content to create?"
+Each slide keeps your audience engaged, building toward your key message.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What's your favorite type of visual content to create?")
 
     post.add_hashtags(["CarouselPosts", "VisualStorytelling", "ContentMarketing"])
 
@@ -136,35 +134,32 @@ Each slide keeps your audience engaged, building toward your key message.""", st
         print("2️⃣  Creating carousel post...")
 
         result = await client.create_multi_image_post(
-            text=post_text,
-            image_paths=existing_images,
-            alt_texts=alt_texts,
-            visibility="PUBLIC"
+            text=post_text, image_paths=existing_images, alt_texts=alt_texts, visibility="PUBLIC"
         )
 
         print("\n" + "=" * 60)
         print("✓ SUCCESS!")
         print("=" * 60)
 
-        post_urn = result.get('id', '')
-        post_status = result.get('status_code', 'N/A')
+        post_urn = result.get("id", "")
+        post_status = result.get("status_code", "N/A")
 
         print(f"\nPost URN: {post_urn}")
         print(f"HTTP Status: {post_status}")
 
         # Format post URL for easy access
-        if post_urn and ('ugcPost' in post_urn or 'share' in post_urn):
+        if post_urn and ("ugcPost" in post_urn or "share" in post_urn):
             post_url = f"https://www.linkedin.com/feed/update/{post_urn}"
-            print(f"\n🔗 View your post:")
+            print("\n🔗 View your post:")
             print(f"   {post_url}")
-            print(f"\nOr check your LinkedIn feed:")
-            print(f"   https://www.linkedin.com/feed/")
+            print("\nOr check your LinkedIn feed:")
+            print("   https://www.linkedin.com/feed/")
 
         print("\n📊 Details:")
-        print(f"   Type: Multi-image carousel")
+        print("   Type: Multi-image carousel")
         print(f"   Images: {len(existing_images)} uploaded")
         print(f"   Text: {len(post_text)} characters")
-        print(f"   Visibility: PUBLIC")
+        print("   Visibility: PUBLIC")
 
     except LinkedInAPIError as e:
         print("\n" + "=" * 60)
@@ -185,6 +180,7 @@ Each slide keeps your audience engaged, building toward your key message.""", st
         print("=" * 60)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
 
 

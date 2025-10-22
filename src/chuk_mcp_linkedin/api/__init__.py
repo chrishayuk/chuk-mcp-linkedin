@@ -42,6 +42,7 @@ class LinkedInClient(PostsAPIMixin, MediaAPIMixin, DocumentsAPIMixin, BaseLinked
         >>> # Document post
         >>> await client.create_document_post("Read this", "report.pdf")
     """
+
     pass
 
 

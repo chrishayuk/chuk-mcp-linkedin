@@ -36,7 +36,11 @@ class ComparisonChart(PostComponent):
 
         if len(items) >= 2:
             for idx, (label, points) in enumerate(items):
-                emoji = TextTokens.INDICATORS.get("positive", "✅") if idx == len(items) - 1 else TextTokens.INDICATORS.get("negative", "❌")
+                emoji = (
+                    TextTokens.INDICATORS.get("positive", "✅")
+                    if idx == len(items) - 1
+                    else TextTokens.INDICATORS.get("negative", "❌")
+                )
                 lines.append(f"{emoji} {label}:")
                 if isinstance(points, list):
                     for point in points:

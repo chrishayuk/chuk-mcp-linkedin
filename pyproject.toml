@@ -39,7 +39,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
+    "pytest-asyncio>=0.23.0",
     "pytest-cov>=4.1.0",
     "black>=23.7.0",
     "ruff>=0.0.285",
@@ -84,6 +84,8 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=src/chuk_mcp_linkedin --cov-report=term-missing"
+# Configure async tests to use asyncio
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 omit = [

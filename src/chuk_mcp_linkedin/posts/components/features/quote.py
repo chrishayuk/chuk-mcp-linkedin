@@ -43,7 +43,4 @@ class Quote(PostComponent):
         return "\n".join(lines)
 
     def validate(self) -> bool:
-        return (
-            len(self.text) > 0 and len(self.text) <= 500 and
-            len(self.author) > 0
-        )
+        return len(self.text) > 0 and len(self.text) <= 500 and len(self.author) > 0

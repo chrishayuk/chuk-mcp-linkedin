@@ -47,6 +47,7 @@ class KeyTakeaway(PostComponent):
 
     def validate(self) -> bool:
         return (
-            len(self.message) > 0 and len(self.message) <= 500 and
-            self.style in ["box", "highlight", "simple"]
+            len(self.message) > 0
+            and len(self.message) <= 500
+            and self.style in ["box", "highlight", "simple"]
         )

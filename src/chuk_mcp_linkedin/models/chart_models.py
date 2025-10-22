@@ -5,7 +5,7 @@ Provides type-safe validation for chart inputs.
 """
 
 from pydantic import BaseModel, Field, field_validator
-from typing import Dict, Any, List, Union
+from typing import Dict, Any
 
 
 class BarChartData(BaseModel):
@@ -14,16 +14,10 @@ class BarChartData(BaseModel):
     data: Dict[str, int] = Field(
         ...,
         description="Chart data with labels as keys and integer values",
-        examples=[{"AI-Assisted": 12, "Code Review": 6, "Documentation": 4}]
+        examples=[{"AI-Assisted": 12, "Code Review": 6, "Documentation": 4}],
     )
-    title: str | None = Field(
-        None,
-        description="Optional chart title"
-    )
-    unit: str = Field(
-        "",
-        description="Optional unit label (e.g., 'hours', 'users', 'tasks')"
-    )
+    title: str | None = Field(None, description="Optional chart title")
+    unit: str = Field("", description="Optional unit label (e.g., 'hours', 'users', 'tasks')")
 
     @field_validator("data")
     @classmethod
@@ -41,12 +35,9 @@ class MetricsChartData(BaseModel):
     data: Dict[str, str] = Field(
         ...,
         description="Metrics data with labels and string values (e.g., percentages)",
-        examples=[{"Faster problem-solving": "67%", "Better learning": "89%"}]
+        examples=[{"Faster problem-solving": "67%", "Better learning": "89%"}],
     )
-    title: str | None = Field(
-        None,
-        description="Optional chart title"
-    )
+    title: str | None = Field(None, description="Optional chart title")
 
     @field_validator("data")
     @classmethod
@@ -62,15 +53,14 @@ class ComparisonChartData(BaseModel):
     data: Dict[str, Any] = Field(
         ...,
         description="Comparison data with 2+ options. Values can be strings or lists of points.",
-        examples=[{
-            "Traditional Dev": ["Slower iterations", "Manual testing"],
-            "AI-Assisted Dev": ["Faster prototyping", "Automated tests"]
-        }]
+        examples=[
+            {
+                "Traditional Dev": ["Slower iterations", "Manual testing"],
+                "AI-Assisted Dev": ["Faster prototyping", "Automated tests"],
+            }
+        ],
     )
-    title: str | None = Field(
-        None,
-        description="Optional chart title"
-    )
+    title: str | None = Field(None, description="Optional chart title")
 
     @field_validator("data")
     @classmethod
@@ -86,12 +76,9 @@ class ProgressChartData(BaseModel):
     data: Dict[str, int] = Field(
         ...,
         description="Progress data with labels and percentage values (0-100)",
-        examples=[{"Completion": 75, "Testing": 50, "Documentation": 30}]
+        examples=[{"Completion": 75, "Testing": 50, "Documentation": 30}],
     )
-    title: str | None = Field(
-        None,
-        description="Optional chart title"
-    )
+    title: str | None = Field(None, description="Optional chart title")
 
     @field_validator("data")
     @classmethod
@@ -112,16 +99,10 @@ class RankingChartData(BaseModel):
     data: Dict[str, str] = Field(
         ...,
         description="Ranking data with labels and description values",
-        examples=[{"Python": "1M users", "JavaScript": "900K users", "Rust": "500K users"}]
+        examples=[{"Python": "1M users", "JavaScript": "900K users", "Rust": "500K users"}],
     )
-    title: str | None = Field(
-        None,
-        description="Optional chart title"
-    )
-    show_medals: bool = Field(
-        True,
-        description="Show medal emojis for top 3 positions"
-    )
+    title: str | None = Field(None, description="Optional chart title")
+    show_medals: bool = Field(True, description="Show medal emojis for top 3 positions")
 
     @field_validator("data")
     @classmethod

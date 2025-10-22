@@ -10,6 +10,7 @@ import sys
 import os
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -42,7 +43,7 @@ async def main():
             print("  export LINKEDIN_PERSON_URN='urn:li:person:YOUR_ID'")
             return
 
-        print(f"✓ Client initialized")
+        print("✓ Client initialized")
         print(f"  Person URN: {client.person_urn[:30]}...")
 
     except Exception as e:
@@ -55,24 +56,21 @@ async def main():
 
     post = ComposablePost("text", theme=theme)
 
-    post.add_hook(
-        "insight",
-        "The best API documentation tells you not just HOW, but WHY."
-    )
+    post.add_hook("insight", "The best API documentation tells you not just HOW, but WHY.")
 
-    post.add_body("""After migrating from LinkedIn's UGC API to the new Posts API:
+    post.add_body(
+        """After migrating from LinkedIn's UGC API to the new Posts API:
 
 → Simpler payload structure
 → Cleaner response handling
 → Better header management
 → More consistent behavior
 
-Sometimes upgrading is worth the effort.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What API migrations have you tackled recently?"
+Sometimes upgrading is worth the effort.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What API migrations have you tackled recently?")
 
     post.add_hashtags(["APIDesign", "DeveloperExperience", "LinkedIn"])
 
@@ -104,34 +102,31 @@ Sometimes upgrading is worth the effort.""", structure="linear")
 
         print("\n📤 Creating post...")
 
-        result = await client.create_text_post(
-            text=post_text,
-            visibility="PUBLIC"
-        )
+        result = await client.create_text_post(text=post_text, visibility="PUBLIC")
 
         print("\n" + "=" * 60)
         print("✓ SUCCESS!")
         print("=" * 60)
 
-        post_urn = result.get('id', '')
-        post_status = result.get('status_code', 'N/A')
+        post_urn = result.get("id", "")
+        post_status = result.get("status_code", "N/A")
 
         print(f"\nPost URN: {post_urn}")
         print(f"HTTP Status: {post_status}")
 
         # Format post URL for easy access
-        if post_urn and ('ugcPost' in post_urn or 'share' in post_urn):
+        if post_urn and ("ugcPost" in post_urn or "share" in post_urn):
             post_url = f"https://www.linkedin.com/feed/update/{post_urn}"
-            print(f"\n🔗 View your post:")
+            print("\n🔗 View your post:")
             print(f"   {post_url}")
-            print(f"\nOr check your LinkedIn feed:")
-            print(f"   https://www.linkedin.com/feed/")
+            print("\nOr check your LinkedIn feed:")
+            print("   https://www.linkedin.com/feed/")
 
         print("\n📊 Details:")
-        print(f"   Type: Text post")
+        print("   Type: Text post")
         print(f"   Text: {len(post_text)} characters")
-        print(f"   Visibility: PUBLIC")
-        print(f"   API: Posts API (new)")
+        print("   Visibility: PUBLIC")
+        print("   API: Posts API (new)")
 
     except LinkedInAPIError as e:
         print("\n" + "=" * 60)
@@ -150,6 +145,7 @@ Sometimes upgrading is worth the effort.""", structure="linear")
         print("=" * 60)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
 
 

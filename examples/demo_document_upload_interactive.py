@@ -14,6 +14,7 @@ Requirements:
 import sys
 import asyncio
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from chuk_mcp_linkedin.api import LinkedInClient, LinkedInAPIError
@@ -42,7 +43,7 @@ async def test_document_upload():
             print("  export LINKEDIN_PERSON_URN='urn:li:person:YOUR_ID'")
             return
 
-        print(f"\n✓ Client initialized")
+        print("\n✓ Client initialized")
         print(f"  Person URN: {client.person_urn}")
 
     except Exception as e:
@@ -64,23 +65,20 @@ async def test_document_upload():
     theme = theme_manager.get_theme("thought_leader")
 
     post = ComposablePost("document", theme=theme)
-    post.add_hook(
-        "question",
-        "Ever wonder how to share detailed insights on LinkedIn?"
-    )
-    post.add_body("""Documents are perfect for:
+    post.add_hook("question", "Ever wonder how to share detailed insights on LinkedIn?")
+    post.add_body(
+        """Documents are perfect for:
 
 → Research findings
 → Case studies
 → Strategic frameworks
 → Technical reports
 
-LinkedIn converts each page to an interactive carousel.""", structure="linear")
-
-    post.add_cta(
-        "curiosity",
-        "What's your preferred format for sharing long-form content?"
+LinkedIn converts each page to an interactive carousel.""",
+        structure="linear",
     )
+
+    post.add_cta("curiosity", "What's your preferred format for sharing long-form content?")
     post.add_hashtags(["ContentStrategy", "ThoughtLeadership", "Documents"])
 
     post_text = post.compose()
@@ -96,7 +94,7 @@ LinkedIn converts each page to an interactive carousel.""", structure="linear")
     print("READY TO POST")
     print("=" * 60)
     print(f"Document: {test_doc.name}")
-    print(f"Title: API Testing Document")
+    print("Title: API Testing Document")
     print(f"Characters: {len(post_text)}")
     print()
 
@@ -117,7 +115,7 @@ LinkedIn converts each page to an interactive carousel.""", structure="linear")
             text=post_text,
             document_path=test_doc,
             document_title="API Testing Document",
-            visibility="PUBLIC"
+            visibility="PUBLIC",
         )
 
         print("\n✓ SUCCESS!")
@@ -126,11 +124,11 @@ LinkedIn converts each page to an interactive carousel.""", structure="linear")
         print(f"  Status: {result.get('lifecycleState', 'N/A')}")
 
         # Try to extract post URL
-        post_id = result.get('id', '')
+        post_id = result.get("id", "")
         if post_id:
             # Format: urn:li:share:123456 or activity:123456
-            if ':' in post_id:
-                activity_id = post_id.split(':')[-1]
+            if ":" in post_id:
+                activity_id = post_id.split(":")[-1]
                 post_url = f"https://www.linkedin.com/feed/update/{post_id}"
                 print(f"  URL: {post_url}")
 
@@ -151,6 +149,7 @@ LinkedIn converts each page to an interactive carousel.""", structure="linear")
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
 
 
@@ -172,7 +171,7 @@ async def test_upload_only():
             print(f"Missing: {', '.join(missing)}")
             return
 
-        print(f"\n✓ Client initialized")
+        print("\n✓ Client initialized")
 
     except Exception as e:
         print(f"\n❌ Error initializing client: {e}")
@@ -195,12 +194,9 @@ async def test_upload_only():
 
     try:
         print("\n📤 Uploading...")
-        document_urn = await client.upload_document(
-            test_doc,
-            title="Test Upload"
-        )
+        document_urn = await client.upload_document(test_doc, title="Test Upload")
 
-        print(f"\n✓ Upload successful!")
+        print("\n✓ Upload successful!")
         print(f"  Document URN: {document_urn}")
         print("\nYou can now use this URN to attach the document to a post.")
 
@@ -209,6 +205,7 @@ async def test_upload_only():
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

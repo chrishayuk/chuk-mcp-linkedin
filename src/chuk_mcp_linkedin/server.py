@@ -41,11 +41,7 @@ async def run_stdio():
     from mcp.server.stdio import stdio_server
 
     async with stdio_server() as (read_stream, write_stream):
-        await mcp.run(
-            read_stream,
-            write_stream,
-            mcp.create_initialization_options()
-        )
+        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
 
 
 if __name__ == "__main__":

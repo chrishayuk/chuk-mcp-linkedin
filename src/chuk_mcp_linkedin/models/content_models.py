@@ -5,27 +5,15 @@ Provides type-safe validation for Quote, BigStat, Timeline, KeyTakeaway, and Pro
 """
 
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
 
 
 class QuoteData(BaseModel):
     """Data model for quote/testimonial components"""
 
-    text: str = Field(
-        ...,
-        description="Quote text",
-        min_length=1,
-        max_length=500
-    )
-    author: str = Field(
-        ...,
-        description="Quote author name",
-        min_length=1
-    )
-    source: str | None = Field(
-        None,
-        description="Optional source/title (e.g., 'CTO at TechCorp')"
-    )
+    text: str = Field(..., description="Quote text", min_length=1, max_length=500)
+    author: str = Field(..., description="Quote author name", min_length=1)
+    source: str | None = Field(None, description="Optional source/title (e.g., 'CTO at TechCorp')")
 
 
 class BigStatData(BaseModel):
@@ -34,18 +22,13 @@ class BigStatData(BaseModel):
     number: str = Field(
         ...,
         description="The statistic number (e.g., '2.5M', '340%', '10x')",
-        examples=["2.5M", "340%", "10x", "99.9%"]
+        examples=["2.5M", "340%", "10x", "99.9%"],
     )
     label: str = Field(
-        ...,
-        description="Description of the statistic",
-        min_length=1,
-        max_length=200
+        ..., description="Description of the statistic", min_length=1, max_length=200
     )
     context: str | None = Field(
-        None,
-        description="Optional additional context (e.g., '↑ 340% growth YoY')",
-        max_length=200
+        None, description="Optional additional context (e.g., '↑ 340% growth YoY')", max_length=200
     )
 
 
@@ -55,16 +38,13 @@ class TimelineData(BaseModel):
     steps: Dict[str, str] = Field(
         ...,
         description="Timeline steps as key-value pairs (year/step: description)",
-        examples=[{"2023": "Launched MVP", "2024": "Reached 10K users"}]
+        examples=[{"2023": "Launched MVP", "2024": "Reached 10K users"}],
     )
-    title: str | None = Field(
-        None,
-        description="Optional timeline title"
-    )
+    title: str | None = Field(None, description="Optional timeline title")
     style: str = Field(
         "arrow",
         description="Timeline style: 'arrow', 'numbered', 'dated'",
-        pattern="^(arrow|numbered|dated)$"
+        pattern="^(arrow|numbered|dated)$",
     )
 
     @field_validator("steps")
@@ -78,41 +58,21 @@ class TimelineData(BaseModel):
 class KeyTakeawayData(BaseModel):
     """Data model for key takeaway/insight box"""
 
-    message: str = Field(
-        ...,
-        description="The key takeaway message",
-        min_length=1,
-        max_length=500
-    )
-    title: str = Field(
-        "KEY TAKEAWAY",
-        description="Takeaway box title",
-        max_length=50
-    )
+    message: str = Field(..., description="The key takeaway message", min_length=1, max_length=500)
+    title: str = Field("KEY TAKEAWAY", description="Takeaway box title", max_length=50)
     style: str = Field(
         "box",
         description="Display style: 'box', 'highlight', 'simple'",
-        pattern="^(box|highlight|simple)$"
+        pattern="^(box|highlight|simple)$",
     )
 
 
 class ProConData(BaseModel):
     """Data model for pros & cons comparison"""
 
-    pros: List[str] = Field(
-        ...,
-        description="List of pros/advantages",
-        min_length=1
-    )
-    cons: List[str] = Field(
-        ...,
-        description="List of cons/disadvantages",
-        min_length=1
-    )
-    title: str | None = Field(
-        None,
-        description="Optional title for the comparison"
-    )
+    pros: List[str] = Field(..., description="List of pros/advantages", min_length=1)
+    cons: List[str] = Field(..., description="List of cons/disadvantages", min_length=1)
+    title: str | None = Field(None, description="Optional title for the comparison")
 
     @field_validator("pros", "cons")
     @classmethod
@@ -132,15 +92,11 @@ class ChecklistData(BaseModel):
         ...,
         description="Checklist items with text and checked status",
         min_length=1,
-        examples=[[{"text": "Deploy to production", "checked": True}]]
+        examples=[[{"text": "Deploy to production", "checked": True}]],
     )
-    title: str | None = Field(
-        None,
-        description="Optional checklist title"
-    )
+    title: str | None = Field(None, description="Optional checklist title")
     show_progress: bool = Field(
-        False,
-        description="Show completion progress (e.g., '3/5 complete')"
+        False, description="Show completion progress (e.g., '3/5 complete')"
     )
 
     @field_validator("items")
@@ -162,23 +118,12 @@ class ChecklistData(BaseModel):
 class BeforeAfterData(BaseModel):
     """Data model for before/after comparison"""
 
-    before: List[str] = Field(
-        ...,
-        description="List of 'before' items",
-        min_length=1
-    )
-    after: List[str] = Field(
-        ...,
-        description="List of 'after' items",
-        min_length=1
-    )
-    title: str | None = Field(
-        None,
-        description="Optional comparison title"
-    )
+    before: List[str] = Field(..., description="List of 'before' items", min_length=1)
+    after: List[str] = Field(..., description="List of 'after' items", min_length=1)
+    title: str | None = Field(None, description="Optional comparison title")
     labels: Dict[str, str] | None = Field(
         None,
-        description="Custom labels for before/after (e.g., {'before': 'Old Way', 'after': 'New Way'})"
+        description="Custom labels for before/after (e.g., {'before': 'Old Way', 'after': 'New Way'})",
     )
 
     @field_validator("before", "after")
@@ -195,21 +140,14 @@ class BeforeAfterData(BaseModel):
 class TipBoxData(BaseModel):
     """Data model for tip/note box"""
 
-    message: str = Field(
-        ...,
-        description="Tip or note message",
-        min_length=1,
-        max_length=500
-    )
+    message: str = Field(..., description="Tip or note message", min_length=1, max_length=500)
     title: str | None = Field(
-        None,
-        description="Optional tip box title (e.g., 'Pro Tip', 'Warning')",
-        max_length=50
+        None, description="Optional tip box title (e.g., 'Pro Tip', 'Warning')", max_length=50
     )
     style: str = Field(
         "info",
         description="Box style: 'info', 'tip', 'warning', 'success'",
-        pattern="^(info|tip|warning|success)$"
+        pattern="^(info|tip|warning|success)$",
     )
 
 
@@ -220,18 +158,10 @@ class StatsGridData(BaseModel):
         ...,
         description="Statistics as key-value pairs (label: value)",
         min_length=2,
-        examples=[{"Speed": "+67%", "Quality": "+54%"}]
+        examples=[{"Speed": "+67%", "Quality": "+54%"}],
     )
-    title: str | None = Field(
-        None,
-        description="Optional grid title"
-    )
-    columns: int = Field(
-        2,
-        description="Number of columns in the grid",
-        ge=1,
-        le=4
-    )
+    title: str | None = Field(None, description="Optional grid title")
+    columns: int = Field(2, description="Number of columns in the grid", ge=1, le=4)
 
     @field_validator("stats")
     @classmethod
@@ -244,18 +174,8 @@ class StatsGridData(BaseModel):
 class PollPreviewData(BaseModel):
     """Data model for poll preview"""
 
-    question: str = Field(
-        ...,
-        description="Poll question",
-        min_length=1,
-        max_length=300
-    )
-    options: List[str] = Field(
-        ...,
-        description="Poll options",
-        min_length=2,
-        max_length=4
-    )
+    question: str = Field(..., description="Poll question", min_length=1, max_length=300)
+    options: List[str] = Field(..., description="Poll options", min_length=2, max_length=4)
 
     @field_validator("options")
     @classmethod
@@ -277,12 +197,9 @@ class FeatureListData(BaseModel):
         ...,
         description="Features with icon, title, and optional description",
         min_length=1,
-        examples=[[{"icon": "⚡", "title": "Fast", "description": "Lightning fast performance"}]]
+        examples=[[{"icon": "⚡", "title": "Fast", "description": "Lightning fast performance"}]],
     )
-    title: str | None = Field(
-        None,
-        description="Optional feature list title"
-    )
+    title: str | None = Field(None, description="Optional feature list title")
 
     @field_validator("features")
     @classmethod
@@ -303,25 +220,14 @@ class FeatureListData(BaseModel):
 class NumberedListData(BaseModel):
     """Data model for numbered list"""
 
-    items: List[str] = Field(
-        ...,
-        description="List items",
-        min_length=1
-    )
-    title: str | None = Field(
-        None,
-        description="Optional list title"
-    )
+    items: List[str] = Field(..., description="List items", min_length=1)
+    title: str | None = Field(None, description="Optional list title")
     style: str = Field(
         "numbers",
         description="Numbering style: 'numbers', 'emoji_numbers', 'bold_numbers'",
-        pattern="^(numbers|emoji_numbers|bold_numbers)$"
+        pattern="^(numbers|emoji_numbers|bold_numbers)$",
     )
-    start: int = Field(
-        1,
-        description="Starting number",
-        ge=1
-    )
+    start: int = Field(1, description="Starting number", ge=1)
 
     @field_validator("items")
     @classmethod

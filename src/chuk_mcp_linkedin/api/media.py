@@ -150,7 +150,9 @@ class MediaAPIMixin:
         This is a multi-step process:
         1. Initialize upload (get upload URL and video URN)
         2. Upload file to the provided URL
-        3. Return video URN for use in posts
+        3. Finalize the upload
+        4. Wait for video to be processed by LinkedIn
+        5. Return video URN for use in posts
 
         Args:
             file_path: Path to video file (MP4)
@@ -160,7 +162,7 @@ class MediaAPIMixin:
             Video URN (e.g., urn:li:video:ABC123)
 
         Raises:
-            LinkedInAPIError: If upload fails
+            LinkedInAPIError: If upload or processing fails
 
         Reference:
             https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/videos-api
@@ -169,6 +171,7 @@ class MediaAPIMixin:
             - Format: MP4 only
             - Length: 3 seconds to 30 minutes
             - Size: 75kb - 500MB
+            - Processing time: Usually 5-30 seconds depending on video size
         """
         if not self.access_token or not self.person_urn:
             raise LinkedInAPIError(
@@ -224,8 +227,23 @@ class MediaAPIMixin:
                     )
 
                 init_data = response.json()
-                upload_url = init_data["value"]["uploadUrl"]
-                video_urn = init_data["value"]["video"]
+
+                # Video API returns uploadInstructions (array), not direct uploadUrl
+                try:
+                    video_urn = init_data["value"]["video"]
+                    upload_instructions = init_data["value"]["uploadInstructions"]
+                    upload_token = init_data["value"].get("uploadToken", "")
+
+                    # For single-part upload, use the first (and only) instruction
+                    if not upload_instructions:
+                        raise LinkedInAPIError("No upload instructions received from LinkedIn")
+
+                    upload_url = upload_instructions[0]["uploadUrl"]
+                except KeyError as e:
+                    raise LinkedInAPIError(
+                        f"Unexpected response structure from LinkedIn video API. "
+                        f"Missing key: {str(e)}. Response: {init_data}"
+                    )
 
             except httpx.HTTPError as e:
                 raise LinkedInAPIError(f"HTTP error during upload initialization: {str(e)}")
@@ -250,7 +268,86 @@ class MediaAPIMixin:
                         f"Failed to upload video: {upload_response.status_code} - {upload_response.text}"
                     )
 
+                # Get ETag from response headers
+                etag = upload_response.headers.get("ETag", "").strip('"')
+
             except httpx.HTTPError as e:
                 raise LinkedInAPIError(f"HTTP error during file upload: {str(e)}")
+
+            # Step 3: Finalize upload
+            try:
+                finalize_url = "https://api.linkedin.com/rest/videos?action=finalizeUpload"
+                finalize_payload = {
+                    "finalizeUploadRequest": {
+                        "video": video_urn,
+                        "uploadToken": upload_token,
+                        "uploadedPartIds": [etag] if etag else []
+                    }
+                }
+
+                finalize_response = await client.post(
+                    finalize_url,
+                    json=finalize_payload,
+                    headers=self._get_headers(use_rest_api=True),
+                    timeout=30.0
+                )
+
+                if finalize_response.status_code not in (200, 201):
+                    raise LinkedInAPIError(
+                        f"Failed to finalize video upload: {finalize_response.status_code} - {finalize_response.text}"
+                    )
+
+            except httpx.HTTPError as e:
+                raise LinkedInAPIError(f"HTTP error during video finalization: {str(e)}")
+
+            # Step 4: Wait for video processing (poll status)
+            import asyncio
+            max_wait = 60  # Wait up to 60 seconds
+            wait_interval = 2  # Check every 2 seconds
+
+            try:
+                for attempt in range(max_wait // wait_interval):
+                    # Get video status
+                    video_id = video_urn.split(":")[-1]
+                    status_url = f"https://api.linkedin.com/rest/videos/{video_id}"
+
+                    status_response = await client.get(
+                        status_url,
+                        headers=self._get_headers(use_rest_api=True),
+                        timeout=10.0
+                    )
+
+                    if status_response.status_code == 200:
+                        status_data = status_response.json()
+                        status = status_data.get("status", "UNKNOWN")
+
+                        # DEBUG: Print status
+                        import sys
+                        print(f"  Video status check {attempt + 1}: {status}", file=sys.stderr, flush=True)
+
+                        if status == "AVAILABLE":
+                            # Video is ready!
+                            break
+                        elif status == "PROCESSING_FAILED":
+                            raise LinkedInAPIError("Video processing failed on LinkedIn")
+                        # Status is PROCESSING, keep waiting
+                    else:
+                        # DEBUG: Print response
+                        import sys
+                        print(f"  Status check failed: {status_response.status_code} - {status_response.text}", file=sys.stderr, flush=True)
+
+                    await asyncio.sleep(wait_interval)
+                else:
+                    # Timed out waiting for video
+                    raise LinkedInAPIError(
+                        f"Video upload timed out after {max_wait} seconds. "
+                        f"Video may still be processing. URN: {video_urn}"
+                    )
+
+            except httpx.HTTPError as e:
+                # Don't fail if status check fails - video might still work
+                import sys
+                print(f"  Status check error: {str(e)}", file=sys.stderr, flush=True)
+                pass
 
         return video_urn

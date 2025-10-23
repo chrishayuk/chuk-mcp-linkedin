@@ -28,10 +28,15 @@ class TestDraft:
 
     def test_draft_update_content(self):
         """Test updating draft content"""
+        import time
+
         draft = Draft(
             draft_id="draft_1", name="My Post", post_type="text", content={"text": "Hello"}
         )
         original_updated = draft.updated_at
+
+        # Small delay to ensure timestamp changes on all platforms (including Windows)
+        time.sleep(0.01)
 
         draft.update_content({"text": "Hello world"})
         assert draft.content["text"] == "Hello world"

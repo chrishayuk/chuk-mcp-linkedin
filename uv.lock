@@ -2,6 +2,9 @@ version = 1
 revision = 3
 requires-python = ">=3.11"
 
+[manifest]
+overrides = [{ name = "uvloop", marker = "sys_platform != 'win32'", specifier = ">=0.20.0" }]
+
 [[package]]
 name = "aioboto3"
 version = "15.4.0"
@@ -522,7 +525,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "starlette" },
     { name = "uvicorn" },
-    { name = "uvloop" },
+    { name = "uvloop", marker = "sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9b/18/ce9dcb4b906d7f3687296568d2f78dd937e1a516b4deb0f667c082802ac4/chuk_mcp_server-0.4.4.tar.gz", hash = "sha256:e7879b5cd6edd62e673af0c7f0c524265b3eb973eeb745938bc5004c9687bceb", size = 306498, upload-time = "2025-10-12T16:31:18.283Z" }
 wheels = [

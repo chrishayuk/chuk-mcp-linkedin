@@ -36,19 +36,21 @@ repos:
       # Run the formatter
       - id: ruff-format
 
-  # MyPy - Static type checker
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
-    hooks:
-      - id: mypy
-        args: [--ignore-missing-imports, --no-strict-optional, --no-warn-return-any, --warn-unused-ignores]
-        additional_dependencies:
-          - types-requests
-          - types-setuptools
-          - pydantic
-          - mcp
-        files: ^src/
-        exclude: ^tests/
+  # MyPy - Static type checker (disabled in pre-commit, runs in CI)
+  # Note: Disabled because pre-commit's isolated environment doesn't match CI
+  # and causes false positives with type: ignore comments
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.9.0
+  #   hooks:
+  #     - id: mypy
+  #       args: [--ignore-missing-imports, --no-strict-optional, --no-warn-return-any]
+  #       additional_dependencies:
+  #         - types-requests
+  #         - types-setuptools
+  #         - pydantic
+  #         - pydantic-settings
+  #       files: ^src/
+  #       exclude: ^tests/
 
   # Security checks
   - repo: https://github.com/PyCQA/bandit

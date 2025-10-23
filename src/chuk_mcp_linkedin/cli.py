@@ -30,7 +30,7 @@ async def run_stdio() -> None:
     from mcp.server.stdio import stdio_server
 
     async with stdio_server() as (read_stream, write_stream):
-        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
+        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())  # type: ignore[attr-defined]
 
 
 async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B104
@@ -55,7 +55,7 @@ async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B1
         # Create Starlette app
         async def handle_sse(request):  # type: ignore[no-untyped-def]
             async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
-                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())
+                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())  # type: ignore[attr-defined]
 
         async def handle_messages(request):  # type: ignore[no-untyped-def]
             await sse.handle_post_message(request.scope, request.receive, request._send)

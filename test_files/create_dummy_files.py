@@ -41,7 +41,6 @@ except ImportError:
 # Try to create a simple PowerPoint
 try:
     from pptx import Presentation
-    from pptx.util import Inches, Pt
 
     def create_pptx():
         pptx_path = Path(__file__).parent / "test_presentation.pptx"
@@ -90,33 +89,32 @@ except ImportError:
 # Try to create a simple Word document
 try:
     from docx import Document
-    from docx.shared import Inches, Pt
 
     def create_docx():
         docx_path = Path(__file__).parent / "test_document.docx"
         doc = Document()
 
         # Add title
-        doc.add_heading('Test LinkedIn Document', 0)
+        doc.add_heading("Test LinkedIn Document", 0)
 
         # Add paragraphs
-        doc.add_paragraph('This is a test Word document for LinkedIn upload.')
-        doc.add_paragraph('Created by chuk-mcp-linkedin')
+        doc.add_paragraph("This is a test Word document for LinkedIn upload.")
+        doc.add_paragraph("Created by chuk-mcp-linkedin")
 
-        doc.add_heading('Section 1', level=1)
+        doc.add_heading("Section 1", level=1)
         doc.add_paragraph(
-            'LinkedIn supports uploading documents in various formats including '
-            'PDF, PowerPoint, and Word.'
+            "LinkedIn supports uploading documents in various formats including "
+            "PDF, PowerPoint, and Word."
         )
 
-        doc.add_heading('Section 2', level=1)
-        doc.add_paragraph('This document tests that functionality.')
+        doc.add_heading("Section 2", level=1)
+        doc.add_paragraph("This document tests that functionality.")
 
         # Add a list
-        doc.add_paragraph('Key features:', style='List Bullet')
-        doc.add_paragraph('Document upload via API', style='List Bullet')
-        doc.add_paragraph('Preview in LinkedIn feed', style='List Bullet')
-        doc.add_paragraph('Carousel navigation', style='List Bullet')
+        doc.add_paragraph("Key features:", style="List Bullet")
+        doc.add_paragraph("Document upload via API", style="List Bullet")
+        doc.add_paragraph("Preview in LinkedIn feed", style="List Bullet")
+        doc.add_paragraph("Carousel navigation", style="List Bullet")
 
         doc.save(str(docx_path))
         print(f"✓ Created DOCX: {docx_path}")
@@ -126,8 +124,8 @@ try:
 except ImportError:
     print("! python-docx not installed - skipping DOCX")
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("SUMMARY")
-print("="*60)
+print("=" * 60)
 print("Run: pip install reportlab python-pptx python-docx")
 print("to generate all test files.")

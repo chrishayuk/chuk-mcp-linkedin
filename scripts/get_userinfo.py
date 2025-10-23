@@ -35,7 +35,7 @@ async def get_userinfo():
                 headers={
                     "Authorization": f"Bearer {token}",
                 },
-                timeout=10.0
+                timeout=10.0,
             )
 
             print(f"Status: {response.status_code}")
@@ -48,8 +48,8 @@ async def get_userinfo():
                 print(json.dumps(data, indent=2))
                 print()
 
-                if 'sub' in data:
-                    member_id = data['sub']
+                if "sub" in data:
+                    member_id = data["sub"]
                     member_urn = f"urn:li:member:{member_id}"
                     print(f"Member ID: {member_id}")
                     print(f"Member URN: {member_urn}")
@@ -63,7 +63,7 @@ async def get_userinfo():
                 try:
                     error_data = response.json()
                     print(json.dumps(error_data, indent=2))
-                except:
+                except Exception:
                     print(response.text)
                 print()
                 print("This error means your access token doesn't have the 'openid' scope.")

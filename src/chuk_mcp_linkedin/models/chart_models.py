@@ -22,7 +22,7 @@ class BarChartData(BaseModel):
 
     @field_validator("data")
     @classmethod
-    def validate_data(cls, v):
+    def validate_data(cls, v: Dict[str, int]) -> Dict[str, int]:
         if not v:
             raise ValueError("Chart data cannot be empty")
         if not all(isinstance(val, int) for val in v.values()):
@@ -42,7 +42,7 @@ class MetricsChartData(BaseModel):
 
     @field_validator("data")
     @classmethod
-    def validate_data(cls, v):
+    def validate_data(cls, v: Dict[str, str]) -> Dict[str, str]:
         if not v:
             raise ValueError("Metrics data cannot be empty")
         return v
@@ -65,7 +65,7 @@ class ComparisonChartData(BaseModel):
 
     @field_validator("data")
     @classmethod
-    def validate_data(cls, v):
+    def validate_data(cls, v: Dict[str, Any]) -> Dict[str, Any]:
         if len(v) < 2:
             raise ValueError("Comparison chart requires at least 2 items")
         return v
@@ -83,7 +83,7 @@ class ProgressChartData(BaseModel):
 
     @field_validator("data")
     @classmethod
-    def validate_data(cls, v):
+    def validate_data(cls, v: Dict[str, int]) -> Dict[str, int]:
         if not v:
             raise ValueError("Progress data cannot be empty")
         for label, value in v.items():
@@ -107,7 +107,7 @@ class RankingChartData(BaseModel):
 
     @field_validator("data")
     @classmethod
-    def validate_data(cls, v):
+    def validate_data(cls, v: Dict[str, str]) -> Dict[str, str]:
         if not v:
             raise ValueError("Ranking data cannot be empty")
         return v

@@ -47,7 +47,7 @@ class MediaAPIMixin:
         Reference:
             https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/images-api
         """
-        if not self.access_token or not self.person_urn:
+        if not self.access_token or not self.person_urn:  # type: ignore[attr-defined]
             raise LinkedInAPIError(
                 "LinkedIn API not configured. Set LINKEDIN_ACCESS_TOKEN and LINKEDIN_PERSON_URN"
             )
@@ -70,20 +70,19 @@ class MediaAPIMixin:
         max_size = 10 * 1024 * 1024  # 10MB reasonable limit
         if file_size > max_size:
             raise LinkedInAPIError(
-                f"File too large: {file_size / 1024 / 1024:.1f}MB. "
-                f"Keep under 10MB for best results"
+                f"File too large: {file_size / 1024 / 1024:.1f}MB. Keep under 10MB for best results"
             )
 
         async with httpx.AsyncClient() as client:
             # Step 1: Initialize upload
             init_url = "https://api.linkedin.com/rest/images?action=initializeUpload"
-            init_payload = {"initializeUploadRequest": {"owner": self.person_urn}}
+            init_payload = {"initializeUploadRequest": {"owner": self.person_urn}}  # type: ignore[attr-defined]
 
             try:
                 response = await client.post(
                     init_url,
                     json=init_payload,
-                    headers=self._get_headers(use_rest_api=True),
+                    headers=self._get_headers(use_rest_api=True),  # type: ignore[attr-defined]
                     timeout=30.0,
                 )
 
@@ -94,7 +93,7 @@ class MediaAPIMixin:
 
                 init_data = response.json()
                 upload_url = init_data["value"]["uploadUrl"]
-                image_urn = init_data["value"]["image"]
+                image_urn: str = init_data["value"]["image"]
 
             except httpx.HTTPError as e:
                 raise LinkedInAPIError(f"HTTP error during upload initialization: {str(e)}")
@@ -121,7 +120,7 @@ class MediaAPIMixin:
                     upload_url,
                     content=file_data,
                     headers={
-                        "Authorization": f"Bearer {self.access_token}",
+                        "Authorization": f"Bearer {self.access_token}",  # type: ignore[attr-defined]
                         "Content-Type": mime_type,
                     },
                     timeout=120.0,
@@ -171,7 +170,7 @@ class MediaAPIMixin:
             - Size: 75kb - 500MB
             - Processing time: Usually 5-30 seconds depending on video size
         """
-        if not self.access_token or not self.person_urn:
+        if not self.access_token or not self.person_urn:  # type: ignore[attr-defined]
             raise LinkedInAPIError(
                 "LinkedIn API not configured. Set LINKEDIN_ACCESS_TOKEN and LINKEDIN_PERSON_URN"
             )
@@ -183,7 +182,7 @@ class MediaAPIMixin:
         # Validate file type (MP4 only)
         if file_path.suffix.lower() != ".mp4":
             raise LinkedInAPIError(
-                f"Unsupported file type: {file_path.suffix}. " f"LinkedIn only supports MP4 videos"
+                f"Unsupported file type: {file_path.suffix}. LinkedIn only supports MP4 videos"
             )
 
         # Validate file size (75kb - 500MB)
@@ -203,7 +202,7 @@ class MediaAPIMixin:
             init_url = "https://api.linkedin.com/rest/videos?action=initializeUpload"
             init_payload = {
                 "initializeUploadRequest": {
-                    "owner": self.person_urn,
+                    "owner": self.person_urn,  # type: ignore[attr-defined]
                     "fileSizeBytes": file_size,
                     "uploadCaptions": False,
                     "uploadThumbnail": False,
@@ -214,7 +213,7 @@ class MediaAPIMixin:
                 response = await client.post(
                     init_url,
                     json=init_payload,
-                    headers=self._get_headers(use_rest_api=True),
+                    headers=self._get_headers(use_rest_api=True),  # type: ignore[attr-defined]
                     timeout=30.0,
                 )
 
@@ -236,6 +235,7 @@ class MediaAPIMixin:
                         raise LinkedInAPIError("No upload instructions received from LinkedIn")
 
                     upload_url = upload_instructions[0]["uploadUrl"]
+                    video_urn_result: str = video_urn
                 except KeyError as e:
                     raise LinkedInAPIError(
                         f"Unexpected response structure from LinkedIn video API. "
@@ -254,7 +254,7 @@ class MediaAPIMixin:
                     upload_url,
                     content=file_data,
                     headers={
-                        "Authorization": f"Bearer {self.access_token}",
+                        "Authorization": f"Bearer {self.access_token}",  # type: ignore[attr-defined]
                         "Content-Type": "video/mp4",
                     },
                     timeout=300.0,  # 5 minutes for video upload
@@ -285,7 +285,7 @@ class MediaAPIMixin:
                 finalize_response = await client.post(
                     finalize_url,
                     json=finalize_payload,
-                    headers=self._get_headers(use_rest_api=True),
+                    headers=self._get_headers(use_rest_api=True),  # type: ignore[attr-defined]
                     timeout=30.0,
                 )
 
@@ -307,4 +307,4 @@ class MediaAPIMixin:
 
             await asyncio.sleep(wait_time)
 
-        return video_urn
+        return video_urn_result

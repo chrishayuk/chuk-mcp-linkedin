@@ -6,16 +6,17 @@ Provides information about available components, recommendations, and system ove
 """
 
 import json
+from typing import Any, Dict
 
 
-def register_registry_tools(mcp, manager):
+def register_registry_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
     """Register component registry tools with the MCP server"""
 
     from ..registry import ComponentRegistry
 
     registry = ComponentRegistry()
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_list_components() -> str:
         """
         List all available post components.
@@ -26,7 +27,7 @@ def register_registry_tools(mcp, manager):
         components = registry.list_post_components()
         return json.dumps(components, indent=2)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_get_component_info(component_type: str) -> str:
         """
         Get detailed information about a component.
@@ -40,7 +41,7 @@ def register_registry_tools(mcp, manager):
         info = registry.get_component_info(component_type)
         return json.dumps(info, indent=2)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_get_recommendations(goal: str) -> str:
         """
         Get recommendations based on goal.
@@ -54,7 +55,7 @@ def register_registry_tools(mcp, manager):
         recs = registry.get_recommendations(goal)
         return json.dumps(recs, indent=2)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_get_system_overview() -> str:
         """
         Get complete overview of the design system.

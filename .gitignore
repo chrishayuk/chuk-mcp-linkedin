@@ -16,6 +16,8 @@ htmlcov/
 .pytest_cache/
 .tox/
 .nox/
+.mypy_cache/
+.ruff_cache/
 
 # Virtual environments
 venv/

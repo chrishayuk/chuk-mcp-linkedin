@@ -5,7 +5,7 @@ Provides session-isolated, secure preview URLs with automatic cleanup.
 """
 
 import uuid
-from typing import Optional
+from typing import Optional, Any, List
 
 from chuk_artifacts import ArtifactStore
 from chuk_artifacts.config import configure_memory, configure_filesystem
@@ -35,7 +35,7 @@ class ArtifactPreviewManager:
         self._store: Optional[ArtifactStore] = None
         self._current_session: Optional[str] = None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "ArtifactPreviewManager":
         """Async context manager entry."""
         # Configure provider
         if self.provider == "memory":
@@ -51,7 +51,7 @@ class ArtifactPreviewManager:
         await self._store.__aenter__()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         if self._store:
             await self._store.__aexit__(exc_type, exc_val, exc_tb)
@@ -73,7 +73,7 @@ class ArtifactPreviewManager:
         self._current_session = session_id
         return session_id
 
-    def set_session(self, session_id: str):
+    def set_session(self, session_id: str) -> None:
         """
         Set the current session.
 
@@ -115,7 +115,7 @@ class ArtifactPreviewManager:
             raise ValueError("No session ID provided or set")
 
         # Store HTML as artifact
-        artifact_id = await self._store.store(
+        artifact_id_result: str = await self._store.store(
             data=html_content.encode("utf-8"),
             mime="text/html",
             summary=f"LinkedIn Post Preview: {draft_name}",
@@ -129,7 +129,7 @@ class ArtifactPreviewManager:
             },
         )
 
-        return artifact_id
+        return artifact_id_result
 
     async def get_preview(
         self, artifact_id: str, session_id: Optional[str] = None
@@ -149,8 +149,8 @@ class ArtifactPreviewManager:
 
         try:
             # Retrieve enforces session isolation automatically
-            content = await self._store.retrieve(artifact_id)
-            return content
+            content_result: bytes | None = await self._store.retrieve(artifact_id)
+            return content_result
         except Exception:
             # Access denied or not found
             return None
@@ -174,13 +174,15 @@ class ArtifactPreviewManager:
 
         try:
             # Generate presigned URL (duration-based)
-            url = await self._store.presign_short(artifact_id, expires_in=expires_in)
-            return url
+            url_result: str | None = await self._store.presign_short(
+                artifact_id, expires_in=expires_in
+            )
+            return url_result
         except Exception:
             # Not supported by provider or access denied
             return None
 
-    async def list_previews(self, session_id: Optional[str] = None) -> list:
+    async def list_previews(self, session_id: Optional[str] = None) -> List[Any]:
         """
         List all previews for a session.
 

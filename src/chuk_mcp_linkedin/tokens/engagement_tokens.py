@@ -210,22 +210,26 @@ class EngagementTokens:
     @classmethod
     def get_hook_power(cls, hook_type: str) -> float:
         """Get effectiveness rating for a hook type"""
-        return cls.HOOKS.get(hook_type, {}).get("power", 0.5)
+        result: float = cls.HOOKS.get(hook_type, {}).get("power", 0.5)
+        return result
 
     @classmethod
     def get_cta_power(cls, cta_type: str) -> float:
         """Get effectiveness rating for a CTA type"""
-        return cls.CTA_STYLES.get(cta_type, {}).get("power", 0.5)
+        result: float = cls.CTA_STYLES.get(cta_type, {}).get("power", 0.5)
+        return result
 
     @classmethod
     def get_hook_examples(cls, hook_type: str) -> List[str]:
         """Get example hooks for a type"""
-        return cls.HOOKS.get(hook_type, {}).get("examples", [])
+        result: List[str] = cls.HOOKS.get(hook_type, {}).get("examples", [])
+        return result
 
     @classmethod
     def get_cta_examples(cls, cta_type: str) -> List[str]:
         """Get example CTAs for a type"""
-        return cls.CTA_STYLES.get(cta_type, {}).get("examples", [])
+        result: List[str] = cls.CTA_STYLES.get(cta_type, {}).get("examples", [])
+        return result
 
     @classmethod
     def is_optimal_posting_time(cls, day: str, hour: int) -> bool:

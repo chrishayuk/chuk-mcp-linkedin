@@ -319,7 +319,8 @@ class ComponentRegistry:
     def get_component_info(component_type: str) -> Dict[str, Any]:
         """Get detailed information about a specific component"""
         components = ComponentRegistry.list_post_components()
-        return components.get(component_type, {})
+        result: Dict[str, Any] = components.get(component_type, {})
+        return result
 
     @staticmethod
     def get_variant_info(post_type: str) -> Dict[str, Any]:

@@ -19,12 +19,12 @@ class ComponentRenderer:
         if variant == "horizontal_line":
             return f"""
 <div style="
-    width: {divider['width']}px;
-    height: {divider['height']}px;
-    background-color: {divider['color']};
-    margin-top: {divider['margin_top']}px;
-    margin-bottom: {divider['margin_bottom']}px;
-    {'border-style: dashed;' if divider['style'] == 'dashed' else ''}
+    width: {divider["width"]}px;
+    height: {divider["height"]}px;
+    background-color: {divider["color"]};
+    margin-top: {divider["margin_top"]}px;
+    margin-bottom: {divider["margin_bottom"]}px;
+    {"border-style: dashed;" if divider["style"] == "dashed" else ""}
 "></div>
 """
 
@@ -32,39 +32,39 @@ class ComponentRenderer:
             gradient = divider.get("gradient", {})
             return f"""
 <div style="
-    width: {divider['width']}px;
-    height: {divider['height']}px;
-    background: linear-gradient(to right, {gradient['start']}, {gradient['mid']}, {gradient['end']});
-    margin-top: {divider['margin_top']}px;
-    margin-bottom: {divider['margin_bottom']}px;
+    width: {divider["width"]}px;
+    height: {divider["height"]}px;
+    background: linear-gradient(to right, {gradient["start"]}, {gradient["mid"]}, {gradient["end"]});
+    margin-top: {divider["margin_top"]}px;
+    margin-bottom: {divider["margin_bottom"]}px;
 "></div>
 """
 
         elif variant == "decorative_accent":
             return f"""
 <div style="
-    width: {divider['width']}px;
-    height: {divider['height']}px;
-    background-color: {divider['color']};
-    border-radius: {divider['border_radius']}px;
-    margin: {divider['margin_top']}px auto {divider['margin_bottom']}px auto;
+    width: {divider["width"]}px;
+    height: {divider["height"]}px;
+    background-color: {divider["color"]};
+    border-radius: {divider["border_radius"]}px;
+    margin: {divider["margin_top"]}px auto {divider["margin_bottom"]}px auto;
 "></div>
 """
 
         elif variant == "section_break":
             return f"""
 <div style="
-    text-align: {divider['align']};
-    color: {divider['color']};
-    font-size: {divider['font_size']}px;
-    margin-top: {divider['margin_top']}px;
-    margin-bottom: {divider['margin_bottom']}px;
+    text-align: {divider["align"]};
+    color: {divider["color"]};
+    font-size: {divider["font_size"]}px;
+    margin-top: {divider["margin_top"]}px;
+    margin-bottom: {divider["margin_bottom"]}px;
     letter-spacing: 8px;
-">{divider['symbols']}</div>
+">{divider["symbols"]}</div>
 """
 
         elif variant == "spacer":
-            return f"""<div style="height: {divider['height']}px;"></div>"""
+            return f"""<div style="height: {divider["height"]}px;"></div>"""
 
         return ""
 
@@ -75,55 +75,55 @@ class ComponentRenderer:
 
         common_style = f"""
 display: inline-block;
-padding: {badge.get('padding_y', 6)}px {badge.get('padding_x', 12)}px;
-font-size: {badge.get('font_size', 18)}px;
-font-weight: {badge.get('font_weight', '600')};
-border-radius: {badge.get('border_radius', 999)}px;
+padding: {badge.get("padding_y", 6)}px {badge.get("padding_x", 12)}px;
+font-size: {badge.get("font_size", 18)}px;
+font-weight: {badge.get("font_weight", "600")};
+border-radius: {badge.get("border_radius", 999)}px;
 """
 
         if variant == "pill":
             return f"""
 <span style="{common_style}
-    background-color: {badge['background_color']};
-    color: {badge['text_color']};
-">{badge['text']}</span>
+    background-color: {badge["background_color"]};
+    color: {badge["text_color"]};
+">{badge["text"]}</span>
 """
 
         elif variant == "status":
             return f"""
 <span style="{common_style}
-    background-color: {badge['background_color']};
-    color: {badge['text_color']};
+    background-color: {badge["background_color"]};
+    color: {badge["text_color"]};
     text-transform: uppercase;
     letter-spacing: 0.5px;
-">{badge['text']}</span>
+">{badge["text"]}</span>
 """
 
         elif variant == "status_outlined":
             return f"""
 <span style="{common_style}
-    background-color: {badge['background_color']};
-    color: {badge['text_color']};
-    border: {badge['border_width']}px solid {badge['border_color']};
+    background-color: {badge["background_color"]};
+    color: {badge["text_color"]};
+    border: {badge["border_width"]}px solid {badge["border_color"]};
     text-transform: uppercase;
     letter-spacing: 0.5px;
-">{badge['text']}</span>
+">{badge["text"]}</span>
 """
 
         elif variant == "percentage_change":
             return f"""
 <span style="{common_style}
-    background-color: {badge['background_color']};
-    color: {badge['text_color']};
-">{badge['text']}</span>
+    background-color: {badge["background_color"]};
+    color: {badge["text_color"]};
+">{badge["text"]}</span>
 """
 
         elif variant == "category_tag":
             return f"""
 <span style="{common_style}
-    background-color: {badge['background_color']};
-    color: {badge['text_color']};
-">{badge['text']}</span>
+    background-color: {badge["background_color"]};
+    color: {badge["text_color"]};
+">{badge["text"]}</span>
 """
 
         return ""
@@ -136,10 +136,10 @@ border-radius: {badge.get('border_radius', 999)}px;
         if variant == "circle":
             return f"""
 <div style="
-    width: {shape['size']}px;
-    height: {shape['size']}px;
+    width: {shape["size"]}px;
+    height: {shape["size"]}px;
     border-radius: 50%;
-    {'background-color: ' + shape['color'] + ';' if shape['fill'] else 'border: ' + str(shape.get('stroke_width', 2)) + 'px solid ' + shape['color'] + ';'}
+    {"background-color: " + shape["color"] + ";" if shape["fill"] else "border: " + str(shape.get("stroke_width", 2)) + "px solid " + shape["color"] + ";"}
     display: inline-block;
 "></div>
 """
@@ -147,16 +147,16 @@ border-radius: {badge.get('border_radius', 999)}px;
         elif variant == "icon_container":
             return f"""
 <div style="
-    width: {shape['size']}px;
-    height: {shape['size']}px;
-    border-radius: {shape['border_radius']}px;
-    background-color: {shape['background_color']};
-    color: {shape['icon_color']};
+    width: {shape["size"]}px;
+    height: {shape["size"]}px;
+    border-radius: {shape["border_radius"]}px;
+    background-color: {shape["background_color"]};
+    color: {shape["icon_color"]};
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: {shape['icon_size']}px;
-">{shape['icon']}</div>
+    font-size: {shape["icon_size"]}px;
+">{shape["icon"]}</div>
 """
 
         elif variant == "checkmark":
@@ -166,16 +166,16 @@ border-radius: {badge.get('border_radius', 999)}px;
 
             return f"""
 <div style="
-    width: {shape['size']}px;
-    height: {shape['size']}px;
+    width: {shape["size"]}px;
+    height: {shape["size"]}px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: {shape['size'] - 10}px;
+    font-size: {shape["size"] - 10}px;
     font-weight: bold;
     {bg_style}
-    {'color: ' + shape['color'] + ';' if not shape.get('background') else ''}
-">{shape['symbol']}</div>
+    {"color: " + shape["color"] + ";" if not shape.get("background") else ""}
+">{shape["symbol"]}</div>
 """
 
         elif variant == "progress_ring":
@@ -183,9 +183,9 @@ border-radius: {badge.get('border_radius', 999)}px;
             percentage = shape["percentage"]
             return f"""
 <div style="
-    width: {shape['size']}px;
+    width: {shape["size"]}px;
     height: 20px;
-    background-color: {shape['background_color']};
+    background-color: {shape["background_color"]};
     border-radius: 10px;
     overflow: hidden;
     position: relative;
@@ -193,7 +193,7 @@ border-radius: {badge.get('border_radius', 999)}px;
     <div style="
         width: {percentage}%;
         height: 100%;
-        background-color: {shape['progress_color']};
+        background-color: {shape["progress_color"]};
         transition: width 0.3s ease;
     "></div>
     <div style="
@@ -222,8 +222,8 @@ border-radius: {badge.get('border_radius', 999)}px;
         if variant == "simple":
             return f"""
 <div style="
-    border: {border['width']}px {border['style']} {border['color']};
-    border-radius: {border['radius']}px;
+    border: {border["width"]}px {border["style"]} {border["color"]};
+    border-radius: {border["radius"]}px;
     padding: {padding}px;
 ">{content}</div>
 """
@@ -239,18 +239,18 @@ border-radius: {badge.get('border_radius', 999)}px;
 
             return f"""
 <div style="
-    {border_prop}: {border['width']}px solid {border['color']};
+    {border_prop}: {border["width"]}px solid {border["color"]};
     padding: {padding}px;
-    padding-{side}: {padding + border['width']}px;
+    padding-{side}: {padding + border["width"]}px;
 ">{content}</div>
 """
 
         elif variant == "callout":
             return f"""
 <div style="
-    border: {border['border_width']}px solid {border['border_color']};
-    background-color: {border['background_color']};
-    border-radius: {border['border_radius']}px;
+    border: {border["border_width"]}px solid {border["border_color"]};
+    background-color: {border["background_color"]};
+    border-radius: {border["border_radius"]}px;
     padding: {padding}px;
 ">{content}</div>
 """
@@ -258,10 +258,10 @@ border-radius: {badge.get('border_radius', 999)}px;
         elif variant == "shadow_frame":
             return f"""
 <div style="
-    {'border: ' + str(border['border_width']) + 'px solid ' + border['border_color'] + ';' if border['border_width'] > 0 else ''}
-    border-radius: {border['border_radius']}px;
+    {"border: " + str(border["border_width"]) + "px solid " + border["border_color"] + ";" if border["border_width"] > 0 else ""}
+    border-radius: {border["border_radius"]}px;
     padding: {padding}px;
-    box-shadow: {border['shadow']};
+    box-shadow: {border["shadow"]};
 ">{content}</div>
 """
 
@@ -277,7 +277,7 @@ border-radius: {badge.get('border_radius', 999)}px;
         if variant == "solid":
             return f"""
 <div style="
-    background-color: {background['color']};
+    background-color: {background["color"]};
     width: {width}px;
     height: {height}px;
     padding: 20px;
@@ -294,7 +294,7 @@ border-radius: {badge.get('border_radius', 999)}px;
 
             return f"""
 <div style="
-    background: linear-gradient({direction}, {background['start_color']}, {background['end_color']});
+    background: linear-gradient({direction}, {background["start_color"]}, {background["end_color"]});
     width: {width}px;
     height: {height}px;
     padding: 20px;
@@ -304,10 +304,10 @@ border-radius: {badge.get('border_radius', 999)}px;
         elif variant == "card":
             return f"""
 <div style="
-    background-color: {background['color']};
-    box-shadow: {background['shadow']};
-    border-radius: {background['border_radius']}px;
-    padding: {background['padding']}px;
+    background-color: {background["color"]};
+    box-shadow: {background["shadow"]};
+    border-radius: {background["border_radius"]}px;
+    padding: {background["padding"]}px;
     width: {width}px;
 ">{content}</div>
 """
@@ -315,10 +315,10 @@ border-radius: {badge.get('border_radius', 999)}px;
         elif variant == "highlight_box":
             return f"""
 <div style="
-    background-color: {background['background_color']};
-    border: {background['border_width']}px solid {background['border_color']};
-    border-radius: {background['border_radius']}px;
-    padding: {background['padding']}px;
+    background-color: {background["background_color"]};
+    border: {background["border_width"]}px solid {background["border_color"]};
+    border-radius: {background["border_radius"]}px;
+    padding: {background["padding"]}px;
     width: {width}px;
 ">{content}</div>
 """

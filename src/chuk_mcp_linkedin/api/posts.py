@@ -42,14 +42,14 @@ class PostsAPIMixin:
         Reference:
             https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api
         """
-        if not self.access_token or not self.person_urn:
+        if not self.access_token or not self.person_urn:  # type: ignore[attr-defined]
             raise LinkedInAPIError(
                 "LinkedIn API not configured. Set LINKEDIN_ACCESS_TOKEN and LINKEDIN_PERSON_URN"
             )
 
         # Build request payload using new Posts API format
         payload = {
-            "author": self.person_urn,
+            "author": self.person_urn,  # type: ignore[attr-defined]
             "commentary": text,
             "visibility": visibility,
             "lifecycleState": "PUBLISHED",
@@ -62,7 +62,7 @@ class PostsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0
+                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0  # type: ignore[attr-defined]
                 )
 
                 # Check for errors
@@ -132,7 +132,7 @@ class PostsAPIMixin:
 
         # Step 2: Create post with image
         payload = {
-            "author": self.person_urn,
+            "author": self.person_urn,  # type: ignore[attr-defined]
             "commentary": text,
             "visibility": visibility,
             "content": {"media": {"id": image_urn, "altText": alt_text or ""}},
@@ -197,7 +197,7 @@ class PostsAPIMixin:
 
         # Create post with multiple images
         payload = {
-            "author": self.person_urn,
+            "author": self.person_urn,  # type: ignore[attr-defined]
             "commentary": text,
             "visibility": visibility,
             "content": {"multiImage": {"images": images}},
@@ -250,7 +250,7 @@ class PostsAPIMixin:
         video_title = title or file_path.stem
 
         payload = {
-            "author": self.person_urn,
+            "author": self.person_urn,  # type: ignore[attr-defined]
             "commentary": text,
             "visibility": visibility,
             "content": {"media": {"id": video_urn, "title": video_title}},
@@ -315,7 +315,7 @@ class PostsAPIMixin:
         for i, option in enumerate(options):
             if len(option) > 30:
                 raise LinkedInAPIError(
-                    f"Option {i+1} too long: {len(option)} chars. Maximum: 30 characters"
+                    f"Option {i + 1} too long: {len(option)} chars. Maximum: 30 characters"
                 )
 
         # Validate duration
@@ -330,7 +330,7 @@ class PostsAPIMixin:
 
         # Create poll post payload
         payload = {
-            "author": self.person_urn,
+            "author": self.person_urn,  # type: ignore[attr-defined]
             "commentary": text,
             "visibility": visibility,
             "content": {
@@ -364,7 +364,7 @@ class PostsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0
+                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0  # type: ignore[attr-defined]
                 )
 
                 if response.status_code not in (200, 201):

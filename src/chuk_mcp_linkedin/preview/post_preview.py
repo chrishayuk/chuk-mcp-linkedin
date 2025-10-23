@@ -5,7 +5,7 @@ LinkedIn post preview generator.
 Creates HTML previews of LinkedIn posts for local viewing.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 import html
 
@@ -47,7 +47,7 @@ class LinkedInPreview:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkedIn Post Preview - {html.escape(draft_data.get('name', 'Draft'))}</title>
+    <title>LinkedIn Post Preview - {html.escape(draft_data.get("name", "Draft"))}</title>
     <style>
         * {{
             margin: 0;
@@ -456,7 +456,7 @@ class LinkedInPreview:
             <div class="preview-meta">
                 <div class="meta-item">
                     <span class="meta-label">Draft:</span>
-                    <span>{html.escape(draft_data.get('name', 'Untitled'))}</span>
+                    <span>{html.escape(draft_data.get("name", "Untitled"))}</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Type:</span>
@@ -464,11 +464,11 @@ class LinkedInPreview:
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Theme:</span>
-                    <span>{html.escape(str(theme).replace('_', ' ').title())}</span>
+                    <span>{html.escape(str(theme).replace("_", " ").title())}</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Generated:</span>
-                    <span>{datetime.now().strftime('%B %d, %Y at %I:%M %p')}</span>
+                    <span>{datetime.now().strftime("%B %d, %Y at %I:%M %p")}</span>
                 </div>
             </div>
         </div>
@@ -534,7 +534,7 @@ class LinkedInPreview:
         return "\n".join(media_html_parts)
 
     @staticmethod
-    def _render_images(images: list) -> str:
+    def _render_images(images: List[Dict[str, Any]]) -> str:
         """Render image attachments (single or multiple images)"""
         if not images:
             return ""
@@ -563,7 +563,7 @@ class LinkedInPreview:
 
         return f"""
         <div class="multi-image-grid {grid_class}">
-            {''.join(images_html)}
+            {"".join(images_html)}
         </div>
         """
 
@@ -827,7 +827,7 @@ class LinkedInPreview:
             </div>
 
             <div class="carousel-indicators">
-                {''.join(f'<div class="indicator-dot{"active" if i == 0 else ""}" data-slide="{i}"></div>' for i in range(pages))}
+                {"".join(f'<div class="indicator-dot{"active" if i == 0 else ""}" data-slide="{i}"></div>' for i in range(pages))}
             </div>
 
             <div class="slide-counter">
@@ -902,11 +902,13 @@ class LinkedInPreview:
         """Extract text content from draft content"""
         # Check for composed text first
         if "composed_text" in content:
-            return content["composed_text"]
+            composed_text: str = content["composed_text"]
+            return composed_text
 
         # Try commentary
         if "commentary" in content:
-            return content["commentary"]
+            commentary: str = content["commentary"]
+            return commentary
 
         # Try to build from components
         components = content.get("components", [])
@@ -936,9 +938,9 @@ class LinkedInPreview:
         hashtag_pattern = r"#(\w+)"
         hashtags = []
 
-        def replace_hashtag(match):
+        def replace_hashtag(match: re.Match[str]) -> str:
             hashtags.append(match.group(1))
-            return f"__HASHTAG_{len(hashtags)-1}__"
+            return f"__HASHTAG_{len(hashtags) - 1}__"
 
         text = re.sub(hashtag_pattern, replace_hashtag, text)
 

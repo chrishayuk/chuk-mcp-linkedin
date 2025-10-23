@@ -38,7 +38,10 @@ class ComposablePost:
     """Shadcn-style composition for LinkedIn posts"""
 
     def __init__(
-        self, post_type: str, theme: Optional[Any] = None, variant_config: Optional[Dict] = None
+        self,
+        post_type: str,
+        theme: Optional[Any] = None,
+        variant_config: Optional[Dict[str, Any]] = None,
     ):
         self.post_type = post_type
         self.theme = theme

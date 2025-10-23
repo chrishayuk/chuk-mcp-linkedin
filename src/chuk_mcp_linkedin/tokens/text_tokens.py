@@ -146,4 +146,7 @@ class TextTokens:
     @classmethod
     def get_hashtag_count(cls, strategy: str) -> Tuple[int, int]:
         """Get recommended hashtag count range"""
-        return cls.HASHTAGS["count"].get(strategy, cls.HASHTAGS["count"]["optimal"])
+        result: Tuple[int, int] = cls.HASHTAGS["count"].get(
+            strategy, cls.HASHTAGS["count"]["optimal"]
+        )
+        return result

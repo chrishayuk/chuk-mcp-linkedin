@@ -23,17 +23,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def run_stdio():
+async def run_stdio() -> None:
     """Run server in STDIO mode for Claude Desktop integration."""
     logger.info("Starting LinkedIn MCP Server in STDIO mode")
 
     from mcp.server.stdio import stdio_server
 
     async with stdio_server() as (read_stream, write_stream):
-        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
+        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())  # type: ignore[attr-defined]
 
 
-async def run_http(host: str = "0.0.0.0", port: int = 8000):
+async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:
     """
     Run server in HTTP mode for API access.
 
@@ -53,15 +53,15 @@ async def run_http(host: str = "0.0.0.0", port: int = 8000):
         sse = SseServerTransport("/messages")
 
         # Create Starlette app
-        async def handle_sse(request):
+        async def handle_sse(request):  # type: ignore[no-untyped-def]
             async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
-                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())
+                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())  # type: ignore[attr-defined]
 
-        async def handle_messages(request):
+        async def handle_messages(request):  # type: ignore[no-untyped-def]
             await sse.handle_post_message(request.scope, request.receive, request._send)
 
         # Health check endpoint
-        async def health(request):
+        async def health(request):  # type: ignore[no-untyped-def]
             from starlette.responses import JSONResponse
 
             return JSONResponse({"status": "healthy", "mode": "http"})
@@ -107,7 +107,7 @@ def detect_mode() -> str:
     return "help"
 
 
-def setup_logging(debug: bool = False, log_level: Optional[str] = None):
+def setup_logging(debug: bool = False, log_level: Optional[str] = None) -> None:
     """
     Configure logging based on arguments.
 
@@ -185,14 +185,15 @@ Environment Variables:
     return parser
 
 
-def main():
+def main() -> None:
     """Main entry point for CLI."""
     parser = create_parser()
     args = parser.parse_args()
 
     # Setup logging
+    debug_val: bool = bool(args.debug or os.environ.get("DEBUG"))
     setup_logging(
-        debug=args.debug or os.environ.get("DEBUG"),
+        debug=debug_val,
         log_level=args.log_level or os.environ.get("MCP_LOG_LEVEL"),
     )
 

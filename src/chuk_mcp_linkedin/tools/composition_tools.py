@@ -5,11 +5,13 @@ Composition tools for building LinkedIn posts.
 Thin wrapper around ComposablePost for MCP tool integration.
 """
 
+from typing import Any, Dict, Optional, List
+
 from ..posts.composition import ComposablePost
 from ..themes.theme_manager import ThemeManager
 
 
-def _get_or_create_post(manager) -> ComposablePost:
+def _get_or_create_post(manager: Any) -> ComposablePost:
     """Get or create ComposablePost instance for current draft."""
     draft = manager.get_current_draft()
     if not draft:
@@ -26,13 +28,14 @@ def _get_or_create_post(manager) -> ComposablePost:
         post = ComposablePost(draft.post_type, theme=theme, variant_config=draft.variant_config)
         draft.content["_composable_post"] = post
 
-    return draft.content["_composable_post"]
+    result: ComposablePost = draft.content["_composable_post"]
+    return result
 
 
-def register_composition_tools(mcp, manager):
+def register_composition_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
     """Register composition tools with the MCP server"""
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_hook(hook_type: str, content: str) -> str:
         """
         Add opening hook to current draft.
@@ -51,7 +54,7 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_body(content: str, structure: str = "linear") -> str:
         """
         Add main content body to current draft.
@@ -70,7 +73,7 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_cta(cta_type: str, text: str) -> str:
         """
         Add call-to-action to current draft.
@@ -89,8 +92,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_bar_chart(data: dict, title: str = None, unit: str = "") -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_bar_chart(
+        data: Dict[str, int], title: Optional[str] = None, unit: str = ""
+    ) -> str:
         """
         Add horizontal bar chart using colored emoji squares.
 
@@ -112,8 +117,8 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_metrics_chart(data: dict, title: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_metrics_chart(data: Dict[str, str], title: Optional[str] = None) -> str:
         """
         Add key metrics chart with emoji indicators (✅/❌).
 
@@ -134,8 +139,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_comparison_chart(data: dict, title: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_comparison_chart(
+        data: Dict[str, Any], title: Optional[str] = None
+    ) -> str:
         """
         Add side-by-side A vs B comparison chart.
 
@@ -159,8 +166,8 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_progress_chart(data: dict, title: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_progress_chart(data: Dict[str, int], title: Optional[str] = None) -> str:
         """
         Add progress bars chart for tracking completion (0-100%).
 
@@ -181,9 +188,9 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_ranking_chart(
-        data: dict, title: str = None, show_medals: bool = True
+        data: Dict[str, str], title: Optional[str] = None, show_medals: bool = True
     ) -> str:
         """
         Add ranking/leaderboard chart with medals (🥇🥈🥉) for top 3.
@@ -206,8 +213,8 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_quote(text: str, author: str, source: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_quote(text: str, author: str, source: Optional[str] = None) -> str:
         """
         Add a quote or testimonial to current draft.
 
@@ -231,8 +238,8 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_big_stat(number: str, label: str, context: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_big_stat(number: str, label: str, context: Optional[str] = None) -> str:
         """
         Add a big eye-catching statistic to current draft.
 
@@ -256,8 +263,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_timeline(steps: dict, title: str = None, style: str = "arrow") -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_timeline(
+        steps: Dict[str, str], title: Optional[str] = None, style: str = "arrow"
+    ) -> str:
         """
         Add a timeline or step-by-step process to current draft.
 
@@ -281,7 +290,7 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_key_takeaway(
         message: str, title: str = "KEY TAKEAWAY", style: str = "box"
     ) -> str:
@@ -308,8 +317,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_pro_con(pros: list[str], cons: list[str], title: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_pro_con(
+        pros: List[str], cons: List[str], title: Optional[str] = None
+    ) -> str:
         """
         Add a pros & cons comparison to current draft.
 
@@ -333,7 +344,7 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_separator(style: str = "line") -> str:
         """
         Add a visual separator to current draft.
@@ -351,9 +362,9 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_checklist(
-        items: list[dict], title: str = None, show_progress: bool = False
+        items: List[Dict[str, Any]], title: Optional[str] = None, show_progress: bool = False
     ) -> str:
         """
         Add checklist with checkmarks to current draft.
@@ -373,9 +384,12 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_before_after(
-        before: list[str], after: list[str], title: str = None, labels: dict = None
+        before: List[str],
+        after: List[str],
+        title: Optional[str] = None,
+        labels: Optional[Dict[str, str]] = None,
     ) -> str:
         """
         Add before/after transformation comparison.
@@ -396,8 +410,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_tip_box(message: str, title: str = None, style: str = "info") -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_tip_box(
+        message: str, title: Optional[str] = None, style: str = "info"
+    ) -> str:
         """
         Add highlighted tip/note box.
 
@@ -416,8 +432,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_stats_grid(stats: dict, title: str = None, columns: int = 2) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_stats_grid(
+        stats: Dict[str, str], title: Optional[str] = None, columns: int = 2
+    ) -> str:
         """
         Add multi-stat grid display.
 
@@ -436,8 +454,8 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_poll_preview(question: str, options: list[str]) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_poll_preview(question: str, options: List[str]) -> str:
         """
         Add poll preview for engagement.
 
@@ -455,8 +473,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_feature_list(features: list[dict], title: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_feature_list(
+        features: List[Dict[str, str]], title: Optional[str] = None
+    ) -> str:
         """
         Add feature list with icons and descriptions.
 
@@ -474,9 +494,9 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_add_numbered_list(
-        items: list[str], title: str = None, style: str = "numbers", start: int = 1
+        items: List[str], title: Optional[str] = None, style: str = "numbers", start: int = 1
     ) -> str:
         """
         Add enhanced numbered list.
@@ -497,8 +517,8 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_add_hashtags(tags: list[str], placement: str = "end") -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_add_hashtags(tags: List[str], placement: str = "end") -> str:
         """
         Add hashtags to current draft.
 
@@ -516,7 +536,7 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_compose_post(optimize: bool = True) -> str:
         """
         Compose post from components in current draft.
@@ -546,7 +566,7 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_get_preview() -> str:
         """
         Get preview of current draft (first 210 chars).
@@ -561,8 +581,10 @@ def register_composition_tools(mcp, manager):
         except ValueError as e:
             return str(e)
 
-    @mcp.tool
-    async def linkedin_preview_html(output_path: str = None, open_browser: bool = True) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_preview_html(
+        output_path: Optional[str] = None, open_browser: bool = True
+    ) -> str:
         """
         Generate HTML preview of current draft and open in browser.
 
@@ -596,7 +618,7 @@ def register_composition_tools(mcp, manager):
         else:
             return f"Preview generated:\n{saved_path}\n\nOpen in browser to view."
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_export_draft() -> str:
         """
         Export current draft as JSON.

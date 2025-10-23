@@ -43,10 +43,8 @@ async def get_person_urn():
             async with httpx.AsyncClient() as client:
                 response = await client.get(
                     url,
-                    headers={
-                        "Authorization": f"Bearer {config.linkedin_access_token}"
-                    },
-                    timeout=10.0
+                    headers={"Authorization": f"Bearer {config.linkedin_access_token}"},
+                    timeout=10.0,
                 )
 
                 print(f"  Status: {response.status_code}")
@@ -65,8 +63,8 @@ async def get_person_urn():
                     # Direct ID format
                     elif "id" in data:
                         # Remove urn prefix if present
-                        person_id = data['id']
-                        if person_id.startswith('urn:li:person:'):
+                        person_id = data["id"]
+                        if person_id.startswith("urn:li:person:"):
                             person_urn = person_id
                         else:
                             person_urn = f"urn:li:person:{person_id}"
@@ -104,7 +102,7 @@ def update_env(person_urn):
 
     try:
         # Read existing .env
-        with open(env_path, 'r') as f:
+        with open(env_path, "r") as f:
             lines = f.readlines()
 
         # Update person URN line
@@ -112,18 +110,18 @@ def update_env(person_urn):
         updated = False
 
         for line in lines:
-            if line.startswith('LINKEDIN_PERSON_URN='):
-                new_lines.append(f'LINKEDIN_PERSON_URN={person_urn}\n')
+            if line.startswith("LINKEDIN_PERSON_URN="):
+                new_lines.append(f"LINKEDIN_PERSON_URN={person_urn}\n")
                 updated = True
             else:
                 new_lines.append(line)
 
         # Add if not found
         if not updated:
-            new_lines.append(f'LINKEDIN_PERSON_URN={person_urn}\n')
+            new_lines.append(f"LINKEDIN_PERSON_URN={person_urn}\n")
 
         # Write back
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.writelines(new_lines)
 
         print("✓ Updated .env with Person URN")

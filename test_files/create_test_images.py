@@ -5,15 +5,16 @@ Create test images for preview rendering.
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
+
 def create_test_image(filename: str, text: str, size=(1200, 630), color="#0a66c2"):
     """Create a simple test image with text"""
-    img = Image.new('RGB', size, color=color)
+    img = Image.new("RGB", size, color=color)
     draw = ImageDraw.Draw(img)
 
     # Try to use a nice font, fall back to default
     try:
         font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 60)
-    except:
+    except Exception:
         font = ImageDraw.ImageFont.load_default()
 
     # Calculate text position (centered)

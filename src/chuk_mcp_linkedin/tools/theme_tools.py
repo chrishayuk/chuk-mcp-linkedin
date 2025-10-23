@@ -6,9 +6,10 @@ Handles theme selection, application, and information retrieval.
 """
 
 import json
+from typing import Any, Dict
 
 
-def register_theme_tools(mcp, manager):
+def register_theme_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
     """Register theme management tools with the MCP server"""
 
     from ..themes.theme_manager import ThemeManager
@@ -17,7 +18,7 @@ def register_theme_tools(mcp, manager):
     theme_manager = ThemeManager()
     registry = ComponentRegistry()
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_list_themes() -> str:
         """
         List all available themes.
@@ -28,7 +29,7 @@ def register_theme_tools(mcp, manager):
         themes = registry.list_themes()
         return json.dumps(themes, indent=2)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_get_theme(theme_name: str) -> str:
         """
         Get details about a specific theme.
@@ -42,7 +43,7 @@ def register_theme_tools(mcp, manager):
         theme = theme_manager.get_theme_summary(theme_name)
         return json.dumps(theme, indent=2)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_apply_theme(theme_name: str) -> str:
         """
         Apply a theme to current draft.

@@ -6,14 +6,15 @@ Handles actual posting to LinkedIn via the API.
 """
 
 import json
+from typing import Any, Dict
 
 
-def register_publishing_tools(mcp, manager, linkedin_client):
+def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> Dict[str, Any]:
     """Register publishing tools with the MCP server"""
 
     from ..api import LinkedInAPIError, config as linkedin_config
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_publish(visibility: str = "PUBLIC", dry_run: bool = False) -> str:
         """
         Publish current draft to LinkedIn.
@@ -76,7 +77,7 @@ def register_publishing_tools(mcp, manager, linkedin_client):
         except LinkedInAPIError as e:
             return f"Failed to publish: {str(e)}"
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_test_connection() -> str:
         """
         Test LinkedIn API connection and configuration.
@@ -103,7 +104,7 @@ def register_publishing_tools(mcp, manager, linkedin_client):
             else:
                 return "LinkedIn API connection failed. Check your access token and person URN."
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_get_config_status() -> str:
         """
         Get LinkedIn API configuration status.

@@ -269,7 +269,8 @@ class DocumentConverter:
                         from pdf2image import pdfinfo_from_path
 
                         info = pdfinfo_from_path(filepath)
-                        return info.get("Pages", 0)
+                        pages: int = info.get("Pages", 0)
+                        return pages
                     except ImportError:
                         return 0
 
@@ -294,7 +295,7 @@ class DocumentConverter:
         return 0
 
     @staticmethod
-    def clear_cache(cache_key: Optional[str] = None):
+    def clear_cache(cache_key: Optional[str] = None) -> None:
         """Clear document cache"""
         if cache_key:
             # Clear specific document cache

@@ -274,21 +274,26 @@ class DesignTokens:
     @staticmethod
     def get_font_size(size_name: str) -> int:
         """Get font size by name"""
-        return DesignTokens.TYPOGRAPHY["sizes"].get(size_name, 24)
+        sizes: Dict[str, int] = DesignTokens.TYPOGRAPHY["sizes"]  # type: ignore[assignment]
+        result: int = sizes.get(size_name, 24)
+        return result
 
     @staticmethod
     def get_color(scheme: str, color_name: str) -> str:
         """Get color from a scheme"""
-        return DesignTokens.COLORS.get(scheme, {}).get(color_name, "#000000")
+        result: str = DesignTokens.COLORS.get(scheme, {}).get(color_name, "#000000")
+        return result
 
     @staticmethod
     def get_spacing(spacing_type: str, size_name: str) -> Any:
         """Get spacing value"""
-        return DesignTokens.SPACING.get(spacing_type, {}).get(size_name, 40)
+        spacing_dict: Dict[str, Any] = DesignTokens.SPACING.get(spacing_type, {})  # type: ignore[assignment]
+        result: Any = spacing_dict.get(size_name, 40)
+        return result
 
     @staticmethod
     def get_safe_area(size: str = "standard") -> Dict[str, int]:
         """Get safe area margins"""
-        return DesignTokens.SPACING["safe_area"].get(
-            size, DesignTokens.SPACING["safe_area"]["standard"]
-        )
+        safe_area_dict: Dict[str, Dict[str, int]] = DesignTokens.SPACING["safe_area"]  # type: ignore[assignment]
+        result: Dict[str, int] = safe_area_dict.get(size, safe_area_dict["standard"])
+        return result

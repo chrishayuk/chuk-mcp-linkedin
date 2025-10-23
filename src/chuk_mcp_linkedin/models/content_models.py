@@ -50,7 +50,7 @@ class TimelineData(BaseModel):
 
     @field_validator("steps")
     @classmethod
-    def validate_steps(cls, v):
+    def validate_steps(cls, v: Dict[str, str]) -> Dict[str, str]:
         if not v or len(v) < 2:
             raise ValueError("Timeline requires at least 2 steps")
         return v
@@ -77,7 +77,7 @@ class ProConData(BaseModel):
 
     @field_validator("pros", "cons")
     @classmethod
-    def validate_items(cls, v):
+    def validate_items(cls, v: List[str]) -> List[str]:
         if not v:
             raise ValueError("Must have at least one item")
         for item in v:
@@ -102,7 +102,7 @@ class ChecklistData(BaseModel):
 
     @field_validator("items")
     @classmethod
-    def validate_items(cls, v):
+    def validate_items(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         if not v:
             raise ValueError("Checklist must have at least one item")
         for item in v:
@@ -129,7 +129,7 @@ class BeforeAfterData(BaseModel):
 
     @field_validator("before", "after")
     @classmethod
-    def validate_items(cls, v):
+    def validate_items(cls, v: List[str]) -> List[str]:
         if not v:
             raise ValueError("Must have at least one item")
         for item in v:
@@ -166,7 +166,7 @@ class StatsGridData(BaseModel):
 
     @field_validator("stats")
     @classmethod
-    def validate_stats(cls, v):
+    def validate_stats(cls, v: Dict[str, str]) -> Dict[str, str]:
         if len(v) < 2:
             raise ValueError("Stats grid requires at least 2 statistics")
         return v
@@ -180,7 +180,7 @@ class PollPreviewData(BaseModel):
 
     @field_validator("options")
     @classmethod
-    def validate_options(cls, v):
+    def validate_options(cls, v: List[str]) -> List[str]:
         if len(v) < 2:
             raise ValueError("Poll must have at least 2 options")
         if len(v) > 4:
@@ -204,7 +204,7 @@ class FeatureListData(BaseModel):
 
     @field_validator("features")
     @classmethod
-    def validate_features(cls, v):
+    def validate_features(cls, v: List[Dict[str, str]]) -> List[Dict[str, str]]:
         if not v:
             raise ValueError("Feature list must have at least one feature")
         for feature in v:
@@ -232,7 +232,7 @@ class NumberedListData(BaseModel):
 
     @field_validator("items")
     @classmethod
-    def validate_items(cls, v):
+    def validate_items(cls, v: List[str]) -> List[str]:
         if not v:
             raise ValueError("Numbered list must have at least one item")
         for item in v:

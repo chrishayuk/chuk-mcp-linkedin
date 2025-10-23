@@ -28,17 +28,17 @@ async def get_member_id():
     print("1. Checking if token contains member ID...")
     try:
         # Tokens are sometimes JWTs which can be decoded
-        parts = token.split('.')
+        parts = token.split(".")
         if len(parts) == 3:
             # Might be a JWT
             payload = parts[1]
             # Add padding if needed
-            payload += '=' * (4 - len(payload) % 4)
+            payload += "=" * (4 - len(payload) % 4)
             decoded = base64.urlsafe_b64decode(payload)
             data = json.loads(decoded)
             print(f"   Token payload: {data}")
-            if 'sub' in data:
-                member_id = data['sub']
+            if "sub" in data:
+                member_id = data["sub"]
                 print(f"   ✓ Found member ID in token: {member_id}")
                 urn = f"urn:li:member:{member_id}"
                 update_env(urn)
@@ -63,9 +63,9 @@ async def get_member_id():
                     url,
                     headers={
                         "Authorization": f"Bearer {token}",
-                        "X-Restli-Protocol-Version": "2.0.0"
+                        "X-Restli-Protocol-Version": "2.0.0",
                     },
-                    timeout=10.0
+                    timeout=10.0,
                 )
 
                 print(f"   Status: {response.status_code}")
@@ -74,9 +74,9 @@ async def get_member_id():
                     print(f"   Response: {json.dumps(data, indent=2)}")
 
                     # Try to extract ID
-                    if 'id' in data:
-                        member_id = data['id']
-                        if member_id.startswith('urn:li:member:'):
+                    if "id" in data:
+                        member_id = data["id"]
+                        if member_id.startswith("urn:li:member:"):
                             urn = member_id
                         else:
                             urn = f"urn:li:member:{member_id}"
@@ -101,23 +101,23 @@ def update_env(urn):
     env_path = Path(__file__).parent.parent / ".env"
 
     try:
-        with open(env_path, 'r') as f:
+        with open(env_path, "r") as f:
             lines = f.readlines()
 
         new_lines = []
         updated = False
 
         for line in lines:
-            if line.startswith('LINKEDIN_PERSON_URN='):
-                new_lines.append(f'LINKEDIN_PERSON_URN={urn}\n')
+            if line.startswith("LINKEDIN_PERSON_URN="):
+                new_lines.append(f"LINKEDIN_PERSON_URN={urn}\n")
                 updated = True
             else:
                 new_lines.append(line)
 
         if not updated:
-            new_lines.append(f'LINKEDIN_PERSON_URN={urn}\n')
+            new_lines.append(f"LINKEDIN_PERSON_URN={urn}\n")
 
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.writelines(new_lines)
 
         print()

@@ -35,7 +35,7 @@ async def get_me():
                     "Authorization": f"Bearer {token}",
                     "X-Restli-Protocol-Version": "2.0.0",
                 },
-                timeout=10.0
+                timeout=10.0,
             )
 
             print(f"Status: {response.status_code}")
@@ -49,12 +49,12 @@ async def get_me():
                 print()
 
                 # Try to extract member ID
-                if 'id' in data:
-                    raw_id = data['id']
+                if "id" in data:
+                    raw_id = data["id"]
                     print(f"Raw ID field: {raw_id}")
 
                     # Check if it's already a URN
-                    if raw_id.startswith('urn:li:'):
+                    if raw_id.startswith("urn:li:"):
                         member_urn = raw_id
                         print(f"Member URN: {member_urn}")
                     else:
@@ -71,7 +71,7 @@ async def get_me():
                 try:
                     error_data = response.json()
                     print(json.dumps(error_data, indent=2))
-                except:
+                except Exception:
                     print(response.text)
 
         except Exception as e:

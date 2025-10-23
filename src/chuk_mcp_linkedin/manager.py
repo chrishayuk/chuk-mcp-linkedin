@@ -37,7 +37,7 @@ class Draft:
         self.updated_at = datetime.now().isoformat()
         self.metadata: Dict[str, Any] = {}
 
-    def update_content(self, content: Dict[str, Any]):
+    def update_content(self, content: Dict[str, Any]) -> None:
         """Update draft content"""
         self.content.update(content)
         self.updated_at = datetime.now().isoformat()
@@ -111,7 +111,7 @@ class LinkedInManager:
         # Load existing drafts
         self._load_drafts()
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "LinkedInManager":
         """Async context manager entry."""
         if self.use_artifacts and not self._artifact_initialized:
             # Configure provider
@@ -128,13 +128,13 @@ class LinkedInManager:
             self._artifact_initialized = True
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         if self._artifact_store:
             await self._artifact_store.__aexit__(exc_type, exc_val, exc_tb)
             self._artifact_initialized = False
 
-    async def _ensure_artifact_store(self):
+    async def _ensure_artifact_store(self) -> None:
         """Ensure artifact store is initialized."""
         if self.use_artifacts and not self._artifact_initialized:
             # Configure provider
@@ -173,6 +173,9 @@ class LinkedInManager:
         draft_json = json.dumps(draft.to_dict(), indent=2)
 
         # Store as artifact
+        if self._artifact_store is None:
+            return None
+
         artifact_id = await self._artifact_store.store(
             data=draft_json.encode("utf-8"),
             mime="application/json",
@@ -187,7 +190,7 @@ class LinkedInManager:
             },
         )
 
-        return artifact_id
+        return str(artifact_id)
 
     async def retrieve_draft_from_artifact(self, artifact_id: str) -> Optional[Draft]:
         """
@@ -204,6 +207,9 @@ class LinkedInManager:
 
         await self._ensure_artifact_store()
 
+        if self._artifact_store is None:
+            return None
+
         try:
             # Retrieve artifact
             data = await self._artifact_store.retrieve(artifact_id)
@@ -218,7 +224,7 @@ class LinkedInManager:
         except Exception:
             return None
 
-    def set_session(self, session_id: str):
+    def set_session(self, session_id: str) -> None:
         """
         Set the current session ID.
 
@@ -452,9 +458,9 @@ class LinkedInManager:
             commentary = draft.content.get("text", "")
 
         if len(commentary) <= chars:
-            return commentary
+            return str(commentary)
 
-        return commentary[:chars] + "..."
+        return str(commentary[:chars]) + "..."
 
     def get_draft_stats(self, draft_id: str) -> Optional[Dict[str, Any]]:
         """Get statistics about a draft"""
@@ -477,13 +483,13 @@ class LinkedInManager:
             "hashtag_count": len(draft.content.get("hashtags", [])),
         }
 
-    def _save_draft(self, draft: Draft):
+    def _save_draft(self, draft: Draft) -> None:
         """Save draft to storage"""
         draft_file = self.storage_path / f"{draft.draft_id}.json"
         with open(draft_file, "w") as f:
             json.dump(draft.to_dict(), f, indent=2)
 
-    def _load_drafts(self):
+    def _load_drafts(self) -> None:
         """Load drafts from storage"""
         for draft_file in self.storage_path.glob("*.json"):
             try:

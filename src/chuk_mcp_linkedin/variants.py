@@ -290,7 +290,7 @@ class VariantResolver:
         Resolve variant selections into final configuration.
         Applies base → variants → compounds → theme overrides.
         """
-        config = base_variants["base"].copy()
+        config: Dict[str, Any] = base_variants["base"].copy()
 
         # Apply selected variants
         for variant_type, variant_name in selected.items():

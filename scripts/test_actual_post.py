@@ -37,10 +37,7 @@ async def test_post():
     print()
 
     try:
-        result = await client.create_text_post(
-            text=test_text,
-            visibility="PUBLIC"
-        )
+        result = await client.create_text_post(text=test_text, visibility="PUBLIC")
 
         print()
         print("✓ SUCCESS!")

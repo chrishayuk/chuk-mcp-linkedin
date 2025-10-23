@@ -5,7 +5,7 @@ Content structure tokens for LinkedIn posts.
 Patterns for organizing and formatting post content.
 """
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 
 
 class StructureTokens:
@@ -214,9 +214,10 @@ class StructureTokens:
         return cls.CTA_PATTERNS.get(cta_type, [])
 
     @classmethod
-    def get_recommended_length(cls, structure: str, length_type: str) -> tuple:
+    def get_recommended_length(cls, structure: str, length_type: str) -> Tuple[int, int]:
         """Get recommended character length for structure and length type"""
         structure_lengths = cls.LENGTH_BY_STRUCTURE.get(
             structure, cls.LENGTH_BY_STRUCTURE["linear"]
         )
-        return structure_lengths.get(length_type, (150, 400))
+        result: Tuple[int, int] = structure_lengths.get(length_type, (150, 400))
+        return result

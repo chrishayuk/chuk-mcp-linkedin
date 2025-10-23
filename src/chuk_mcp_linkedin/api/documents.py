@@ -47,7 +47,7 @@ class DocumentsAPIMixin:
         Reference:
             https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/documents-api
         """
-        if not self.access_token or not self.person_urn:
+        if not self.access_token or not self.person_urn:  # type: ignore[attr-defined]
             raise LinkedInAPIError(
                 "LinkedIn API not configured. Set LINKEDIN_ACCESS_TOKEN and LINKEDIN_PERSON_URN"
             )
@@ -69,19 +69,19 @@ class DocumentsAPIMixin:
         max_size = 100 * 1024 * 1024  # 100MB
         if file_size > max_size:
             raise LinkedInAPIError(
-                f"File too large: {file_size / 1024 / 1024:.1f}MB. " f"Maximum: 100MB"
+                f"File too large: {file_size / 1024 / 1024:.1f}MB. Maximum: 100MB"
             )
 
         async with httpx.AsyncClient() as client:
             # Step 1: Initialize upload
             init_url = "https://api.linkedin.com/rest/documents?action=initializeUpload"
-            init_payload = {"initializeUploadRequest": {"owner": self.person_urn}}
+            init_payload = {"initializeUploadRequest": {"owner": self.person_urn}}  # type: ignore[attr-defined]
 
             try:
                 response = await client.post(
                     init_url,
                     json=init_payload,
-                    headers=self._get_headers(use_rest_api=True),
+                    headers=self._get_headers(use_rest_api=True),  # type: ignore[attr-defined]
                     timeout=30.0,
                 )
 
@@ -92,7 +92,7 @@ class DocumentsAPIMixin:
 
                 init_data = response.json()
                 upload_url = init_data["value"]["uploadUrl"]
-                document_urn = init_data["value"]["document"]
+                document_urn: str = init_data["value"]["document"]
 
             except httpx.HTTPError as e:
                 raise LinkedInAPIError(f"HTTP error during upload initialization: {str(e)}")
@@ -121,7 +121,7 @@ class DocumentsAPIMixin:
                     upload_url,
                     content=file_data,
                     headers={
-                        "Authorization": f"Bearer {self.access_token}",
+                        "Authorization": f"Bearer {self.access_token}",  # type: ignore[attr-defined]
                         "Content-Type": mime_type,
                     },
                     timeout=120.0,  # Longer timeout for file upload
@@ -170,7 +170,7 @@ class DocumentsAPIMixin:
         title = document_title or file_path.name
 
         payload = {
-            "author": self.person_urn,
+            "author": self.person_urn,  # type: ignore[attr-defined]
             "commentary": text,
             "visibility": visibility,
             "content": {"media": {"id": document_urn, "title": title}},
@@ -183,7 +183,7 @@ class DocumentsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0
+                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0  # type: ignore[attr-defined]
                 )
 
                 if response.status_code not in (200, 201):

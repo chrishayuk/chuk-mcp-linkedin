@@ -6,13 +6,14 @@ Handles CRUD operations for draft posts.
 """
 
 import json
+from typing import Any, Dict, Optional
 
 
-def register_draft_tools(mcp, manager):
+def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
     """Register draft management tools with the MCP server"""
 
-    @mcp.tool
-    async def linkedin_create(name: str, post_type: str, theme: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_create(name: str, post_type: str, theme: Optional[str] = None) -> str:
         """
         Create a new LinkedIn post draft.
 
@@ -31,7 +32,7 @@ def register_draft_tools(mcp, manager):
         )
         return f"Created draft '{draft.name}' (ID: {draft.draft_id})"
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_list() -> str:
         """
         List all draft posts.
@@ -42,7 +43,7 @@ def register_draft_tools(mcp, manager):
         drafts = manager.list_drafts()
         return json.dumps(drafts, indent=2)
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_switch(draft_id: str) -> str:
         """
         Switch to a different draft.
@@ -58,8 +59,8 @@ def register_draft_tools(mcp, manager):
             return f"Switched to draft {draft_id}"
         return f"Draft {draft_id} not found"
 
-    @mcp.tool
-    async def linkedin_get_info(draft_id: str = None) -> str:
+    @mcp.tool  # type: ignore[misc]
+    async def linkedin_get_info(draft_id: Optional[str] = None) -> str:
         """
         Get detailed information about a draft.
 
@@ -78,7 +79,7 @@ def register_draft_tools(mcp, manager):
             return json.dumps(info, indent=2)
         return "No draft found"
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_delete(draft_id: str) -> str:
         """
         Delete a draft.
@@ -94,7 +95,7 @@ def register_draft_tools(mcp, manager):
             return f"Deleted draft {draft_id}"
         return f"Draft {draft_id} not found"
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_clear_all() -> str:
         """
         Clear all drafts.
@@ -105,10 +106,10 @@ def register_draft_tools(mcp, manager):
         count = manager.clear_all_drafts()
         return f"Cleared {count} drafts"
 
-    @mcp.tool
+    @mcp.tool  # type: ignore[misc]
     async def linkedin_preview_url(
-        draft_id: str = None,
-        session_id: str = None,
+        draft_id: Optional[str] = None,
+        session_id: Optional[str] = None,
         provider: str = "memory",
         expires_in: int = 3600,
     ) -> str:

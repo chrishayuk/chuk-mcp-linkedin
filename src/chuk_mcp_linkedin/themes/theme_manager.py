@@ -313,7 +313,7 @@ THEMES: Dict[str, LinkedInTheme] = {
 class ThemeManager:
     """Manage and apply themes to posts"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.themes = THEMES.copy()
         self.custom_themes: Dict[str, LinkedInTheme] = {}
 
@@ -334,7 +334,7 @@ class ThemeManager:
         """Get all themes"""
         return {**self.themes, **self.custom_themes}
 
-    def create_custom_theme(self, **kwargs) -> LinkedInTheme:
+    def create_custom_theme(self, **kwargs: Any) -> LinkedInTheme:
         """Create a custom theme"""
         theme = LinkedInTheme(**kwargs)
         self.custom_themes[theme.name.lower().replace(" ", "_")] = theme

@@ -26,7 +26,7 @@ class DocumentConverter:
         # Use file path + modification time for cache key
         mtime = path.stat().st_mtime
         cache_input = f"{filepath}_{mtime}"
-        return hashlib.md5(cache_input.encode()).hexdigest()
+        return hashlib.md5(cache_input.encode(), usedforsecurity=False).hexdigest()
 
     @staticmethod
     def _get_cache_dir(cache_key: str) -> Path:

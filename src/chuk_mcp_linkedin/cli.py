@@ -33,7 +33,7 @@ async def run_stdio() -> None:
         await mcp.run(read_stream, write_stream, mcp.create_initialization_options())  # type: ignore[attr-defined]
 
 
-async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:
+async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B104
     """
     Run server in HTTP mode for API access.
 
@@ -168,7 +168,9 @@ Environment Variables:
 
     # HTTP mode
     http_parser = subparsers.add_parser("http", help="Run in HTTP mode (API server)")
-    http_parser.add_argument("--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)")
+    http_parser.add_argument(
+        "--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)"
+    )  # nosec B104
     http_parser.add_argument(
         "--port", type=int, default=8000, help="Port to listen on (default: 8000)"
     )
@@ -176,7 +178,7 @@ Environment Variables:
     # Auto mode
     auto_parser = subparsers.add_parser("auto", help="Auto-detect best transport mode")
     auto_parser.add_argument(
-        "--http-host", default="0.0.0.0", help="Host for HTTP mode (default: 0.0.0.0)"
+        "--http-host", default="0.0.0.0", help="Host for HTTP mode (default: 0.0.0.0)"  # nosec B104
     )
     auto_parser.add_argument(
         "--http-port", type=int, default=8000, help="Port for HTTP mode (default: 8000)"

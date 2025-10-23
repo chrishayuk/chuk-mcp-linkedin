@@ -116,3 +116,9 @@ dev = [
     "pre-commit>=3.0.0",
     "bandit>=1.7.5",
 ]
+
+[tool.uv]
+# Override dependencies - uvloop doesn't support Windows
+override-dependencies = [
+    "uvloop>=0.20.0; sys_platform != 'win32'",
+]

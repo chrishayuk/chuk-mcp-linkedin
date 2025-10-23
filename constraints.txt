@@ -1,0 +1,3 @@
+# Constraints for platform-specific dependencies
+# uvloop doesn't support Windows, exclude it on Windows platforms
+uvloop; sys_platform != 'win32'

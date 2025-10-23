@@ -177,8 +177,8 @@ Environment Variables:
     auto_parser = subparsers.add_parser("auto", help="Auto-detect best transport mode")
     auto_parser.add_argument(
         "--http-host",
-        default="0.0.0.0",
-        help="Host for HTTP mode (default: 0.0.0.0)",  # nosec B104
+        default="0.0.0.0",  # nosec B104
+        help="Host for HTTP mode (default: 0.0.0.0)",
     )
     auto_parser.add_argument(
         "--http-port", type=int, default=8000, help="Port for HTTP mode (default: 8000)"

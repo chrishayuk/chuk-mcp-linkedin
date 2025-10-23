@@ -185,8 +185,8 @@ class DocumentsAPIMixin:
                 response = await client.post(
                     url,
                     json=payload,
-                    headers=self._get_headers(use_rest_api=True),
-                    timeout=30.0,  # type: ignore[attr-defined]
+                    headers=self._get_headers(use_rest_api=True),  # type: ignore[attr-defined]
+                    timeout=30.0,
                 )
 
                 if response.status_code not in (200, 201):

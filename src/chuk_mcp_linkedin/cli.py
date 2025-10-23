@@ -30,7 +30,7 @@ async def run_stdio() -> None:
     from mcp.server.stdio import stdio_server
 
     async with stdio_server() as (read_stream, write_stream):
-        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())  # type: ignore[attr-defined]
+        await mcp.run(read_stream, write_stream, mcp.create_initialization_options())
 
 
 async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B104
@@ -55,7 +55,7 @@ async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B1
         # Create Starlette app
         async def handle_sse(request):  # type: ignore[no-untyped-def]
             async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
-                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())  # type: ignore[attr-defined]
+                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())
 
         async def handle_messages(request):  # type: ignore[no-untyped-def]
             await sse.handle_post_message(request.scope, request.receive, request._send)
@@ -168,14 +168,18 @@ Environment Variables:
 
     # HTTP mode
     http_parser = subparsers.add_parser("http", help="Run in HTTP mode (API server)")
-    http_parser.add_argument("--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)")  # nosec B104
+    http_parser.add_argument(  # fmt: skip
+        "--host",
+        default="0.0.0.0",  # nosec B104
+        help="Host to bind to (default: 0.0.0.0)",
+    )
     http_parser.add_argument(
         "--port", type=int, default=8000, help="Port to listen on (default: 8000)"
     )
 
     # Auto mode
     auto_parser = subparsers.add_parser("auto", help="Auto-detect best transport mode")
-    auto_parser.add_argument(
+    auto_parser.add_argument(  # fmt: skip
         "--http-host",
         default="0.0.0.0",  # nosec B104
         help="Host for HTTP mode (default: 0.0.0.0)",

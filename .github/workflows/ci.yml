@@ -89,7 +89,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -133,7 +133,7 @@ jobs:
         uses: astral-sh/setup-uv@v2
 
       - name: Install build dependencies
-        run: uv pip install build twine
+        run: uv pip install --system build twine
 
       - name: Build distribution
         run: python -m build

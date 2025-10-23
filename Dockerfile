@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install uv for fast dependency management
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:${PATH}"
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy project configuration
 COPY pyproject.toml README.md ./

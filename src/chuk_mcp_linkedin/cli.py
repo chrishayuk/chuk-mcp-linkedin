@@ -168,9 +168,7 @@ Environment Variables:
 
     # HTTP mode
     http_parser = subparsers.add_parser("http", help="Run in HTTP mode (API server)")
-    http_parser.add_argument(
-        "--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)"
-    )  # nosec B104
+    http_parser.add_argument("--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)")  # nosec B104
     http_parser.add_argument(
         "--port", type=int, default=8000, help="Port to listen on (default: 8000)"
     )
@@ -178,7 +176,9 @@ Environment Variables:
     # Auto mode
     auto_parser = subparsers.add_parser("auto", help="Auto-detect best transport mode")
     auto_parser.add_argument(
-        "--http-host", default="0.0.0.0", help="Host for HTTP mode (default: 0.0.0.0)"  # nosec B104
+        "--http-host",
+        default="0.0.0.0",
+        help="Host for HTTP mode (default: 0.0.0.0)",  # nosec B104
     )
     auto_parser.add_argument(
         "--http-port", type=int, default=8000, help="Port for HTTP mode (default: 8000)"

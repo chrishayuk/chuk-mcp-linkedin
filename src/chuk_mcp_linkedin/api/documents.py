@@ -183,7 +183,10 @@ class DocumentsAPIMixin:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    url, json=payload, headers=self._get_headers(use_rest_api=True), timeout=30.0  # type: ignore[attr-defined]
+                    url,
+                    json=payload,
+                    headers=self._get_headers(use_rest_api=True),
+                    timeout=30.0,  # type: ignore[attr-defined]
                 )
 
                 if response.status_code not in (200, 201):

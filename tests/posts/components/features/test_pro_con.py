@@ -17,6 +17,13 @@ class TestProConRender:
         assert "Pro 1" in result
         assert "Con 1" in result
 
+    def test_render_with_title(self):
+        component = ProCon(["Pro 1"], ["Con 1"], title="Decision Analysis")
+        result = component.render()
+        assert "DECISION ANALYSIS" in result
+        assert "Pro 1" in result
+        assert "Con 1" in result
+
 
 class TestProConValidation:
     def test_validate_valid(self):

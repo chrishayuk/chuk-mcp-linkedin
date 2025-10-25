@@ -141,7 +141,7 @@ print(text)
 ### Prerequisites
 
 - Python 3.11 or higher
-- LinkedIn API access token ([get one here](https://www.linkedin.com/developers/))
+- LinkedIn OAuth credentials ([create an app](https://www.linkedin.com/developers/))
 
 ### Basic Installation
 
@@ -232,30 +232,18 @@ final_text = post.compose()
 Document posts have 45.85% engagement rate - the highest format in 2025!
 
 ```python
-from chuk_mcp_linkedin.api import LinkedInClient
 from chuk_mcp_linkedin.posts import ComposablePost
 
-# 1. Compose post text
+# Compose post text (publishing via MCP server with OAuth)
 post = ComposablePost("document", theme=theme)
 post.add_hook("stat", "Document posts get 45.85% engagement")
 post.add_body("Our Q4 results are in. Here's what we learned 📊")
 post.add_cta("curiosity", "What's your biggest takeaway?")
 text = post.compose()
 
-# 2. Upload document to LinkedIn
-client = LinkedInClient(access_token="your_token")
-doc_urn = client.upload_document(
-    file_path="Q4_Report.pdf",
-    owner_urn="urn:li:person:abc123",
-    title="Q4 2024 Results"
-)
-
-# 3. Create post with document
-client.create_document_post(
-    commentary=text,
-    document_urn=doc_urn,
-    visibility="PUBLIC"
-)
+# Publishing is done via MCP server tools with OAuth authentication
+# See examples/oauth_linkedin_example.py for OAuth flow
+# See docs/OAUTH.md for setup instructions
 ```
 
 #### Poll Post (Highest Reach)
@@ -507,43 +495,50 @@ manager = LinkedInManager(
 
 ### MCP Server Integration
 
-Add to your Claude Desktop config (`claude_desktop_config.json`):
+#### With OAuth (Recommended)
+
+For HTTP mode with OAuth authentication:
 
 ```json
 {
   "mcpServers": {
     "linkedin": {
       "command": "linkedin-mcp",
-      "args": ["stdio"],
+      "args": ["http", "--port", "8000"],
       "env": {
-        "LINKEDIN_ACCESS_TOKEN": "your_token_here"
+        "SESSION_PROVIDER": "memory",
+        "LINKEDIN_CLIENT_ID": "your_linkedin_client_id",
+        "LINKEDIN_CLIENT_SECRET": "your_linkedin_client_secret",
+        "OAUTH_ENABLED": "true"
       }
     }
   }
 }
 ```
 
-Or use UV:
+Then use with MCP-CLI:
+```bash
+uv run mcp-cli --server linkedin --provider openai --model gpt-4
+```
+
+See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup instructions.
+
+#### STDIO Mode (Legacy)
+
+For Claude Desktop direct integration:
 
 ```json
 {
   "mcpServers": {
     "linkedin": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/chuk-mcp-linkedin",
-        "run",
-        "linkedin-mcp",
-        "stdio"
-      ],
-      "env": {
-        "LINKEDIN_ACCESS_TOKEN": "your_token_here"
-      }
+      "command": "linkedin-mcp",
+      "args": ["stdio"]
     }
   }
 }
 ```
+
+**Note**: OAuth is required for publishing tools. STDIO mode supports all other tools (drafting, composition, previews).
 
 ## Docker
 
@@ -580,16 +575,68 @@ make docker-clean      # Clean up Docker resources
 Create a `.env` file:
 
 ```env
-LINKEDIN_ACCESS_TOKEN=your_access_token_here
+# ============================================================================
+# OAuth Configuration (Required for Publishing)
+# ============================================================================
+
+# LinkedIn OAuth Credentials (from https://www.linkedin.com/developers/apps)
+LINKEDIN_CLIENT_ID=your_linkedin_client_id
+LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+
+# OAuth Server URLs
+LINKEDIN_REDIRECT_URI=http://localhost:8000/oauth/callback  # Must match LinkedIn app settings
+OAUTH_SERVER_URL=http://localhost:8000
+OAUTH_ENABLED=true
+
+# Session Storage (for OAuth tokens)
+SESSION_PROVIDER=memory              # Development: memory | Production: redis
+SESSION_REDIS_URL=redis://localhost:6379/0  # Required if SESSION_PROVIDER=redis
+
+# ============================================================================
+# OAuth Token TTL Configuration (Optional - Defaults Shown)
+# ============================================================================
+
+# Authorization codes - Temporary codes exchanged for access tokens during OAuth flow
+# Short-lived for security (5 minutes)
+OAUTH_AUTH_CODE_TTL=300
+
+# Access tokens - Used by MCP clients to authenticate API requests
+# Should be short-lived and refreshed regularly (15 minutes)
+OAUTH_ACCESS_TOKEN_TTL=900
+
+# Refresh tokens - Long-lived tokens that obtain new access tokens without re-authentication
+# Short lifetime requires daily re-authorization for maximum security (1 day)
+OAUTH_REFRESH_TOKEN_TTL=86400
+
+# Client registrations - How long dynamically registered MCP clients remain valid (1 year)
+OAUTH_CLIENT_REGISTRATION_TTL=31536000
+
+# LinkedIn tokens - Access and refresh tokens from LinkedIn stored server-side
+# Auto-refreshed when expired (1 day, more secure than LinkedIn's 60-day default)
+OAUTH_EXTERNAL_TOKEN_TTL=86400
+
+# ============================================================================
+# Server Configuration
+# ============================================================================
 DEBUG=0
 HTTP_PORT=8000
+
+# LinkedIn Person URN (for API calls - auto-detected from OAuth token)
+LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID  # Optional: Auto-fetched via OAuth
 ```
 
-See [docs/DOCKER.md](docs/DOCKER.md) for detailed Docker documentation.
+**Key Points:**
+- **SESSION_PROVIDER=memory** - Required for development (no Redis needed)
+- **SESSION_PROVIDER=redis** - Required for production (with SESSION_REDIS_URL)
+- **OAuth is required** - Publishing tools (`linkedin_publish`) require OAuth authentication
+- **Token TTLs** - Defaults are security-focused (short lifetimes, daily re-auth)
+
+See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup and [docs/DOCKER.md](docs/DOCKER.md) for Docker deployment.
 
 ## Documentation
 
 - **[Getting Started](docs/GETTING_STARTED.md)** - Complete beginner's guide
+- **[OAuth Guide](docs/OAUTH.md)** - OAuth 2.1 setup and configuration
 - **[API Reference](docs/API.md)** - Full API documentation
 - **[Themes Guide](docs/THEMES.md)** - All themes and customization
 - **[Design Tokens](docs/TOKENS.md)** - Token system reference
@@ -603,18 +650,20 @@ See [docs/DOCKER.md](docs/DOCKER.md) for detailed Docker documentation.
 Comprehensive examples in the `examples/` directory:
 
 ```bash
-# Complete post composition examples
-python examples/complete_example.py
+# OAuth flow demonstration (authentication)
+python examples/oauth_linkedin_example.py
 
-# Preview system demonstration
-python examples/preview_example.py
+# Complete component showcase
+python examples/showcase_all_components.py
 
-# Design token showcase
-python examples/layout_token_showcase.py
+# Charts and data visualization
+python examples/demo_charts_preview.py
 
-# Document upload example
-python examples/demo_document_upload.py
+# Media types showcase
+python examples/showcase_media_types.py
 ```
+
+See [examples/README.md](examples/README.md) for complete list and OAuth setup instructions.
 
 ## Development
 

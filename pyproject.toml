@@ -35,6 +35,7 @@ dependencies = [
     "httpx>=0.24.0",
     "chuk-mcp-server>=0.4.4",
     "chuk-artifacts>=0.1.0",
+    "chuk-sessions[redis]>=0.1.0",  # Session management with Redis backend
 ]
 
 [project.scripts]

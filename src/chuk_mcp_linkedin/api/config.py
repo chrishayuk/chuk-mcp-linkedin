@@ -62,9 +62,9 @@ class LinkedInConfig(BaseSettings):
         """Get list of missing required configuration"""
         missing = []
         if not self.linkedin_access_token:
-            missing.append("LINKEDIN_ACCESS_TOKEN")
+            missing.append("linkedin_access_token")
         if not self.linkedin_person_urn:
-            missing.append("LINKEDIN_PERSON_URN")
+            missing.append("linkedin_person_urn")
         return missing
 
 

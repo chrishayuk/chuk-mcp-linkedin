@@ -65,9 +65,9 @@ class LinkedInClient:
         missing = []
 
         if not self.access_token:
-            missing.append("LINKEDIN_ACCESS_TOKEN")
+            missing.append("linkedin_access_token")
         if not self.person_urn:
-            missing.append("LINKEDIN_PERSON_URN")
+            missing.append("linkedin_person_urn")
 
         return (len(missing) == 0, missing)
 

@@ -14,7 +14,8 @@ import os
 import sys
 from typing import Optional
 
-from .async_server import mcp
+# Import the unified server (OAuth auto-enabled if credentials present)
+from .async_server import mcp, setup_oauth
 
 # Setup logging
 logging.basicConfig(
@@ -33,7 +34,7 @@ async def run_stdio() -> None:
         await mcp.run(read_stream, write_stream, mcp.create_initialization_options())  # type: ignore[attr-defined]
 
 
-async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B104
+def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B104
     """
     Run server in HTTP mode for API access.
 
@@ -43,46 +44,9 @@ async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B1
     """
     logger.info(f"Starting LinkedIn MCP Server in HTTP mode on {host}:{port}")
 
-    try:
-        from mcp.server.sse import SseServerTransport
-        from starlette.applications import Starlette
-        from starlette.routing import Route
-        import uvicorn
-
-        # Create SSE transport
-        sse = SseServerTransport("/messages")
-
-        # Create Starlette app
-        async def handle_sse(request):  # type: ignore[no-untyped-def]
-            async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
-                await mcp.run(streams[0], streams[1], mcp.create_initialization_options())  # type: ignore[attr-defined]
-
-        async def handle_messages(request):  # type: ignore[no-untyped-def]
-            await sse.handle_post_message(request.scope, request.receive, request._send)
-
-        # Health check endpoint
-        async def health(request):  # type: ignore[no-untyped-def]
-            from starlette.responses import JSONResponse
-
-            return JSONResponse({"status": "healthy", "mode": "http"})
-
-        app = Starlette(
-            routes=[
-                Route("/sse", endpoint=handle_sse),
-                Route("/messages", endpoint=handle_messages, methods=["POST"]),
-                Route("/health", endpoint=health),
-            ]
-        )
-
-        # Run server
-        config = uvicorn.Config(app, host=host, port=port, log_level="info")
-        server = uvicorn.Server(config)
-        await server.serve()
-
-    except ImportError as e:
-        logger.error(f"HTTP mode requires additional dependencies: {e}")
-        logger.error("Install with: uv pip install uvicorn starlette")
-        sys.exit(1)
+    # Use ChukMCPServer's built-in run method with OAuth hook
+    # setup_oauth will be called after default endpoints are registered
+    mcp.run(host=host, port=port, stdio=False, log_level="warning", post_register_hook=setup_oauth)
 
 
 def detect_mode() -> str:
@@ -145,10 +109,12 @@ Examples:
   %(prog)s auto
 
 Environment Variables:
-  MCP_STDIO=1           Force STDIO mode
-  MCP_HTTP=1            Force HTTP mode
-  LINKEDIN_ACCESS_TOKEN LinkedIn API access token
-  DEBUG=1               Enable debug logging
+  MCP_STDIO=1                 Force STDIO mode
+  MCP_HTTP=1                  Force HTTP mode
+  LINKEDIN_CLIENT_ID          LinkedIn OAuth Client ID
+  LINKEDIN_CLIENT_SECRET      LinkedIn OAuth Client Secret
+  SESSION_PROVIDER            Token storage (memory or redis)
+  DEBUG=1                     Enable debug logging
         """,
     )
 
@@ -208,7 +174,7 @@ def main() -> None:
         asyncio.run(run_stdio())
 
     elif args.command == "http":
-        asyncio.run(run_http(host=args.host, port=args.port))
+        run_http(host=args.host, port=args.port)
 
     elif args.command == "auto":
         mode = detect_mode()
@@ -217,7 +183,7 @@ def main() -> None:
             asyncio.run(run_stdio())
         elif mode == "http":
             logger.info("Auto-detected HTTP mode")
-            asyncio.run(run_http(host=args.http_host, port=args.http_port))
+            run_http(host=args.http_host, port=args.http_port)
         else:
             parser.print_help()
 

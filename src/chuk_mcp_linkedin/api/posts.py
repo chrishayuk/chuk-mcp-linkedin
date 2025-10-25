@@ -44,7 +44,7 @@ class PostsAPIMixin:
         """
         if not self.access_token or not self.person_urn:  # type: ignore[attr-defined]
             raise LinkedInAPIError(
-                "LinkedIn API not configured. Set LINKEDIN_ACCESS_TOKEN and LINKEDIN_PERSON_URN"
+                "LinkedIn API not configured. Access token and Person URN required (obtained via OAuth)"
             )
 
         # Build request payload using new Posts API format

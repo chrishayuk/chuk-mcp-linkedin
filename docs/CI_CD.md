@@ -313,12 +313,13 @@ make all
 
 ## GitHub Actions Secrets
 
-Required secrets for CI/CD:
+Optional secrets for CI/CD:
 
-- `LINKEDIN_ACCESS_TOKEN` - For integration tests (optional)
 - `CODECOV_TOKEN` - For coverage upload (optional)
 
 Configure in: Repository Settings → Secrets and variables → Actions
+
+Note: OAuth integration tests do not require LinkedIn credentials as they use mocked tokens.
 
 ## Branch Protection
 

@@ -11,7 +11,9 @@ services:
     command: ["linkedin-mcp", "stdio", "--debug"]
     environment:
       - MCP_SERVER_MODE=stdio
-      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - LINKEDIN_CLIENT_ID=${LINKEDIN_CLIENT_ID}
+      - LINKEDIN_CLIENT_SECRET=${LINKEDIN_CLIENT_SECRET}
+      - SESSION_PROVIDER=${SESSION_PROVIDER:-memory}
       - DEBUG=${DEBUG:-0}
     volumes:
       # Mount .env file for credentials
@@ -36,7 +38,9 @@ services:
     command: ["linkedin-mcp", "http", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       - MCP_SERVER_MODE=http
-      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - LINKEDIN_CLIENT_ID=${LINKEDIN_CLIENT_ID}
+      - LINKEDIN_CLIENT_SECRET=${LINKEDIN_CLIENT_SECRET}
+      - SESSION_PROVIDER=${SESSION_PROVIDER:-memory}
       - PORT=8000
     ports:
       - "${HTTP_PORT:-8000}:8000"
@@ -68,7 +72,9 @@ services:
     command: ["linkedin-mcp", "stdio", "--debug"]
     environment:
       - MCP_SERVER_MODE=stdio
-      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - LINKEDIN_CLIENT_ID=${LINKEDIN_CLIENT_ID}
+      - LINKEDIN_CLIENT_SECRET=${LINKEDIN_CLIENT_SECRET}
+      - SESSION_PROVIDER=${SESSION_PROVIDER:-memory}
       - DEBUG=1
       - PYTHONPATH=/app/src
     volumes:
@@ -93,7 +99,9 @@ services:
     container_name: linkedin-mcp-auto
     command: ["linkedin-mcp", "auto", "--http-port", "8000"]
     environment:
-      - LINKEDIN_ACCESS_TOKEN=${LINKEDIN_ACCESS_TOKEN}
+      - LINKEDIN_CLIENT_ID=${LINKEDIN_CLIENT_ID}
+      - LINKEDIN_CLIENT_SECRET=${LINKEDIN_CLIENT_SECRET}
+      - SESSION_PROVIDER=${SESSION_PROVIDER:-memory}
       - MCP_STDIO=${MCP_STDIO:-}
       - MCP_HTTP=${MCP_HTTP:-}
     ports:

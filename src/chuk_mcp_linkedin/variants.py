@@ -5,16 +5,29 @@ Provides variant definitions and resolution with compound variant support.
 """
 
 from typing import Dict, Any, Optional
-from dataclasses import dataclass
+from pydantic import BaseModel, Field, ConfigDict
 
 
-@dataclass
-class VariantConfig:
+class VariantConfig(BaseModel):
     """Configuration for a single variant option"""
 
-    name: str
-    properties: Dict[str, Any]
-    description: Optional[str] = None
+    name: str = Field(..., description="Variant name", min_length=1)
+    properties: Dict[str, Any] = Field(..., description="Variant properties")
+    description: Optional[str] = Field(None, description="Optional variant description")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "story",
+                "properties": {
+                    "structure": "story_arc",
+                    "emoji_level": "moderate",
+                    "line_break_style": "dramatic",
+                },
+                "description": "Narrative-driven post style",
+            }
+        }
+    )
 
 
 class PostVariants:

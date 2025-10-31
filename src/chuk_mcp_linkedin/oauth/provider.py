@@ -120,9 +120,11 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
 
         if user_id:
             # User already linked to LinkedIn
-            linkedin_token = await self.token_store.get_linkedin_token(user_id)
+            linkedin_token = await self.token_store.get_external_token(user_id, "linkedin")
 
-            if linkedin_token and not await self.token_store.is_linkedin_token_expired(user_id):
+            if linkedin_token and not await self.token_store.is_external_token_expired(
+                user_id, "linkedin"
+            ):
                 # Have valid LinkedIn token, create authorization code
                 code = await self.token_store.create_authorization_code(
                     user_id=user_id,
@@ -192,6 +194,11 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         Returns:
             OAuth token with access_token and refresh_token
         """
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.info(f"🔄 Exchanging authorization code for access token (code: {code[:16]}...)")
+
         # Validate authorization code
         code_data = await self.token_store.validate_authorization_code(
             code=code,
@@ -201,10 +208,13 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         )
 
         if not code_data:
+            logger.error("❌ Authorization code validation failed")
             raise TokenError(
                 error="invalid_grant",
                 error_description="Invalid or expired authorization code",
             )
+
+        logger.info(f"✓ Authorization code valid for user_id: {code_data['user_id']}")
 
         # Create access token and refresh token
         access_token, refresh_token = await self.token_store.create_access_token(
@@ -213,9 +223,13 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             scope=code_data["scope"],
         )
 
+        logger.info(
+            f"✓ Created access token: {access_token[:16]}... (expires in 900s, sandbox: {self.token_store.sandbox_id})"
+        )
+
         return OAuthToken(
             access_token=access_token,
-            token_type="Bearer",
+            token_type="Bearer",  # nosec B106
             expires_in=3600,  # 1 hour
             refresh_token=refresh_token,
             scope=code_data["scope"],
@@ -250,7 +264,7 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
 
         return OAuthToken(
             access_token=new_access_token,
-            token_type="Bearer",
+            token_type="Bearer",  # nosec B106
             expires_in=3600,
             refresh_token=new_refresh_token,
             scope=scope,
@@ -271,18 +285,28 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         Returns:
             Token data with user_id and LinkedIn token
         """
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.info(f"🔍 Validating access token: {token[:16]}...")
+
         # Validate MCP token
         token_data = await self.token_store.validate_access_token(token)
         if not token_data:
+            logger.error(
+                f"❌ Token validation failed: token not found in store (sandbox_id: {self.token_store.sandbox_id})"
+            )
             raise TokenError(
                 error="invalid_token",
                 error_description="Invalid or expired access token",
             )
 
+        logger.info(f"✓ Token valid for user_id: {token_data.get('user_id')}")
+
         user_id = token_data["user_id"]
 
         # Get LinkedIn token
-        linkedin_token_data = await self.token_store.get_linkedin_token(user_id)
+        linkedin_token_data = await self.token_store.get_external_token(user_id, "linkedin")
         if not linkedin_token_data:
             raise TokenError(
                 error="insufficient_scope",
@@ -290,19 +314,22 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             )
 
         # Check if LinkedIn token needs refresh
-        if await self.token_store.is_linkedin_token_expired(user_id):
+        if await self.token_store.is_external_token_expired(user_id, "linkedin"):
             # Refresh LinkedIn token
             refresh_token = linkedin_token_data.get("refresh_token")
             if refresh_token:
                 try:
                     new_token = await self.linkedin_client.refresh_access_token(refresh_token)
-                    await self.token_store.update_linkedin_token(
+                    await self.token_store.update_external_token(
                         user_id=user_id,
                         access_token=new_token["access_token"],
                         refresh_token=new_token.get("refresh_token", refresh_token),
                         expires_in=new_token.get("expires_in", 5184000),
+                        provider="linkedin",
                     )
-                    linkedin_token_data = await self.token_store.get_linkedin_token(user_id)
+                    linkedin_token_data = await self.token_store.get_external_token(
+                        user_id, "linkedin"
+                    )
                 except Exception as e:
                     raise TokenError(
                         error="invalid_token",
@@ -316,7 +343,7 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
 
         return {
             **token_data,
-            "linkedin_access_token": linkedin_token_data["access_token"],
+            "external_access_token": linkedin_token_data["access_token"],
         }
 
     async def register_client(
@@ -394,11 +421,12 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             raise ValueError(f"Failed to get LinkedIn user info: {e}")
 
         # Store LinkedIn token
-        await self.token_store.link_linkedin_token(
+        await self.token_store.link_external_token(
             user_id=user_id,
             access_token=linkedin_token["access_token"],
             refresh_token=linkedin_token.get("refresh_token"),
             expires_in=linkedin_token.get("expires_in", 5184000),
+            provider="linkedin",
         )
 
         # Create MCP authorization code

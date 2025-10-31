@@ -14,7 +14,7 @@ OAuth Flow:
     6. Refresh token when expired (if refresh token provided)
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, cast
 import httpx
 from urllib.parse import urlencode
 
@@ -28,7 +28,7 @@ class LinkedInOAuthClient:
 
     # LinkedIn OAuth endpoints
     AUTHORIZATION_URL = "https://www.linkedin.com/oauth/v2/authorization"
-    TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
+    TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"  # nosec B105
     USERINFO_URL = "https://api.linkedin.com/v2/userinfo"
 
     # Default scopes for LinkedIn posting
@@ -115,7 +115,7 @@ class LinkedInOAuthClient:
             )
 
             response.raise_for_status()
-            return response.json()
+            return cast(Dict[str, Any], response.json())
 
     async def refresh_access_token(
         self,
@@ -148,7 +148,7 @@ class LinkedInOAuthClient:
             )
 
             response.raise_for_status()
-            return response.json()
+            return cast(Dict[str, Any], response.json())
 
     async def get_user_info(
         self,
@@ -179,7 +179,7 @@ class LinkedInOAuthClient:
             )
 
             response.raise_for_status()
-            return response.json()
+            return cast(Dict[str, Any], response.json())
 
     async def validate_token(
         self,

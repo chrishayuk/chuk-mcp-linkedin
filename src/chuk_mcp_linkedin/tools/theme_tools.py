@@ -3,13 +3,18 @@
 Theme and variant management tools.
 
 Handles theme selection, application, and information retrieval.
+
+All tools require OAuth authorization to prevent server abuse and enable
+user-scoped data persistence across sessions.
 """
 
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+from chuk_mcp_server.decorators import requires_auth
+from ..manager_factory import get_current_manager
 
 
-def register_theme_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
+def register_theme_tools(mcp: Any) -> Dict[str, Any]:
     """Register theme management tools with the MCP server"""
 
     from ..themes.theme_manager import ThemeManager
@@ -19,7 +24,8 @@ def register_theme_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
     registry = ComponentRegistry()
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_list_themes() -> str:
+    @requires_auth()
+    async def linkedin_list_themes(_external_access_token: Optional[str] = None) -> str:
         """
         List all available themes.
 
@@ -30,7 +36,10 @@ def register_theme_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         return json.dumps(themes, indent=2)
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_get_theme(theme_name: str) -> str:
+    @requires_auth()
+    async def linkedin_get_theme(
+        theme_name: str, _external_access_token: Optional[str] = None
+    ) -> str:
         """
         Get details about a specific theme.
 
@@ -44,7 +53,10 @@ def register_theme_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         return json.dumps(theme, indent=2)
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_apply_theme(theme_name: str) -> str:
+    @requires_auth()
+    async def linkedin_apply_theme(
+        theme_name: str, _external_access_token: Optional[str] = None
+    ) -> str:
         """
         Apply a theme to current draft.
 
@@ -54,6 +66,7 @@ def register_theme_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         Returns:
             Success message
         """
+        manager = get_current_manager()
         draft = manager.get_current_draft()
         if not draft:
             return "No active draft"

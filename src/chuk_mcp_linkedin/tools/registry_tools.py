@@ -3,13 +3,17 @@
 Component registry and information tools.
 
 Provides information about available components, recommendations, and system overview.
+
+All tools require OAuth authorization to prevent server abuse and enable
+user-scoped data persistence across sessions.
 """
 
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+from chuk_mcp_server.decorators import requires_auth
 
 
-def register_registry_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
+def register_registry_tools(mcp: Any) -> Dict[str, Any]:
     """Register component registry tools with the MCP server"""
 
     from ..registry import ComponentRegistry
@@ -17,7 +21,8 @@ def register_registry_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
     registry = ComponentRegistry()
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_list_components() -> str:
+    @requires_auth()
+    async def linkedin_list_components(_external_access_token: Optional[str] = None) -> str:
         """
         List all available post components.
 
@@ -28,7 +33,10 @@ def register_registry_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         return json.dumps(components, indent=2)
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_get_component_info(component_type: str) -> str:
+    @requires_auth()
+    async def linkedin_get_component_info(
+        component_type: str, _external_access_token: Optional[str] = None
+    ) -> str:
         """
         Get detailed information about a component.
 
@@ -42,7 +50,10 @@ def register_registry_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         return json.dumps(info, indent=2)
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_get_recommendations(goal: str) -> str:
+    @requires_auth()
+    async def linkedin_get_recommendations(
+        goal: str, _external_access_token: Optional[str] = None
+    ) -> str:
         """
         Get recommendations based on goal.
 
@@ -56,7 +67,8 @@ def register_registry_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         return json.dumps(recs, indent=2)
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_get_system_overview() -> str:
+    @requires_auth()
+    async def linkedin_get_system_overview(_external_access_token: Optional[str] = None) -> str:
         """
         Get complete overview of the design system.
 

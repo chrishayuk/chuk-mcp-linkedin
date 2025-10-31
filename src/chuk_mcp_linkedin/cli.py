@@ -13,9 +13,32 @@ import logging
 import os
 import sys
 from typing import Optional
+from pathlib import Path
+
+# Load .env file if present
+try:
+    from dotenv import load_dotenv
+
+    # Look for .env in current directory and project root
+    env_file = Path.cwd() / ".env"
+    if env_file.exists():
+        load_dotenv(env_file)
+        logger_init = logging.getLogger(__name__)
+        logger_init.debug(f"Loaded environment from {env_file}")
+    else:
+        # Try project root (where pyproject.toml is)
+        project_root = Path(__file__).parent.parent.parent
+        env_file = project_root / ".env"
+        if env_file.exists():
+            load_dotenv(env_file)
+            logger_init = logging.getLogger(__name__)
+            logger_init.debug(f"Loaded environment from {env_file}")
+except ImportError:
+    # python-dotenv not installed - environment variables must be set manually
+    pass
 
 # Import the unified server (OAuth auto-enabled if credentials present)
-from .async_server import mcp, setup_oauth
+from .async_server import mcp, setup_http_server
 
 # Setup logging
 logging.basicConfig(
@@ -34,19 +57,26 @@ async def run_stdio() -> None:
         await mcp.run(read_stream, write_stream, mcp.create_initialization_options())  # type: ignore[attr-defined]
 
 
-def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:  # nosec B104
+def run_http(host: str = "0.0.0.0", port: int = 8000, log_level: str = "warning") -> None:  # nosec B104
     """
     Run server in HTTP mode for API access.
 
     Args:
         host: Host to bind to (default: 0.0.0.0)
         port: Port to listen on (default: 8000)
+        log_level: Logging level (default: warning)
     """
     logger.info(f"Starting LinkedIn MCP Server in HTTP mode on {host}:{port}")
 
-    # Use ChukMCPServer's built-in run method with OAuth hook
-    # setup_oauth will be called after default endpoints are registered
-    mcp.run(host=host, port=port, stdio=False, log_level="warning", post_register_hook=setup_oauth)
+    # Use ChukMCPServer's built-in run method with HTTP server setup hook
+    # setup_http_server will register preview routes and OAuth after default endpoints
+    mcp.run(
+        host=host,
+        port=port,
+        stdio=False,
+        log_level=log_level.lower(),
+        post_register_hook=setup_http_server,
+    )
 
 
 def detect_mode() -> str:
@@ -169,12 +199,15 @@ def main() -> None:
         log_level=args.log_level or os.environ.get("MCP_LOG_LEVEL"),
     )
 
+    # Determine log level for HTTP mode
+    http_log_level = args.log_level or os.environ.get("MCP_LOG_LEVEL", "WARNING")
+
     # Handle commands
     if args.command == "stdio":
         asyncio.run(run_stdio())
 
     elif args.command == "http":
-        run_http(host=args.host, port=args.port)
+        run_http(host=args.host, port=args.port, log_level=http_log_level)
 
     elif args.command == "auto":
         mode = detect_mode()
@@ -183,7 +216,7 @@ def main() -> None:
             asyncio.run(run_stdio())
         elif mode == "http":
             logger.info("Auto-detected HTTP mode")
-            run_http(host=args.http_host, port=args.http_port)
+            run_http(host=args.http_host, port=args.http_port, log_level=http_log_level)
         else:
             parser.print_help()
 

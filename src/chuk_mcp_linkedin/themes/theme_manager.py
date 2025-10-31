@@ -5,54 +5,151 @@ Theme management system for LinkedIn posts.
 Provides 10 pre-built themes for different LinkedIn personas and strategies.
 """
 
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Literal
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 
 
-@dataclass
-class LinkedInTheme:
+class LinkedInTheme(BaseModel):
     """Complete theme definition for LinkedIn voice and strategy"""
 
     # Identity
-    name: str
-    description: str
+    name: str = Field(..., description="Theme name", min_length=1)
+    description: str = Field(..., description="Theme description", min_length=1)
 
     # Voice & Tone
-    tone: str  # professional, casual, inspirational, technical, humorous
-    formality: str  # formal, conversational, friendly, casual
-    emotion: str  # neutral, warm, passionate, analytical, playful
+    tone: Literal["professional", "casual", "inspirational", "technical", "humorous"] = Field(
+        ..., description="Overall tone of voice"
+    )
+    formality: Literal["formal", "conversational", "friendly", "casual"] = Field(
+        ..., description="Level of formality"
+    )
+    emotion: Literal["neutral", "warm", "passionate", "analytical", "playful"] = Field(
+        ..., description="Emotional tone"
+    )
 
     # Content Strategy
-    primary_goal: str  # authority, engagement, community, leads, awareness
-    content_mix: Dict[str, float]  # {"educational": 0.4, "personal": 0.3, "promotional": 0.3}
+    primary_goal: Literal["authority", "engagement", "community", "leads", "awareness"] = Field(
+        ..., description="Primary content goal"
+    )
+    content_mix: Dict[str, float] = Field(
+        ...,
+        description="Content type distribution (educational, personal, promotional)",
+        examples=[{"educational": 0.4, "personal": 0.3, "promotional": 0.3}],
+    )
 
     # Formatting Style
-    emoji_level: str  # none, minimal, moderate, expressive, heavy
-    line_break_style: str  # dense, readable, scannable, dramatic, extreme
-    paragraph_length: str  # tight, standard, loose
+    emoji_level: Literal["none", "minimal", "moderate", "expressive", "heavy"] = Field(
+        ..., description="Emoji usage level"
+    )
+    line_break_style: Literal["dense", "readable", "scannable", "dramatic", "extreme"] = Field(
+        ..., description="Line break and spacing style"
+    )
+    paragraph_length: Literal["tight", "standard", "loose"] = Field(
+        ..., description="Paragraph length preference"
+    )
 
     # Structure Preferences
-    preferred_structures: List[str]  # ["listicle", "framework", "story_arc"]
-    hook_style: str  # question, stat, story, controversy, list, curiosity
-    cta_style: str  # direct, curiosity, action, share, soft
+    preferred_structures: List[str] = Field(
+        ...,
+        description="Preferred post structures",
+        min_length=1,
+        examples=[["listicle", "framework", "story_arc"]],
+    )
+    hook_style: Literal["question", "stat", "story", "controversy", "list", "curiosity"] = Field(
+        ..., description="Hook/opening style"
+    )
+    cta_style: Literal["direct", "curiosity", "action", "share", "soft"] = Field(
+        ..., description="Call-to-action style"
+    )
 
     # Engagement Style
-    hashtag_strategy: str  # minimal, optimal, branded, trending, mixed
-    hashtag_placement: str  # inline, mid, end, first_comment
-    comment_style: str  # brief, thoughtful, conversational, deep
+    hashtag_strategy: Literal["minimal", "optimal", "branded", "trending", "mixed", "niche"] = (
+        Field(..., description="Hashtag usage strategy")
+    )
+    hashtag_placement: Literal["inline", "mid", "end", "first_comment"] = Field(
+        ..., description="Hashtag placement preference"
+    )
+    comment_style: Literal["brief", "thoughtful", "conversational", "deep"] = Field(
+        ..., description="Comment engagement style"
+    )
 
     # Content Characteristics
-    controversy_level: str  # safe, moderate, bold, provocative
-    vulnerability_level: str  # guarded, selective, open, raw
-    humor_level: str  # none, subtle, moderate, frequent
+    controversy_level: Literal["safe", "moderate", "bold", "provocative"] = Field(
+        ..., description="Willingness to be controversial"
+    )
+    vulnerability_level: Literal["guarded", "selective", "open", "raw"] = Field(
+        ..., description="Personal vulnerability level"
+    )
+    humor_level: Literal["none", "subtle", "moderate", "frequent"] = Field(
+        ..., description="Humor usage level"
+    )
 
     # Visual Preferences
-    preferred_formats: List[str]  # ["text", "carousel", "video", "document"]
-    media_frequency: float  # 0.0 to 1.0 (how often to include media)
+    preferred_formats: List[str] = Field(
+        ...,
+        description="Preferred post formats",
+        min_length=1,
+        examples=[["text", "carousel", "video", "document"]],
+    )
+    media_frequency: float = Field(
+        ..., description="Frequency of media inclusion (0.0 to 1.0)", ge=0.0, le=1.0
+    )
 
     # Scheduling
-    post_frequency: int  # Posts per week
-    best_posting_times: List[str]  # ["morning", "lunch"]
+    post_frequency: int = Field(..., description="Posts per week", ge=1, le=14)
+    best_posting_times: List[str] = Field(
+        ...,
+        description="Best times to post",
+        min_length=1,
+        examples=[["morning", "lunch", "evening"]],
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "Thought Leader",
+                "description": "Establish expertise and industry authority",
+                "tone": "professional",
+                "formality": "conversational",
+                "emotion": "analytical",
+                "primary_goal": "authority",
+                "content_mix": {"educational": 0.6, "personal": 0.2, "promotional": 0.2},
+                "emoji_level": "minimal",
+                "line_break_style": "scannable",
+                "paragraph_length": "standard",
+                "preferred_structures": ["framework", "listicle", "comparison"],
+                "hook_style": "stat",
+                "cta_style": "curiosity",
+                "hashtag_strategy": "minimal",
+                "hashtag_placement": "end",
+                "comment_style": "thoughtful",
+                "controversy_level": "moderate",
+                "vulnerability_level": "selective",
+                "humor_level": "subtle",
+                "preferred_formats": ["text", "document", "carousel"],
+                "media_frequency": 0.4,
+                "post_frequency": 4,
+                "best_posting_times": ["morning", "lunch"],
+            }
+        }
+    )
+
+    @field_validator("content_mix")
+    @classmethod
+    def validate_content_mix(cls, v: Dict[str, float]) -> Dict[str, float]:
+        """Validate content mix adds up to approximately 1.0"""
+        total = sum(v.values())
+        if not (0.95 <= total <= 1.05):  # Allow small floating point errors
+            raise ValueError(f"Content mix must sum to 1.0, got {total}")
+
+        # Validate all values are between 0 and 1
+        for key, value in v.items():
+            if not (0.0 <= value <= 1.0):
+                raise ValueError(
+                    f"Content mix values must be between 0.0 and 1.0, got {key}={value}"
+                )
+
+        return v
 
 
 # Pre-built themes for common LinkedIn personas
@@ -343,7 +440,7 @@ class ThemeManager:
     def export_theme(self, theme_name: str) -> Dict[str, Any]:
         """Export theme as dictionary"""
         theme = self.get_theme(theme_name)
-        return asdict(theme)
+        return theme.model_dump()
 
     def import_theme(self, theme_dict: Dict[str, Any]) -> LinkedInTheme:
         """Import theme from dictionary"""

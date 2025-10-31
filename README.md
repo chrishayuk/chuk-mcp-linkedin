@@ -66,7 +66,7 @@ Based on 2025 analysis of 1M+ posts across 9K company pages:
 - **Entry points**: `linkedin-mcp` and `linkedin-mcp-server` commands
 
 ### 🔧 Developer Experience
-- **94% test coverage** - 958 tests passing
+- **96% test coverage** - 1058 tests passing
 - **CI/CD ready** - GitHub Actions, pre-commit hooks
 - **Type-safe** - Full MyPy type annotations
 - **Well-documented** - Extensive docs and examples
@@ -792,7 +792,7 @@ chuk-mcp-linkedin/
 │   ├── cli.py            # CLI implementation
 │   ├── server.py         # MCP server (legacy)
 │   └── async_server.py   # Async MCP server
-├── tests/                # Comprehensive test suite (94% coverage)
+├── tests/                # Comprehensive test suite (96% coverage)
 ├── examples/             # Usage examples
 ├── docs/                 # Documentation
 ├── .github/workflows/    # CI/CD workflows
@@ -818,7 +818,7 @@ Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidel
 
 ## Testing
 
-- **94% test coverage** - 958 tests passing
+- **96% test coverage** - 1058 tests passing
 - **Multiple test types** - Unit, integration, component tests
 - **Artifact system tests** - Session isolation, preview URLs
 - **CI/CD** - GitHub Actions on every push

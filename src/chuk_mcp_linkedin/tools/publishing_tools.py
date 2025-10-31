@@ -6,18 +6,21 @@ Handles actual posting to LinkedIn via the API with OAuth authentication.
 """
 
 from typing import Any, Dict, Optional
+from chuk_mcp_server.decorators import requires_auth
+from ..manager_factory import get_current_manager
 
 
-def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> Dict[str, Any]:
+def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
     """Register publishing tools with the MCP server"""
 
     from ..api import LinkedInAPIError, config as linkedin_config
 
     @mcp.tool  # type: ignore[misc]
+    @requires_auth()
     async def linkedin_publish(
         visibility: str = "PUBLIC",
         dry_run: bool = False,
-        _linkedin_access_token: Optional[str] = None,
+        _external_access_token: Optional[str] = None,
     ) -> str:
         """
         Publish current draft to LinkedIn.
@@ -25,17 +28,18 @@ def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> D
         Args:
             visibility: Post visibility (PUBLIC or CONNECTIONS)
             dry_run: Preview what would be published without actually posting
-            _linkedin_access_token: LinkedIn access token (injected by OAuth middleware)
+            _external_access_token: External OAuth access token (injected by OAuth middleware)
 
         Returns:
             Success message or error
         """
+        manager = get_current_manager()
         draft = manager.get_current_draft()
         if not draft:
             return "No active draft"
 
         # Check if OAuth token is provided
-        if not _linkedin_access_token:
+        if not _external_access_token:
             return (
                 "Authentication required. Please authorize with LinkedIn using OAuth.\n\n"
                 "The MCP client must provide a valid access token via the Authorization header."
@@ -59,7 +63,7 @@ def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> D
         from ..api import LinkedInClient
 
         oauth_client = LinkedInClient()
-        oauth_client.access_token = _linkedin_access_token
+        oauth_client.access_token = _external_access_token
         oauth_client.person_urn = linkedin_config.linkedin_person_urn
 
         # Publish!
@@ -80,18 +84,19 @@ def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> D
             return f"Failed to publish: {str(e)}"
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_test_connection(_linkedin_access_token: Optional[str] = None) -> str:
+    @requires_auth()
+    async def linkedin_test_connection(_external_access_token: Optional[str] = None) -> str:
         """
         Test LinkedIn API connection and configuration.
 
         Args:
-            _linkedin_access_token: LinkedIn access token (injected by OAuth middleware)
+            _external_access_token: External OAuth access token (injected by OAuth middleware)
 
         Returns:
             Connection status
         """
         # Check if OAuth token is provided
-        if not _linkedin_access_token:
+        if not _external_access_token:
             return (
                 "Authentication required. Please authorize with LinkedIn using OAuth.\n\n"
                 "The MCP client must provide a valid access token via the Authorization header."
@@ -101,7 +106,7 @@ def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> D
         from ..api import LinkedInClient
 
         oauth_client = LinkedInClient()
-        oauth_client.access_token = _linkedin_access_token
+        oauth_client.access_token = _external_access_token
 
         is_valid = await oauth_client.test_connection()
 
@@ -109,7 +114,7 @@ def register_publishing_tools(mcp: Any, manager: Any, linkedin_client: Any) -> D
             return (
                 "LinkedIn API connection successful!\n\n"
                 f"Access token: validated via OAuth\n"
-                f"Token length: {len(_linkedin_access_token)} characters"
+                f"Token length: {len(_external_access_token)} characters"
             )
         else:
             return "LinkedIn API connection failed. Please re-authorize with LinkedIn."

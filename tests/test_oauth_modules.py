@@ -206,13 +206,13 @@ class TestLinkedInOAuthProvider:
                 "client_id": "client_456",
             }
         )
-        store.get_linkedin_token = AsyncMock(
+        store.get_external_token = AsyncMock(
             return_value={
                 "access_token": "linkedin_token",
                 "refresh_token": "linkedin_refresh",
             }
         )
-        store.is_linkedin_token_expired = AsyncMock(return_value=False)
+        store.is_external_token_expired = AsyncMock(return_value=False)
         store.register_client = AsyncMock(
             return_value={
                 "client_id": "new_client_id",
@@ -220,8 +220,8 @@ class TestLinkedInOAuthProvider:
             }
         )
         store.refresh_access_token = AsyncMock(return_value=("new_access", "new_refresh"))
-        store.link_linkedin_token = AsyncMock()
-        store.update_linkedin_token = AsyncMock()
+        store.link_external_token = AsyncMock()
+        store.update_external_token = AsyncMock()
         return store
 
     @pytest.fixture
@@ -312,7 +312,7 @@ class TestLinkedInOAuthProvider:
         result = await provider.validate_access_token("access_token")
 
         assert result["user_id"] == "user_123"
-        assert result["linkedin_access_token"] == "linkedin_token"
+        assert result["external_access_token"] == "linkedin_token"
 
     @pytest.mark.asyncio
     async def test_validate_access_token_invalid(self, provider, mock_token_store):
@@ -329,7 +329,7 @@ class TestLinkedInOAuthProvider:
         """Test validating token without LinkedIn token"""
         from chuk_mcp_server.oauth import TokenError
 
-        mock_token_store.get_linkedin_token = AsyncMock(return_value=None)
+        mock_token_store.get_external_token = AsyncMock(return_value=None)
 
         with pytest.raises(TokenError):
             await provider.validate_access_token("access_token")
@@ -376,10 +376,10 @@ class TestLinkedInOAuthProvider:
         from chuk_mcp_server.oauth import AuthorizationParams
 
         mock_token_store.validate_client = AsyncMock(return_value=True)
-        mock_token_store.get_linkedin_token = AsyncMock(
+        mock_token_store.get_external_token = AsyncMock(
             return_value={"access_token": "linkedin_token", "refresh_token": "refresh"}
         )
-        mock_token_store.is_linkedin_token_expired = AsyncMock(return_value=False)
+        mock_token_store.is_external_token_expired = AsyncMock(return_value=False)
 
         # Set up pending authorization with user_id
         state = "test_state"
@@ -414,7 +414,7 @@ class TestLinkedInOAuthProvider:
     @pytest.mark.asyncio
     async def test_validate_access_token_refresh_linkedin_token(self, provider, mock_token_store):
         """Test validating token triggers LinkedIn token refresh"""
-        mock_token_store.is_linkedin_token_expired = AsyncMock(return_value=True)
+        mock_token_store.is_external_token_expired = AsyncMock(return_value=True)
 
         with patch.object(provider.linkedin_client, "refresh_access_token") as mock_refresh:
             mock_refresh.return_value = {
@@ -426,14 +426,14 @@ class TestLinkedInOAuthProvider:
             await provider.validate_access_token("access_token")
 
             mock_refresh.assert_called_once_with("linkedin_refresh")
-            mock_token_store.update_linkedin_token.assert_called_once()
+            mock_token_store.update_external_token.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_validate_access_token_refresh_fails(self, provider, mock_token_store):
         """Test validation fails when LinkedIn token refresh fails"""
         from chuk_mcp_server.oauth import TokenError
 
-        mock_token_store.is_linkedin_token_expired = AsyncMock(return_value=True)
+        mock_token_store.is_external_token_expired = AsyncMock(return_value=True)
 
         with patch.object(provider.linkedin_client, "refresh_access_token") as mock_refresh:
             mock_refresh.side_effect = Exception("Refresh failed")
@@ -446,8 +446,8 @@ class TestLinkedInOAuthProvider:
         """Test validation fails when LinkedIn token expired and no refresh token"""
         from chuk_mcp_server.oauth import TokenError
 
-        mock_token_store.is_linkedin_token_expired = AsyncMock(return_value=True)
-        mock_token_store.get_linkedin_token = AsyncMock(
+        mock_token_store.is_external_token_expired = AsyncMock(return_value=True)
+        mock_token_store.get_external_token = AsyncMock(
             return_value={"access_token": "expired_token"}  # No refresh_token
         )
 
@@ -485,7 +485,7 @@ class TestLinkedInOAuthProvider:
                 assert result["code"] == "auth_code_123"
                 assert result["state"] == "mcp_state"
                 assert state not in provider._pending_authorizations
-                mock_token_store.link_linkedin_token.assert_called_once()
+                mock_token_store.link_external_token.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_handle_external_callback_invalid_state(self, provider):

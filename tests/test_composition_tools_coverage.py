@@ -6,6 +6,7 @@ Tests all error handling paths and edge cases.
 import pytest
 from unittest.mock import MagicMock, patch
 from chuk_mcp_linkedin.manager import Draft
+from chuk_mcp_linkedin.tools import composition_tools
 
 
 @pytest.fixture
@@ -33,6 +34,15 @@ def mock_manager():
 class TestCompositionToolsErrorPaths:
     """Test error handling paths in composition tools"""
 
+    @pytest.fixture(autouse=True)
+    def patch_manager(self, mock_manager):
+        """Automatically patch get_current_manager for all tests in this class"""
+        with patch(
+            "chuk_mcp_linkedin.tools.composition_tools.get_current_manager",
+            return_value=mock_manager,
+        ):
+            yield
+
     @pytest.mark.asyncio
     async def test_add_hook_exception_handling(self, mock_mcp, mock_manager):
         """Test hook with exception from ComposablePost"""
@@ -43,17 +53,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         # Trigger validation error by using invalid hook type with ComposablePost
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_hook.side_effect = ValueError("Invalid hook type")
-            # Make _get_or_create_post return our mock
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_hook"]("invalid_type", "content")
             assert "Invalid hook type" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_body_exception_handling(self, mock_mcp, mock_manager):
@@ -65,15 +78,19 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_body.side_effect = ValueError("Content too long")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_body"]("x" * 10000, "linear")
             assert "Content too long" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_cta_exception_handling(self, mock_mcp, mock_manager):
@@ -85,15 +102,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_cta.side_effect = ValueError("Invalid CTA type")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_cta"]("invalid", "text")
             assert "Invalid CTA type" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_bar_chart_exception(self, mock_mcp, mock_manager):
@@ -105,15 +127,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_bar_chart.side_effect = ValueError("Invalid data")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_bar_chart"]({"A": "invalid"}, "Title")
             assert "Invalid data" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_metrics_chart_exception(self, mock_mcp, mock_manager):
@@ -125,15 +152,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_metrics_chart.side_effect = ValueError("Invalid metrics")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_metrics_chart"]({"A": 123}, "Title")
             assert "Invalid metrics" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_comparison_chart_exception(self, mock_mcp, mock_manager):
@@ -145,15 +177,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_comparison_chart.side_effect = ValueError("Need 2 options")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_comparison_chart"]({"A": "only one"}, "Title")
             assert "Need 2 options" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_progress_chart_exception(self, mock_mcp, mock_manager):
@@ -165,15 +202,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_progress_chart.side_effect = ValueError("Invalid percentage")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_progress_chart"]({"A": 150}, "Title")
             assert "Invalid percentage" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_ranking_chart_exception(self, mock_mcp, mock_manager):
@@ -185,15 +227,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_ranking_chart.side_effect = ValueError("Invalid ranking data")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_ranking_chart"]({}, "Title")
             assert "Invalid ranking data" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_quote_exception(self, mock_mcp, mock_manager):
@@ -205,15 +252,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_quote.side_effect = ValueError("Quote too long")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_quote"]("x" * 1000, "Author")
             assert "Quote too long" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_big_stat_exception(self, mock_mcp, mock_manager):
@@ -225,15 +277,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_big_stat.side_effect = ValueError("Invalid stat")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_big_stat"]("", "label")
             assert "Invalid stat" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_timeline_exception(self, mock_mcp, mock_manager):
@@ -245,15 +302,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_timeline.side_effect = ValueError("Empty timeline")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_timeline"]({}, "Title")
             assert "Empty timeline" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_key_takeaway_exception(self, mock_mcp, mock_manager):
@@ -265,15 +327,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_key_takeaway.side_effect = ValueError("Message too long")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_key_takeaway"]("x" * 1000)
             assert "Message too long" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_pro_con_exception(self, mock_mcp, mock_manager):
@@ -285,15 +352,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_pro_con.side_effect = ValueError("Empty lists")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_pro_con"]([], [])
             assert "Empty lists" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_separator_exception(self, mock_mcp, mock_manager):
@@ -305,15 +377,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_separator.side_effect = ValueError("Invalid style")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_separator"]("invalid")
             assert "Invalid style" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_checklist_exception(self, mock_mcp, mock_manager):
@@ -325,15 +402,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_checklist.side_effect = ValueError("Invalid checklist items")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_checklist"]([])
             assert "Invalid checklist items" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_before_after_exception(self, mock_mcp, mock_manager):
@@ -345,15 +427,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_before_after.side_effect = ValueError("Mismatched lists")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_before_after"]([], [])
             assert "Mismatched lists" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_tip_box_exception(self, mock_mcp, mock_manager):
@@ -365,15 +452,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_tip_box.side_effect = ValueError("Message empty")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_tip_box"]("")
             assert "Message empty" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_stats_grid_exception(self, mock_mcp, mock_manager):
@@ -385,15 +477,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_stats_grid.side_effect = ValueError("Invalid columns")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_stats_grid"]({"A": "1"}, columns=10)
             assert "Invalid columns" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_poll_preview_exception(self, mock_mcp, mock_manager):
@@ -405,15 +502,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_poll_preview.side_effect = ValueError("Not enough options")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_poll_preview"]("Question?", ["A"])
             assert "Not enough options" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_feature_list_exception(self, mock_mcp, mock_manager):
@@ -425,15 +527,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_feature_list.side_effect = ValueError("Missing title")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_feature_list"]([{"no_title": "oops"}])
             assert "Missing title" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_numbered_list_exception(self, mock_mcp, mock_manager):
@@ -445,15 +552,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_numbered_list.side_effect = ValueError("Empty list")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_numbered_list"]([])
             assert "Empty list" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_add_hashtags_exception(self, mock_mcp, mock_manager):
@@ -465,15 +577,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.add_hashtags.side_effect = ValueError("No tags")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_add_hashtags"]([])
             assert "No tags" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_compose_post_exception(self, mock_mcp, mock_manager):
@@ -485,16 +602,21 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.compose.side_effect = ValueError("Content exceeds limit")
             mock_post.optimize_for_engagement.return_value = None
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_compose_post"](optimize=True)
             assert "Content exceeds limit" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_get_preview_exception(self, mock_mcp, mock_manager):
@@ -506,15 +628,20 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("chuk_mcp_linkedin.tools.composition_tools.ComposablePost") as _:
             mock_post = MagicMock()
             mock_post.get_preview.side_effect = ValueError("No content")
-            mock_draft.content["_composable_post"] = mock_post
+            # Add mock to cache
+
+            composition_tools._post_cache["draft-123"] = mock_post
 
             result = await tools["linkedin_get_preview"]()
             assert "No content" in result
+
+            # Cleanup cache
+            composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_get_or_create_post_with_theme(self, mock_mcp, mock_manager):
@@ -526,27 +653,31 @@ class TestCompositionToolsErrorPaths:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         # Call any tool to trigger _get_or_create_post with theme
         result = await tools["linkedin_add_body"]("Test content")
 
         assert "Added body" in result
-        # Verify ComposablePost was created with theme
-        assert "_composable_post" in mock_draft.content
+        # Verify ComposablePost was created in cache with theme
+        assert "draft-123" in composition_tools._post_cache
+
+        # Cleanup cache
+        composition_tools._post_cache.clear()
 
     @pytest.mark.asyncio
     async def test_preview_html_failed_generation(self, mock_mcp, mock_manager):
         """Test HTML preview when generation fails"""
         from chuk_mcp_linkedin.tools.composition_tools import register_composition_tools
+        from unittest.mock import AsyncMock
 
         mock_draft = Draft(
             draft_id="draft-123", name="Test", post_type="text", content={}, theme=None
         )
         mock_manager.get_current_draft.return_value = mock_draft
-        mock_manager.generate_html_preview.return_value = None  # Failure
+        mock_manager.generate_preview_url = AsyncMock(return_value=None)  # Failure
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_preview_html"](open_browser=False)
 
         assert "Failed to generate preview" in result

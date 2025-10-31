@@ -92,3 +92,6 @@ pyproject.toml.bak
 # Lock files (using requirements in Dockerfile instead)
 poetry.lock
 Pipfile.lock
+
+# artifacts
+artifacts/

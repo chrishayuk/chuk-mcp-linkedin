@@ -68,10 +68,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import sys; sys.path.insert(0, '/app/src'); import chuk_mcp_linkedin; print('OK')" || exit 1
 
 # Default command - run MCP server in stdio mode via CLI
-CMD ["linkedin-mcp", "stdio"]
+#CMD ["linkedin-mcp", "stdio"]
 
 # Alternative commands:
-# CMD ["linkedin-mcp", "http", "--host", "0.0.0.0", "--port", "8000"]  # HTTP mode
+CMD ["linkedin-mcp", "http", "--host", "0.0.0.0", "--port", "8000"]  # HTTP mode
 # CMD ["linkedin-mcp", "auto"]                                          # Auto-detect mode
 
 # Expose port for HTTP mode (optional)
@@ -84,4 +84,4 @@ LABEL maintainer="chris@chuk.ai" \
       org.opencontainers.image.source="https://github.com/chrishayuk/chuk-mcp-linkedin" \
       org.opencontainers.image.title="LinkedIn MCP Server" \
       org.opencontainers.image.description="Design system MCP server for creating LinkedIn posts" \
-      org.opencontainers.image.authors="Christopher Hay <chris@chuk.ai>"
+      org.opencontainers.image.authors="Chris Hay <chrishay@somejunkmailbox.com>"

@@ -13,7 +13,7 @@ from ..manager_factory import get_current_manager
 def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
     """Register publishing tools with the MCP server"""
 
-    from ..api import LinkedInAPIError, config as linkedin_config
+    from ..api import LinkedInAPIError
 
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
@@ -33,38 +33,87 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
         Returns:
             Success message or error
         """
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.info(
+            f"linkedin_publish called with token: {'present' if _external_access_token else 'MISSING'}"
+        )
+
         manager = get_current_manager()
         draft = manager.get_current_draft()
         if not draft:
             return "No active draft"
 
-        # Check if OAuth token is provided
+        # Protocol handler should have already validated OAuth - this is a safety check
         if not _external_access_token:
-            return (
-                "Authentication required. Please authorize with LinkedIn using OAuth.\n\n"
-                "The MCP client must provide a valid access token via the Authorization header."
-            )
+            logger.error("linkedin_publish: OAuth token not injected despite @requires_auth!")
+            return {
+                "status": "error",
+                "error": "Authentication required. Please authorize with LinkedIn using OAuth.",
+                "error_type": "missing_oauth_token",
+            }
 
         # Get post text
         post_text = draft.content.get("composed_text") or draft.content.get("commentary", "")
         if not post_text:
-            return "No post content to publish. Add content first or compose the post."
+            return {
+                "status": "error",
+                "error": "No post content to publish. Add content first or compose the post.",
+                "error_type": "missing_content",
+            }
 
         # Dry run - show what would be published
         if dry_run:
-            return (
-                f"DRY RUN - Would publish to LinkedIn:\n\n"
-                f"Visibility: {visibility}\n"
-                f"Length: {len(post_text)} characters\n\n"
-                f"Content:\n{post_text[:500]}{'...' if len(post_text) > 500 else ''}"
-            )
+            return {
+                "status": "dry_run",
+                "visibility": visibility,
+                "character_count": len(post_text),
+                "content_preview": post_text[:500] + ("..." if len(post_text) > 500 else ""),
+                "full_content": post_text,
+            }
 
         # Create a LinkedIn client with the OAuth access token
         from ..api import LinkedInClient
+        import httpx
 
         oauth_client = LinkedInClient()
         oauth_client.access_token = _external_access_token
-        oauth_client.person_urn = linkedin_config.linkedin_person_urn
+
+        # Get person URN from LinkedIn API using the OAuth token
+        try:
+            async with httpx.AsyncClient() as client:
+                userinfo_response = await client.get(
+                    "https://api.linkedin.com/v2/userinfo",
+                    headers={"Authorization": f"Bearer {_external_access_token}"},
+                    timeout=10.0,
+                )
+                userinfo_response.raise_for_status()
+                userinfo = userinfo_response.json()
+                person_id = userinfo.get("sub")
+
+                if not person_id:
+                    return {
+                        "status": "error",
+                        "error": "Failed to get LinkedIn user profile. The 'sub' field is missing from userinfo.",
+                        "error_type": "missing_person_id",
+                    }
+
+                # Convert person ID to URN format if needed
+                if person_id.startswith("urn:"):
+                    person_urn = person_id
+                else:
+                    person_urn = f"urn:li:person:{person_id}"
+
+                oauth_client.person_urn = person_urn
+                logger.info(f"Retrieved person URN from LinkedIn: {person_urn}")
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": f"Failed to get LinkedIn user profile: {str(e)}",
+                "error_type": "userinfo_fetch_failed",
+            }
 
         # Publish!
         try:
@@ -73,19 +122,30 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
             # Extract post ID from response
             post_id = result.get("id", "unknown")
 
-            return (
-                f"Successfully published to LinkedIn!\n\n"
-                f"Post ID: {post_id}\n"
-                f"Visibility: {visibility}\n"
-                f"Characters: {len(post_text)}"
-            )
+            # Convert post ID to LinkedIn URL
+            # Post ID format: urn:li:share:7390188640271798272
+            # URL format: https://www.linkedin.com/feed/update/urn:li:share:7390188640271798272/
+            post_url = f"https://www.linkedin.com/feed/update/{post_id}/"
+
+            return {
+                "status": "published",
+                "post_id": post_id,
+                "post_url": post_url,
+                "visibility": visibility,
+                "character_count": len(post_text),
+                "author_urn": person_urn,
+            }
 
         except LinkedInAPIError as e:
-            return f"Failed to publish: {str(e)}"
+            return {
+                "status": "error",
+                "error": str(e),
+                "error_type": "linkedin_api_error",
+            }
 
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
-    async def linkedin_test_connection(_external_access_token: Optional[str] = None) -> str:
+    async def linkedin_test_connection(_external_access_token: Optional[str] = None) -> dict:
         """
         Test LinkedIn API connection and configuration.
 
@@ -93,31 +153,57 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
             _external_access_token: External OAuth access token (injected by OAuth middleware)
 
         Returns:
-            Connection status
+            Connection status with user profile information
         """
         # Check if OAuth token is provided
         if not _external_access_token:
-            return (
-                "Authentication required. Please authorize with LinkedIn using OAuth.\n\n"
-                "The MCP client must provide a valid access token via the Authorization header."
-            )
+            return {
+                "status": "error",
+                "error": "Authentication required. Please authorize with LinkedIn using OAuth.",
+                "error_type": "missing_oauth_token",
+            }
 
         # Create a LinkedIn client with the OAuth access token
         from ..api import LinkedInClient
+        import httpx
 
         oauth_client = LinkedInClient()
         oauth_client.access_token = _external_access_token
 
-        is_valid = await oauth_client.test_connection()
+        # Test connection and get user info
+        try:
+            async with httpx.AsyncClient() as client:
+                userinfo_response = await client.get(
+                    "https://api.linkedin.com/v2/userinfo",
+                    headers={"Authorization": f"Bearer {_external_access_token}"},
+                    timeout=10.0,
+                )
+                userinfo_response.raise_for_status()
+                userinfo = userinfo_response.json()
 
-        if is_valid:
-            return (
-                "LinkedIn API connection successful!\n\n"
-                f"Access token: validated via OAuth\n"
-                f"Token length: {len(_external_access_token)} characters"
-            )
-        else:
-            return "LinkedIn API connection failed. Please re-authorize with LinkedIn."
+                person_id = userinfo.get("sub")
+                # Format as URN if needed
+                if person_id and not person_id.startswith("urn:"):
+                    person_urn = f"urn:li:person:{person_id}"
+                else:
+                    person_urn = person_id
+
+                return {
+                    "status": "connected",
+                    "name": userinfo.get("name"),
+                    "email": userinfo.get("email"),
+                    "person_id": person_id,
+                    "person_urn": person_urn,
+                    "oauth_validated": True,
+                    "token_length": len(_external_access_token),
+                }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e),
+                "error_type": "connection_failed",
+            }
 
     return {
         "linkedin_publish": linkedin_publish,

@@ -17,6 +17,13 @@ class TestBigStatRender:
         assert "100" in result
         assert "Users" in result
 
+    def test_render_with_context(self):
+        component = BigStat("100", "Users", context="This is great progress")
+        result = component.render()
+        assert "100" in result
+        assert "Users" in result
+        assert "This is great progress" in result
+
 
 class TestBigStatValidation:
     def test_validate_valid(self):

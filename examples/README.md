@@ -2,6 +2,14 @@
 
 Clean, focused examples demonstrating core functionality of the LinkedIn MCP Server.
 
+## Important Note
+
+**All examples use OAuth 2.1 for authentication.** The legacy examples that used `LINKEDIN_ACCESS_TOKEN` have been removed.
+
+For OAuth setup, see:
+- **[oauth_linkedin_example.py](#5-oauth--authentication)** - Complete OAuth flow demonstration
+- **[docs/OAUTH.md](../docs/OAUTH.md)** - OAuth setup guide
+
 ## Available Examples
 
 ### 1. **Complete Component Showcase** ⭐
@@ -202,25 +210,21 @@ html = LinkedInPreview.generate_html(draft_data)
 preview_path = LinkedInPreview.save_preview(html, "my_post.html")
 ```
 
-### Upload Document to LinkedIn
+### Publishing to LinkedIn
+
+Publishing requires OAuth authentication. See the OAuth example:
 
 ```python
-from chuk_mcp_linkedin.api import LinkedInDocumentsAPI, DocumentPostBuilder
+# See examples/oauth_linkedin_example.py for complete OAuth flow
+# The MCP server handles OAuth automatically when configured properly
+```
 
-# Upload document
-api = LinkedInDocumentsAPI(access_token)
-doc = api.upload_document(
-    "report.pdf",
-    owner_urn="urn:li:person:abc123",
-    title="Q4 Report"
-)
-
-# Create post with document
-post = DocumentPostBuilder.create_document_post(
-    commentary="Check out our Q4 results!",
-    document_urn=doc.urn,
-    document_title="Q4 Performance Report"
-)
+For production use, configure the MCP server with OAuth:
+```bash
+export LINKEDIN_CLIENT_ID=your_client_id
+export LINKEDIN_CLIENT_SECRET=your_client_secret
+export SESSION_PROVIDER=memory
+uv run linkedin-mcp http --port 8000
 ```
 
 ## Testing Examples
@@ -249,3 +253,134 @@ All examples provide clear terminal output and/or open HTML previews in your bro
 - 🔗 API examples show workflow structure
 
 Happy posting! 🚀
+
+---
+
+## 5. **OAuth & Authentication**
+
+### `oauth_linkedin_example.py`
+Complete LinkedIn OAuth flow demonstration with chuk-sessions token storage.
+
+**Features:**
+- MCP client registration
+- LinkedIn OAuth authorization flow
+- Token exchange and validation
+- Token refresh with rotation
+- chuk-sessions storage (memory or Redis)
+- Step-by-step flow visualization
+
+**Run:**
+```bash
+# Set LinkedIn credentials
+export LINKEDIN_CLIENT_ID=your_client_id
+export LINKEDIN_CLIENT_SECRET=your_client_secret
+
+# Run with memory backend (default)
+python examples/oauth_linkedin_example.py
+
+# Or with Redis backend
+export SESSION_PROVIDER=redis
+export SESSION_REDIS_URL=redis://localhost:6379/0
+python examples/oauth_linkedin_example.py
+```
+
+**Output:**
+```
+================================================================================
+LinkedIn OAuth Flow Example with chuk-sessions
+================================================================================
+
+📦 Token Storage Backend: MEMORY
+
+Step 1: Registering MCP Client
+--------------------------------------------------------------------------------
+✅ Client registered successfully!
+   Client ID: xoUmSxhdFGnoRVQ-mz4i8g
+   Client Secret: 5c7UhwF0KG...
+
+Step 2: Initiating LinkedIn Authorization
+--------------------------------------------------------------------------------
+🔗 LinkedIn authorization required
+...
+
+📊 Complete OAuth Flow:
+   ────────────────────────────────────────────────────────────────────────────
+   1. MCP Client → OAuth Server: Request authorization
+   2. OAuth Server → LinkedIn: Redirect user for login
+   3. User authorizes on LinkedIn
+   4. LinkedIn → OAuth Server: Callback with code
+   5. OAuth Server → LinkedIn: Exchange code for token
+   6. OAuth Server: Store LinkedIn token in chuk-sessions
+   7. OAuth Server → MCP Client: Return authorization code
+   8. MCP Client → OAuth Server: Exchange code for MCP token
+   9. MCP Client uses MCP token for API calls
+   10. OAuth Server validates MCP token & uses LinkedIn token
+   ────────────────────────────────────────────────────────────────────────────
+```
+
+**Prerequisites:**
+1. Create LinkedIn app at https://www.linkedin.com/developers/apps
+2. Add redirect URI: `http://localhost:8000/oauth/linkedin/callback`
+3. Copy Client ID and Client Secret
+
+**Token Storage:**
+
+Tokens are automatically stored in chuk-sessions with TTL:
+- Authorization codes: 10 minutes
+- MCP access tokens: 1 hour
+- MCP refresh tokens: 30 days
+- LinkedIn tokens: 60 days
+
+**Backend Options:**
+
+| Backend | Use Case | Configuration |
+|---------|----------|---------------|
+| Memory (default) | Development, testing | No config needed |
+| Redis | Production, multi-user | `SESSION_PROVIDER=redis` |
+
+**Inspect Tokens (Redis):**
+```bash
+# Connect to Redis
+redis-cli
+
+# List all tokens
+KEYS chuk-mcp-linkedin:*
+
+# Get specific token
+GET chuk-mcp-linkedin:access_token:abc123...
+
+# Check time remaining
+TTL chuk-mcp-linkedin:access_token:abc123...
+```
+
+**Full Production Setup:**
+
+```bash
+# Terminal 1: Start OAuth server
+export LINKEDIN_CLIENT_ID=your_client_id
+export LINKEDIN_CLIENT_SECRET=your_client_secret
+export SESSION_PROVIDER=redis
+export SESSION_REDIS_URL=redis://localhost:6379/0
+
+uv run linkedin-mcp http --port 8000
+
+# Terminal 2: Configure MCP client (Claude Desktop)
+# Edit ~/Library/Application Support/Claude/claude_desktop_config.json:
+{
+  "mcpServers": {
+    "linkedin": {
+      "command": "linkedin-mcp",
+      "args": ["http", "--port", "8000"],
+      "authorization": {
+        "type": "oauth2",
+        "authorization_url": "http://localhost:8000/oauth/authorize",
+        "token_url": "http://localhost:8000/oauth/token"
+      }
+    }
+  }
+}
+```
+
+**See Also:**
+- `OAUTH_WITH_CHUK_SESSIONS.md` - Complete OAuth + chuk-sessions guide
+- `OAUTH_IMPLEMENTATION_SUMMARY.md` - OAuth architecture details

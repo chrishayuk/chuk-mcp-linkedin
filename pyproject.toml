@@ -29,12 +29,13 @@ classifiers = [
 ]
 
 dependencies = [
-    "mcp>=0.9.0",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
-    "httpx>=0.24.0",
-    "chuk-mcp-server>=0.4.4",
-    "chuk-artifacts>=0.1.0",
+    "httpx>=0.24.0", # Session management with Redis backend
+    "python-dotenv>=1.0.0",
+    "chuk-artifacts>=0.4.1",
+    "chuk-sessions[redis]>=0.4.2",
+    "chuk-mcp-server>=0.5.3",
 ]
 
 [project.scripts]

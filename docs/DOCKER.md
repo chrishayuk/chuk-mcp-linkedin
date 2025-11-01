@@ -92,7 +92,14 @@ This mounts the source code directory for live development.
 Create a `.env` file in the project root:
 
 ```env
-LINKEDIN_ACCESS_TOKEN=your_access_token_here
+# Required - LinkedIn OAuth credentials
+LINKEDIN_CLIENT_ID=your_client_id_here
+LINKEDIN_CLIENT_SECRET=your_client_secret_here
+
+# Required for Development - Session storage
+SESSION_PROVIDER=memory
+
+# Optional - Server configuration
 MCP_SERVER_MODE=stdio
 DEBUG=0
 ```

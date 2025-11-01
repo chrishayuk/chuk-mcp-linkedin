@@ -2,6 +2,12 @@
 Tests for LinkedIn API client.
 
 Tests the API client configuration and structure without making real API calls.
+
+Note: These tests use linkedin_access_token for the LinkedInConfig/LinkedInClient classes,
+which are still used internally by the MCP server after OAuth authentication.
+The MCP server obtains tokens via OAuth and passes them to these classes.
+
+For OAuth flow tests, see test_oauth.py and test_session_oauth.py.
 """
 
 import pytest
@@ -174,7 +180,7 @@ class TestLinkedInClientValidation:
         client = LinkedInClient(config=config)
         is_valid, missing = client.validate_config()
         assert is_valid is False
-        assert "LINKEDIN_ACCESS_TOKEN" in missing
+        assert "linkedin_access_token" in missing
 
     def test_validate_config_missing_person_urn(self):
         """Test validation fails with missing person URN"""
@@ -185,7 +191,7 @@ class TestLinkedInClientValidation:
         client = LinkedInClient(config=config)
         is_valid, missing = client.validate_config()
         assert is_valid is False
-        assert "LINKEDIN_PERSON_URN" in missing
+        assert "linkedin_person_urn" in missing
 
     def test_validate_config_missing_both(self):
         """Test validation fails with both missing"""
@@ -196,8 +202,8 @@ class TestLinkedInClientValidation:
         client = LinkedInClient(config=config)
         is_valid, missing = client.validate_config()
         assert is_valid is False
-        assert "LINKEDIN_ACCESS_TOKEN" in missing
-        assert "LINKEDIN_PERSON_URN" in missing
+        assert "linkedin_access_token" in missing
+        assert "linkedin_person_urn" in missing
         assert len(missing) == 2
 
 
@@ -252,7 +258,7 @@ class TestLinkedInConfigMethods:
             linkedin_person_urn="urn:li:person:test123",
         )
         missing = config.get_missing_config()
-        assert "LINKEDIN_ACCESS_TOKEN" in missing
+        assert "linkedin_access_token" in missing
 
     def test_get_missing_config_urn_missing(self):
         """Test get_missing_config identifies missing URN"""
@@ -261,7 +267,7 @@ class TestLinkedInConfigMethods:
             linkedin_person_urn=None,
         )
         missing = config.get_missing_config()
-        assert "LINKEDIN_PERSON_URN" in missing
+        assert "linkedin_person_urn" in missing
 
     def test_get_missing_config_both_missing(self):
         """Test get_missing_config identifies both missing"""
@@ -270,8 +276,8 @@ class TestLinkedInConfigMethods:
             linkedin_person_urn=None,
         )
         missing = config.get_missing_config()
-        assert "LINKEDIN_ACCESS_TOKEN" in missing
-        assert "LINKEDIN_PERSON_URN" in missing
+        assert "linkedin_access_token" in missing
+        assert "linkedin_person_urn" in missing
 
 
 class TestLinkedInClientConnection:

@@ -6,7 +6,7 @@ Provides type-safe validation for Quote, BigStat, Timeline, KeyTakeaway, and Pro
 """
 
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Dict, Any
+from typing import List, Dict
 
 
 class QuoteData(BaseModel):
@@ -86,34 +86,25 @@ class ProConData(BaseModel):
         return v
 
 
+class ChecklistItem(BaseModel):
+    """Single checklist item"""
+
+    text: str = Field(..., description="Item text", min_length=1)
+    checked: bool = Field(False, description="Whether item is checked")
+
+
 class ChecklistData(BaseModel):
     """Data model for checklist component"""
 
-    items: List[Dict[str, Any]] = Field(
+    items: List[ChecklistItem] = Field(
         ...,
         description="Checklist items with text and checked status",
         min_length=1,
-        examples=[[{"text": "Deploy to production", "checked": True}]],
     )
     title: str | None = Field(None, description="Optional checklist title")
     show_progress: bool = Field(
         False, description="Show completion progress (e.g., '3/5 complete')"
     )
-
-    @field_validator("items")
-    @classmethod
-    def validate_items(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        if not v:
-            raise ValueError("Checklist must have at least one item")
-        for item in v:
-            if "text" not in item:
-                raise ValueError("Each checklist item must have 'text' field")
-            if not item["text"] or len(item["text"].strip()) == 0:
-                raise ValueError("Checklist item text cannot be empty")
-            # checked defaults to False if not provided
-            if "checked" not in item:
-                item["checked"] = False
-        return v
 
 
 class BeforeAfterData(BaseModel):
@@ -191,31 +182,23 @@ class PollPreviewData(BaseModel):
         return v
 
 
+class FeatureItem(BaseModel):
+    """Single feature item"""
+
+    icon: str = Field("•", description="Feature icon or bullet")
+    title: str = Field(..., description="Feature title", min_length=1)
+    description: str | None = Field(None, description="Optional feature description")
+
+
 class FeatureListData(BaseModel):
     """Data model for feature list with icons"""
 
-    features: List[Dict[str, str]] = Field(
+    features: List[FeatureItem] = Field(
         ...,
         description="Features with icon, title, and optional description",
         min_length=1,
-        examples=[[{"icon": "⚡", "title": "Fast", "description": "Lightning fast performance"}]],
     )
     title: str | None = Field(None, description="Optional feature list title")
-
-    @field_validator("features")
-    @classmethod
-    def validate_features(cls, v: List[Dict[str, str]]) -> List[Dict[str, str]]:
-        if not v:
-            raise ValueError("Feature list must have at least one feature")
-        for feature in v:
-            if "title" not in feature:
-                raise ValueError("Each feature must have a 'title' field")
-            if not feature["title"] or len(feature["title"].strip()) == 0:
-                raise ValueError("Feature title cannot be empty")
-            # icon is optional but should have default
-            if "icon" not in feature:
-                feature["icon"] = "•"
-        return v
 
 
 class NumberedListData(BaseModel):

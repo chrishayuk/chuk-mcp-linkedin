@@ -194,11 +194,12 @@ class TestChecklistData:
     def test_valid_data(self):
         data = ChecklistData(items=[{"text": "Task 1", "checked": True}])
         assert len(data.items) == 1
-        assert data.items[0]["text"] == "Task 1"
+        assert data.items[0].text == "Task 1"
+        assert data.items[0].checked is True
 
     def test_defaults_checked_to_false(self):
         data = ChecklistData(items=[{"text": "Task"}])
-        assert data.items[0]["checked"] is False
+        assert data.items[0].checked is False
 
     def test_with_progress(self):
         data = ChecklistData(items=[{"text": "T"}], show_progress=True)
@@ -209,11 +210,11 @@ class TestChecklistData:
             ChecklistData(items=[])
 
     def test_missing_text_fails(self):
-        with pytest.raises(ValidationError, match="must have 'text'"):
+        with pytest.raises(ValidationError):
             ChecklistData(items=[{"checked": True}])
 
     def test_empty_text_fails(self):
-        with pytest.raises(ValidationError, match="cannot be empty"):
+        with pytest.raises(ValidationError):
             ChecklistData(items=[{"text": ""}])
 
 
@@ -296,21 +297,23 @@ class TestFeatureListData:
     def test_valid_data(self):
         data = FeatureListData(features=[{"title": "Feature 1", "icon": "⚡"}])
         assert len(data.features) == 1
+        assert data.features[0].title == "Feature 1"
+        assert data.features[0].icon == "⚡"
 
     def test_defaults_icon(self):
         data = FeatureListData(features=[{"title": "Feature"}])
-        assert data.features[0]["icon"] == "•"
+        assert data.features[0].icon == "•"
 
     def test_empty_features_fails(self):
         with pytest.raises(ValidationError):
             FeatureListData(features=[])
 
     def test_missing_title_fails(self):
-        with pytest.raises(ValidationError, match="must have a 'title'"):
+        with pytest.raises(ValidationError):
             FeatureListData(features=[{"icon": "⚡"}])
 
     def test_empty_title_fails(self):
-        with pytest.raises(ValidationError, match="cannot be empty"):
+        with pytest.raises(ValidationError):
             FeatureListData(features=[{"title": ""}])
 
 

@@ -42,11 +42,19 @@ def mock_linkedin_client():
 class TestDraftTools:
     """Test draft management tools"""
 
+    @pytest.fixture(autouse=True)
+    def patch_manager(self, mock_manager):
+        """Automatically patch get_current_manager for all tests in this class"""
+        with patch(
+            "chuk_mcp_linkedin.tools.draft_tools.get_current_manager", return_value=mock_manager
+        ):
+            yield
+
     def test_register_draft_tools(self, mock_mcp, mock_manager):
         """Test that draft tools are registered"""
         from chuk_mcp_linkedin.tools.draft_tools import register_draft_tools
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
 
         assert "linkedin_create" in tools
         assert "linkedin_list" in tools
@@ -65,7 +73,7 @@ class TestDraftTools:
         )
         mock_manager.create_draft.return_value = mock_draft
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_create"]("Test", "text", "professional")
 
         assert "Created draft 'Test'" in result
@@ -81,7 +89,7 @@ class TestDraftTools:
 
         mock_manager.list_drafts.return_value = [{"id": "draft-1", "name": "Test"}]
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_list"]()
 
         assert "draft-1" in result
@@ -95,7 +103,7 @@ class TestDraftTools:
 
         mock_manager.switch_draft.return_value = True
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_switch"]("draft-123")
 
         assert "Switched to draft draft-123" in result
@@ -108,7 +116,7 @@ class TestDraftTools:
 
         mock_manager.switch_draft.return_value = False
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_switch"]("nonexistent")
 
         assert "not found" in result
@@ -124,7 +132,7 @@ class TestDraftTools:
         mock_manager.get_draft.return_value = mock_draft
         mock_manager.get_draft_stats.return_value = {"char_count": 100}
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_get_info"]("draft-123")
 
         assert "draft-123" in result or "Test" in result
@@ -142,7 +150,7 @@ class TestDraftTools:
         mock_manager.get_draft.return_value = mock_draft
         mock_manager.get_draft_stats.return_value = {"char_count": 100}
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_get_info"](None)
 
         assert "draft-123" in result or "Test" in result
@@ -155,7 +163,7 @@ class TestDraftTools:
         mock_manager.current_draft_id = None
         mock_manager.get_draft.return_value = None
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_get_info"](None)
 
         assert "No draft found" in result
@@ -167,7 +175,7 @@ class TestDraftTools:
 
         mock_manager.delete_draft.return_value = True
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_delete"]("draft-123")
 
         assert "Deleted draft draft-123" in result
@@ -179,7 +187,7 @@ class TestDraftTools:
 
         mock_manager.delete_draft.return_value = False
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_delete"]("nonexistent")
 
         assert "not found" in result
@@ -191,24 +199,131 @@ class TestDraftTools:
 
         mock_manager.clear_all_drafts.return_value = 5
 
-        tools = register_draft_tools(mock_mcp, mock_manager)
+        tools = register_draft_tools(mock_mcp)
         result = await tools["linkedin_clear_all"]()
 
         assert "Cleared 5 drafts" in result
+
+    @pytest.mark.asyncio
+    async def test_linkedin_preview_url_success_memory(self, mock_mcp, mock_manager):
+        """Test generating preview URL with memory storage"""
+        from chuk_mcp_linkedin.tools.draft_tools import register_draft_tools
+
+        mock_draft = Draft(
+            draft_id="draft-123", name="Test Draft", post_type="text", content={}, theme=None
+        )
+        mock_manager.get_draft.return_value = mock_draft
+        mock_manager.artifact_provider = "memory"
+        mock_manager.generate_preview_url = AsyncMock(
+            return_value="http://localhost:8000/preview/token123"
+        )
+
+        tools = register_draft_tools(mock_mcp)
+        result = await tools["linkedin_preview_url"](draft_id="draft-123")
+
+        assert "Preview URL: http://localhost:8000/preview/token123" in result
+        assert "Draft: Test Draft" in result
+        assert "Draft ID: draft-123" in result
+        assert "URL Type: token-based URL" in result
+        assert "linkedin-mcp http --port 8000" in result
+        mock_manager.generate_preview_url.assert_called_once_with(
+            draft_id="draft-123", base_url="http://localhost:8000", expires_in=3600
+        )
+
+    @pytest.mark.asyncio
+    async def test_linkedin_preview_url_success_s3(self, mock_mcp, mock_manager):
+        """Test generating preview URL with S3 storage"""
+        from chuk_mcp_linkedin.tools.draft_tools import register_draft_tools
+
+        mock_draft = Draft(
+            draft_id="draft-456", name="S3 Draft", post_type="text", content={}, theme=None
+        )
+        mock_manager.get_draft.return_value = mock_draft
+        mock_manager.artifact_provider = "s3"
+        mock_manager.generate_preview_url = AsyncMock(
+            return_value="https://s3.amazonaws.com/signed-url"
+        )
+
+        tools = register_draft_tools(mock_mcp)
+        result = await tools["linkedin_preview_url"](draft_id="draft-456", expires_in=7200)
+
+        assert "Preview URL: https://s3.amazonaws.com/signed-url" in result
+        assert "Draft: S3 Draft" in result
+        assert "URL Type: signed URL (S3)" in result
+        assert "Signed URL expires in 7200 seconds" in result
+        mock_manager.generate_preview_url.assert_called_once_with(
+            draft_id="draft-456", base_url="http://localhost:8000", expires_in=7200
+        )
+
+    @pytest.mark.asyncio
+    async def test_linkedin_preview_url_no_draft_id(self, mock_mcp, mock_manager):
+        """Test preview URL when no draft is selected"""
+        from chuk_mcp_linkedin.tools.draft_tools import register_draft_tools
+
+        mock_manager.current_draft_id = None
+
+        tools = register_draft_tools(mock_mcp)
+        result = await tools["linkedin_preview_url"]()
+
+        assert "Error: No draft selected" in result
+
+    @pytest.mark.asyncio
+    async def test_linkedin_preview_url_generation_failed(self, mock_mcp, mock_manager):
+        """Test preview URL when generation fails"""
+        from chuk_mcp_linkedin.tools.draft_tools import register_draft_tools
+
+        mock_manager.generate_preview_url = AsyncMock(return_value=None)
+
+        tools = register_draft_tools(mock_mcp)
+        result = await tools["linkedin_preview_url"](draft_id="draft-123")
+
+        assert "Error: Failed to generate preview URL" in result
+
+    @pytest.mark.asyncio
+    async def test_linkedin_preview_url_use_current_draft(self, mock_mcp, mock_manager):
+        """Test preview URL uses current draft when draft_id not provided"""
+        from chuk_mcp_linkedin.tools.draft_tools import register_draft_tools
+
+        mock_draft = Draft(
+            draft_id="current-draft", name="Current", post_type="text", content={}, theme=None
+        )
+        mock_manager.current_draft_id = "current-draft"
+        mock_manager.get_draft.return_value = mock_draft
+        mock_manager.artifact_provider = "filesystem"
+        mock_manager.generate_preview_url = AsyncMock(
+            return_value="http://localhost:8000/preview/current"
+        )
+
+        tools = register_draft_tools(mock_mcp)
+        result = await tools["linkedin_preview_url"]()
+
+        assert "Draft ID: current-draft" in result
+        mock_manager.generate_preview_url.assert_called_once_with(
+            draft_id="current-draft", base_url="http://localhost:8000", expires_in=3600
+        )
 
 
 class TestPublishingTools:
     """Test publishing tools"""
 
+    @pytest.fixture(autouse=True)
+    def patch_manager(self, mock_manager):
+        """Automatically patch get_current_manager for all tests in this class"""
+        with patch(
+            "chuk_mcp_linkedin.tools.publishing_tools.get_current_manager",
+            return_value=mock_manager,
+        ):
+            yield
+
     def test_register_publishing_tools(self, mock_mcp, mock_manager, mock_linkedin_client):
         """Test that publishing tools are registered"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
-        tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
 
         assert "linkedin_publish" in tools
         assert "linkedin_test_connection" in tools
-        assert "linkedin_get_config_status" in tools
+        assert len(tools) == 2  # Only two publishing tools with OAuth
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_no_draft(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -217,16 +332,18 @@ class TestPublishingTools:
 
         mock_manager.get_current_draft.return_value = None
 
-        tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_publish"]()
 
-        assert "No active draft" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "no_draft"
+        assert "No active draft" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_not_configured(
         self, mock_mcp, mock_manager, mock_linkedin_client
     ):
-        """Test publishing when API is not configured"""
+        """Test publishing without OAuth token"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
         mock_draft = Draft(
@@ -238,15 +355,12 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = False
-            mock_config.get_missing_config.return_value = ["access_token"]
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+        result = await tools["linkedin_publish"]()
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_publish"]()
-
-            assert "not configured" in result
-            assert "access_token" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_oauth_token"
+        assert "Authentication required" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_no_content(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -258,13 +372,12 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = True
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+        result = await tools["linkedin_publish"](_external_access_token="test_token")
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_publish"]()
-
-            assert "No post content" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_content"
+        assert "No post content" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_dry_run(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -280,18 +393,18 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = True
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+        result = await tools["linkedin_publish"](dry_run=True, _external_access_token="test_token")
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_publish"](dry_run=True)
-
-            assert "DRY RUN" in result
-            assert "Test post content" in result
+        assert result["status"] == "dry_run"
+        assert result["character_count"] == 17
+        assert "Test post content" in result["full_content"]
 
     @pytest.mark.asyncio
-    async def test_linkedin_publish_disabled(self, mock_mcp, mock_manager, mock_linkedin_client):
-        """Test publishing when publishing is disabled"""
+    async def test_linkedin_publish_without_token(
+        self, mock_mcp, mock_manager, mock_linkedin_client
+    ):
+        """Test publishing without OAuth token"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
         mock_draft = Draft(
@@ -303,18 +416,16 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = True
-            mock_config.enable_publishing = False
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+        result = await tools["linkedin_publish"](dry_run=False)
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_publish"](dry_run=False)
-
-            assert "Publishing is disabled" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_oauth_token"
+        assert "Authentication required" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_success(self, mock_mcp, mock_manager, mock_linkedin_client):
-        """Test successful publishing"""
+        """Test successful publishing with OAuth"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
         mock_draft = Draft(
@@ -326,15 +437,29 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = True
-            mock_config.enable_publishing = True
+        # Mock httpx client for userinfo fetch
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = MagicMock()
+            mock_response.raise_for_status = MagicMock()
+            mock_response.json = MagicMock(return_value={"sub": "test_person_id"})
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_publish"](visibility="PUBLIC", dry_run=False)
+            # Mock LinkedInClient for post creation
+            with patch("chuk_mcp_linkedin.api.LinkedInClient") as mock_client_class:
+                mock_linkedin_instance = mock_client_class.return_value
+                mock_linkedin_instance.create_text_post = AsyncMock(
+                    return_value={"id": "urn:li:share:post-123"}
+                )
 
-            assert "Successfully published" in result
-            assert "post-123" in result
+                tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+                result = await tools["linkedin_publish"](
+                    visibility="PUBLIC", dry_run=False, _external_access_token="test_token"
+                )
+
+                assert result["status"] == "published"
+                assert result["post_id"] == "urn:li:share:post-123"
+                assert "post_url" in result
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_api_error(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -350,83 +475,89 @@ class TestPublishingTools:
             theme=None,
         )
         mock_manager.get_current_draft.return_value = mock_draft
-        mock_linkedin_client.create_text_post = AsyncMock(side_effect=LinkedInAPIError("API Error"))
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = True
-            mock_config.enable_publishing = True
+        # Mock httpx client for userinfo fetch
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = MagicMock()
+            mock_response.raise_for_status = MagicMock()
+            mock_response.json = MagicMock(return_value={"sub": "test_person_id"})
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_publish"]()
+            # Mock LinkedInClient to raise error
+            with patch("chuk_mcp_linkedin.api.LinkedInClient") as mock_client_class:
+                mock_linkedin_instance = mock_client_class.return_value
+                mock_linkedin_instance.create_text_post = AsyncMock(
+                    side_effect=LinkedInAPIError("API Error")
+                )
 
-            assert "Failed to publish" in result
+                tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+                result = await tools["linkedin_publish"](_external_access_token="test_token")
+
+                assert result["status"] == "error"
+                assert result["error_type"] == "linkedin_api_error"
 
     @pytest.mark.asyncio
     async def test_linkedin_test_connection_success(
         self, mock_mcp, mock_manager, mock_linkedin_client
     ):
-        """Test successful connection test"""
+        """Test successful connection test with OAuth"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.linkedin_person_urn = "urn:li:person:123"
-            mock_config.enable_publishing = True
+        # Mock httpx client for userinfo fetch
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = MagicMock()
+            mock_response.raise_for_status = MagicMock()
+            mock_response.json = MagicMock(
+                return_value={
+                    "sub": "test_person_id",
+                    "name": "Test User",
+                    "email": "test@example.com",
+                }
+            )
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_test_connection"]()
+            tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+            result = await tools["linkedin_test_connection"](_external_access_token="test_token")
 
-            assert "successful" in result
-            assert "urn:li:person:123" in result
+            assert result["status"] == "connected"
+            assert result["name"] == "Test User"
+            assert result["email"] == "test@example.com"
 
     @pytest.mark.asyncio
     async def test_linkedin_test_connection_failure(
         self, mock_mcp, mock_manager, mock_linkedin_client
     ):
-        """Test failed connection test"""
+        """Test connection test without OAuth token"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
-        mock_linkedin_client.test_connection = AsyncMock(return_value=False)
-        mock_linkedin_client.validate_config = MagicMock(return_value=(False, ["access_token"]))
+        tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+        result = await tools["linkedin_test_connection"]()
 
-        with patch("chuk_mcp_linkedin.api.config"):
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_test_connection"]()
-
-            assert "not configured" in result or "failed" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_oauth_token"
+        assert "Authentication required" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_test_connection_invalid_credentials(
         self, mock_mcp, mock_manager, mock_linkedin_client
     ):
-        """Test connection test with invalid credentials"""
+        """Test connection test with invalid OAuth token"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
-        mock_linkedin_client.test_connection = AsyncMock(return_value=False)
-        mock_linkedin_client.validate_config = MagicMock(return_value=(True, []))
+        # Mock httpx client to raise an error
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = AsyncMock()
+            mock_response.raise_for_status = AsyncMock(side_effect=Exception("Unauthorized"))
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
-        with patch("chuk_mcp_linkedin.api.config"):
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_test_connection"]()
+            tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
+            result = await tools["linkedin_test_connection"](_external_access_token="invalid_token")
 
-            assert "failed" in result
-
-    @pytest.mark.asyncio
-    async def test_linkedin_get_config_status(self, mock_mcp, mock_manager, mock_linkedin_client):
-        """Test getting config status"""
-        from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
-
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.is_configured.return_value = True
-            mock_config.get_missing_config.return_value = []
-            mock_config.linkedin_access_token = "token"
-            mock_config.linkedin_person_urn = "urn:li:person:123"
-            mock_config.enable_publishing = True
-
-            tools = register_publishing_tools(mock_mcp, mock_manager, mock_linkedin_client)
-            result = await tools["linkedin_get_config_status"]()
-
-            assert "configured" in result
-            assert "urn:li:person:123" in result
+            assert result["status"] == "error"
+            assert result["error_type"] == "connection_failed"
 
 
 class TestRegistryTools:
@@ -436,7 +567,7 @@ class TestRegistryTools:
         """Test that registry tools are registered"""
         from chuk_mcp_linkedin.tools.registry_tools import register_registry_tools
 
-        tools = register_registry_tools(mock_mcp, mock_manager)
+        tools = register_registry_tools(mock_mcp)
 
         assert "linkedin_list_components" in tools
         assert "linkedin_get_component_info" in tools
@@ -448,7 +579,7 @@ class TestRegistryTools:
         """Test listing components"""
         from chuk_mcp_linkedin.tools.registry_tools import register_registry_tools
 
-        tools = register_registry_tools(mock_mcp, mock_manager)
+        tools = register_registry_tools(mock_mcp)
         result = await tools["linkedin_list_components"]()
 
         # Should return JSON with components (can be list or dict)
@@ -460,7 +591,7 @@ class TestRegistryTools:
         """Test getting component info"""
         from chuk_mcp_linkedin.tools.registry_tools import register_registry_tools
 
-        tools = register_registry_tools(mock_mcp, mock_manager)
+        tools = register_registry_tools(mock_mcp)
         result = await tools["linkedin_get_component_info"]("hook")
 
         # Should return JSON with component info
@@ -472,7 +603,7 @@ class TestRegistryTools:
         """Test getting recommendations"""
         from chuk_mcp_linkedin.tools.registry_tools import register_registry_tools
 
-        tools = register_registry_tools(mock_mcp, mock_manager)
+        tools = register_registry_tools(mock_mcp)
         result = await tools["linkedin_get_recommendations"]("engagement")
 
         # Should return JSON with recommendations
@@ -484,7 +615,7 @@ class TestRegistryTools:
         """Test getting system overview"""
         from chuk_mcp_linkedin.tools.registry_tools import register_registry_tools
 
-        tools = register_registry_tools(mock_mcp, mock_manager)
+        tools = register_registry_tools(mock_mcp)
         result = await tools["linkedin_get_system_overview"]()
 
         # Should return JSON with system overview
@@ -495,11 +626,19 @@ class TestRegistryTools:
 class TestThemeTools:
     """Test theme tools"""
 
+    @pytest.fixture(autouse=True)
+    def patch_manager(self, mock_manager):
+        """Automatically patch get_current_manager for all tests in this class"""
+        with patch(
+            "chuk_mcp_linkedin.tools.theme_tools.get_current_manager", return_value=mock_manager
+        ):
+            yield
+
     def test_register_theme_tools(self, mock_mcp, mock_manager):
         """Test that theme tools are registered"""
         from chuk_mcp_linkedin.tools.theme_tools import register_theme_tools
 
-        tools = register_theme_tools(mock_mcp, mock_manager)
+        tools = register_theme_tools(mock_mcp)
 
         assert "linkedin_list_themes" in tools
         assert "linkedin_get_theme" in tools
@@ -510,7 +649,7 @@ class TestThemeTools:
         """Test listing themes"""
         from chuk_mcp_linkedin.tools.theme_tools import register_theme_tools
 
-        tools = register_theme_tools(mock_mcp, mock_manager)
+        tools = register_theme_tools(mock_mcp)
         result = await tools["linkedin_list_themes"]()
 
         # Should return JSON with themes (can be list or dict)
@@ -522,7 +661,7 @@ class TestThemeTools:
         """Test getting theme info"""
         from chuk_mcp_linkedin.tools.theme_tools import register_theme_tools
 
-        tools = register_theme_tools(mock_mcp, mock_manager)
+        tools = register_theme_tools(mock_mcp)
         # Use a valid theme name
         result = await tools["linkedin_get_theme"]("thought_leader")
 
@@ -537,7 +676,7 @@ class TestThemeTools:
 
         mock_manager.get_current_draft.return_value = None
 
-        tools = register_theme_tools(mock_mcp, mock_manager)
+        tools = register_theme_tools(mock_mcp)
         result = await tools["linkedin_apply_theme"]("professional")
 
         assert "No active draft" in result
@@ -552,7 +691,7 @@ class TestThemeTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_theme_tools(mock_mcp, mock_manager)
+        tools = register_theme_tools(mock_mcp)
         result = await tools["linkedin_apply_theme"]("professional")
 
         assert "Applied theme 'professional'" in result
@@ -562,11 +701,20 @@ class TestThemeTools:
 class TestCompositionTools:
     """Test composition tools"""
 
+    @pytest.fixture(autouse=True)
+    def patch_manager(self, mock_manager):
+        """Automatically patch get_current_manager for all tests in this class"""
+        with patch(
+            "chuk_mcp_linkedin.tools.composition_tools.get_current_manager",
+            return_value=mock_manager,
+        ):
+            yield
+
     def test_register_composition_tools(self, mock_mcp, mock_manager):
         """Test that composition tools are registered"""
         from chuk_mcp_linkedin.tools.composition_tools import register_composition_tools
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         # Check content tools
         assert "linkedin_add_hook" in tools
@@ -608,7 +756,7 @@ class TestCompositionTools:
 
         mock_manager.get_current_draft.return_value = None
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_hook"]("question", "Why is AI important?")
 
         assert "No active draft" in result
@@ -623,7 +771,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_hook"]("question", "Why is AI important?")
 
         assert "Added question hook" in result
@@ -639,7 +787,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_body"]("Main content here", "linear")
 
         assert "Added body" in result
@@ -655,7 +803,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_cta"]("direct", "Click here!")
 
         assert "Added direct CTA" in result
@@ -670,7 +818,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_bar_chart"]({}, "Title")
 
         # Empty dict is valid (just no bars), validation happens in component
@@ -686,7 +834,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_bar_chart"]({"A": 10, "B": 20}, "Chart")
 
         assert "Added bar chart" in result
@@ -699,7 +847,7 @@ class TestCompositionTools:
 
         mock_manager.get_current_draft.return_value = None
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_compose_post"]()
 
         assert "No active draft" in result
@@ -718,7 +866,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_compose_post"](optimize=False)
 
         assert "Composed post" in result
@@ -733,7 +881,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         # Add content first so there's something to preview
         await tools["linkedin_add_body"]("Test content for preview")
         result = await tools["linkedin_get_preview"]()
@@ -748,7 +896,7 @@ class TestCompositionTools:
 
         mock_manager.get_current_draft.return_value = None
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_preview_html"]()
 
         assert "No active draft" in result
@@ -762,15 +910,17 @@ class TestCompositionTools:
             draft_id="draft-123", name="Test", post_type="text", content={}, theme=None
         )
         mock_manager.get_current_draft.return_value = mock_draft
-        mock_manager.generate_html_preview.return_value = "/path/to/preview.html"
+        mock_manager.generate_preview_url = AsyncMock(
+            return_value="http://localhost:8000/preview/abc123"
+        )
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
 
         with patch("webbrowser.open") as mock_browser:
             result = await tools["linkedin_preview_html"](open_browser=True)
 
             assert "Preview generated" in result
-            assert "/path/to/preview.html" in result
+            assert "http://localhost:8000/preview/abc123" in result
             mock_browser.assert_called_once()
 
     @pytest.mark.asyncio
@@ -782,13 +932,15 @@ class TestCompositionTools:
             draft_id="draft-123", name="Test", post_type="text", content={}, theme=None
         )
         mock_manager.get_current_draft.return_value = mock_draft
-        mock_manager.generate_html_preview.return_value = "/path/to/preview.html"
+        mock_manager.generate_preview_url = AsyncMock(
+            return_value="http://localhost:8000/preview/abc123"
+        )
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_preview_html"](open_browser=False)
 
-        assert "Preview generated" in result
-        assert "Open in browser" in result
+        assert "Preview URL" in result
+        assert "http://localhost:8000/preview/abc123" in result
 
     @pytest.mark.asyncio
     async def test_linkedin_export_draft_no_draft(self, mock_mcp, mock_manager):
@@ -797,7 +949,7 @@ class TestCompositionTools:
 
         mock_manager.get_current_draft.return_value = None
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_export_draft"]()
 
         assert "No active draft" in result
@@ -813,7 +965,7 @@ class TestCompositionTools:
         mock_manager.get_current_draft.return_value = mock_draft
         mock_manager.export_draft.return_value = '{"draft_id": "draft-123"}'
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_export_draft"]()
 
         assert "draft-123" in result
@@ -828,7 +980,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_separator"]("line")
 
         assert "Added line separator" in result
@@ -843,7 +995,7 @@ class TestCompositionTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        tools = register_composition_tools(mock_mcp, mock_manager)
+        tools = register_composition_tools(mock_mcp)
         result = await tools["linkedin_add_hashtags"](["ai", "tech", "innovation"])
 
         assert "Added 3 hashtags" in result

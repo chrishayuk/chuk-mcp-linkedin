@@ -3,17 +3,34 @@
 Draft management tools for LinkedIn posts.
 
 Handles CRUD operations for draft posts.
+
+All tools require OAuth authorization to prevent server abuse and enable
+user-scoped data persistence across sessions.
+
+User Isolation:
+    - Protocol handler sets user_id in context from OAuth token
+    - get_current_manager() retrieves user-specific manager from context
+    - No cross-user access possible - all operations are scoped to user_id
+    - No need to pass _user_id parameter - it's automatic!
 """
 
 import json
 from typing import Any, Dict, Optional
+from chuk_mcp_server.decorators import requires_auth
+from ..manager_factory import get_current_manager
 
 
-def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
+def register_draft_tools(mcp: Any) -> Dict[str, Any]:
     """Register draft management tools with the MCP server"""
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_create(name: str, post_type: str, theme: Optional[str] = None) -> str:
+    @requires_auth()
+    async def linkedin_create(
+        name: str,
+        post_type: str,
+        theme: Optional[str] = None,
+        _external_access_token: Optional[str] = None,
+    ) -> str:
         """
         Create a new LinkedIn post draft.
 
@@ -25,6 +42,7 @@ def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         Returns:
             Success message with draft ID
         """
+        manager = get_current_manager()
         draft = manager.create_draft(
             name=name,
             post_type=post_type,
@@ -33,18 +51,24 @@ def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         return f"Created draft '{draft.name}' (ID: {draft.draft_id})"
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_list() -> str:
+    @requires_auth()
+    async def linkedin_list(_external_access_token: Optional[str] = None) -> str:
         """
-        List all draft posts.
+        List all draft posts for the authenticated LinkedIn user.
 
         Returns:
             JSON list of all drafts with metadata
         """
+        manager = get_current_manager()
         drafts = manager.list_drafts()
         return json.dumps(drafts, indent=2)
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_switch(draft_id: str) -> str:
+    @requires_auth()
+    async def linkedin_switch(
+        draft_id: str,
+        _external_access_token: Optional[str] = None,
+    ) -> str:
         """
         Switch to a different draft.
 
@@ -54,13 +78,18 @@ def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         Returns:
             Success or error message
         """
+        manager = get_current_manager()
         success = manager.switch_draft(draft_id)
         if success:
             return f"Switched to draft {draft_id}"
         return f"Draft {draft_id} not found"
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_get_info(draft_id: Optional[str] = None) -> str:
+    @requires_auth()
+    async def linkedin_get_info(
+        draft_id: Optional[str] = None,
+        _external_access_token: Optional[str] = None,
+    ) -> str:
         """
         Get detailed information about a draft.
 
@@ -70,17 +99,22 @@ def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         Returns:
             JSON with draft details and stats
         """
+        manager = get_current_manager()
         draft_id = draft_id or manager.current_draft_id
         draft = manager.get_draft(draft_id) if draft_id else None
 
-        if draft:
+        if draft and draft_id:
             stats = manager.get_draft_stats(draft_id)
             info = {**draft.to_dict(), "stats": stats}
             return json.dumps(info, indent=2)
         return "No draft found"
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_delete(draft_id: str) -> str:
+    @requires_auth()
+    async def linkedin_delete(
+        draft_id: str,
+        _external_access_token: Optional[str] = None,
+    ) -> str:
         """
         Delete a draft.
 
@@ -90,94 +124,83 @@ def register_draft_tools(mcp: Any, manager: Any) -> Dict[str, Any]:
         Returns:
             Success or error message
         """
+        manager = get_current_manager()
         success = manager.delete_draft(draft_id)
         if success:
             return f"Deleted draft {draft_id}"
         return f"Draft {draft_id} not found"
 
     @mcp.tool  # type: ignore[misc]
-    async def linkedin_clear_all() -> str:
+    @requires_auth()
+    async def linkedin_clear_all(_external_access_token: Optional[str] = None) -> str:
         """
-        Clear all drafts.
+        Clear all drafts for the authenticated LinkedIn user.
 
         Returns:
             Count of drafts cleared
         """
+        manager = get_current_manager()
         count = manager.clear_all_drafts()
         return f"Cleared {count} drafts"
 
     @mcp.tool  # type: ignore[misc]
+    @requires_auth()
     async def linkedin_preview_url(
         draft_id: Optional[str] = None,
-        session_id: Optional[str] = None,
-        provider: str = "memory",
+        base_url: str = "http://localhost:8000",
         expires_in: int = 3600,
+        _external_access_token: Optional[str] = None,
     ) -> str:
         """
-        Generate a preview URL for a draft using chuk-artifacts.
+        Generate a shareable preview URL for a draft.
 
-        Creates a session-isolated, secure preview URL with automatic cleanup.
-        The preview is stored as an artifact with presigned URL access.
+        Returns a URL that can be shared with anyone:
+        - For S3/cloud storage: Returns a signed URL that expires after the specified time
+        - For memory/filesystem: Returns a token-based URL (no expiration)
+
+        No authentication required to view the preview.
+
+        NOTE: For token-based URLs (memory/filesystem), the server must be running in HTTP mode.
+        If using STDIO mode (e.g., MCP CLI), start a separate HTTP server with:
+            linkedin-mcp http --port 8000
 
         Args:
             draft_id: Draft ID (optional, uses current if not provided)
-            session_id: Optional session ID (generates new session if not provided)
-            provider: Storage provider (memory, filesystem, s3, ibm-cos)
-            expires_in: URL expiration in seconds (default: 1 hour)
+            base_url: Base URL of the server (default: http://localhost:8000)
+            expires_in: Expiration time in seconds for signed URLs (default: 3600 = 1 hour)
 
         Returns:
-            Presigned URL to view the preview, or error message
+            Shareable preview URL or error message
         """
-        from ..preview import LinkedInPreview
-        from ..preview.artifact_preview import get_artifact_manager
-
-        # Get draft
+        manager = get_current_manager()
         draft_id = draft_id or manager.current_draft_id
-        draft = manager.get_draft(draft_id) if draft_id else None
 
-        if not draft:
-            return "Error: No draft found"
+        if not draft_id:
+            return "Error: No draft selected"
 
-        # Get stats
-        stats = manager.get_draft_stats(draft_id)
-
-        # Generate HTML
-        html_content = LinkedInPreview.generate_html(draft.to_dict(), stats)
-
-        # Get or create artifact manager
-        artifact_manager = await get_artifact_manager(provider=provider)
-
-        # Create or use session
-        if not session_id:
-            session_id = artifact_manager.create_session()
-        else:
-            artifact_manager.set_session(session_id)
-
-        # Store preview as artifact
-        artifact_id = await artifact_manager.store_preview(
-            html_content=html_content,
-            draft_id=draft_id,
-            draft_name=draft.name,
-            session_id=session_id,
+        # Generate preview URL using manager's method
+        preview_url = await manager.generate_preview_url(
+            draft_id=draft_id, base_url=base_url, expires_in=expires_in
         )
 
-        # Generate presigned URL
-        url = await artifact_manager.get_preview_url(
-            artifact_id=artifact_id, session_id=session_id, expires_in=expires_in
-        )
+        if not preview_url:
+            return "Error: Failed to generate preview URL"
 
-        if not url:
-            return (
-                f"Error: Presigned URLs not supported by provider '{provider}'. "
-                "Try using a different provider (s3, ibm-cos)."
-            )
+        draft = manager.get_draft(draft_id)
+        storage_type = (
+            "signed URL (S3)"
+            if manager.artifact_provider in ("s3", "ibm-cos")
+            else "token-based URL"
+        )
 
         return (
-            f"Preview URL: {url}\n\n"
-            f"Session ID: {session_id}\n"
-            f"Artifact ID: {artifact_id}\n"
-            f"Expires in: {expires_in} seconds\n\n"
-            "This URL is session-isolated and will expire automatically."
+            f"Preview URL: {preview_url}\n\n"
+            f"Draft: {draft.name if draft else 'Unknown'}\n"
+            f"Draft ID: {draft_id}\n"
+            f"URL Type: {storage_type}\n\n"
+            "This URL is shareable and does not require authentication.\n"
+            "Open this URL in your browser to view the formatted preview.\n\n"
+            f"{'NOTE: Signed URL expires in ' + str(expires_in) + ' seconds' if manager.artifact_provider in ('s3', 'ibm-cos') else 'NOTE: If the URL returns Not Found, run the server in HTTP mode: linkedin-mcp http --port 8000'}"
         )
 
     return {

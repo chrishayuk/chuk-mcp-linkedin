@@ -238,3 +238,66 @@ async def test_delete_nonexistent_preview():
         success = await manager.delete_preview("nonexistent_id", session_id=session_id)
         # Just verify it doesn't crash
         assert isinstance(success, bool)
+
+
+@pytest.mark.asyncio
+async def test_store_preview_without_store():
+    """Test that store_preview raises error when not initialized."""
+    manager = ArtifactPreviewManager(provider="memory")
+    # Don't use async with context, so _store is None
+
+    with pytest.raises(RuntimeError, match="ArtifactStore not initialized"):
+        await manager.store_preview(
+            html_content="<html></html>",
+            draft_id="draft_1",
+            draft_name="Draft 1",
+            session_id="session_1",
+        )
+
+
+@pytest.mark.asyncio
+async def test_get_preview_without_store():
+    """Test that get_preview raises error when not initialized."""
+    manager = ArtifactPreviewManager(provider="memory")
+    # Don't use async with context, so _store is None
+
+    with pytest.raises(RuntimeError, match="ArtifactStore not initialized"):
+        await manager.get_preview("artifact_id")
+
+
+@pytest.mark.asyncio
+async def test_get_preview_url_without_store():
+    """Test that get_preview_url raises error when not initialized."""
+    manager = ArtifactPreviewManager(provider="memory")
+    # Don't use async with context, so _store is None
+
+    with pytest.raises(RuntimeError, match="ArtifactStore not initialized"):
+        await manager.get_preview_url("artifact_id")
+
+
+@pytest.mark.asyncio
+async def test_list_previews_without_store():
+    """Test that list_previews raises error when not initialized."""
+    manager = ArtifactPreviewManager(provider="memory")
+    # Don't use async with context, so _store is None
+
+    with pytest.raises(RuntimeError, match="ArtifactStore not initialized"):
+        await manager.list_previews()
+
+
+@pytest.mark.asyncio
+async def test_list_previews_no_session_error():
+    """Test error when listing previews without any session."""
+    async with ArtifactPreviewManager(provider="memory") as manager:
+        with pytest.raises(ValueError, match="No session ID provided or set"):
+            await manager.list_previews()
+
+
+@pytest.mark.asyncio
+async def test_delete_preview_without_store():
+    """Test that delete_preview raises error when not initialized."""
+    manager = ArtifactPreviewManager(provider="memory")
+    # Don't use async with context, so _store is None
+
+    with pytest.raises(RuntimeError, match="ArtifactStore not initialized"):
+        await manager.delete_preview("artifact_id")

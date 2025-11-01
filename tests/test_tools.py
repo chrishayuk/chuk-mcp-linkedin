@@ -335,7 +335,9 @@ class TestPublishingTools:
         tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_publish"]()
 
-        assert "No active draft" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "no_draft"
+        assert "No active draft" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_not_configured(
@@ -356,8 +358,9 @@ class TestPublishingTools:
         tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_publish"]()
 
-        assert "Authentication required" in result
-        assert "OAuth" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_oauth_token"
+        assert "Authentication required" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_no_content(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -372,7 +375,9 @@ class TestPublishingTools:
         tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_publish"](_external_access_token="test_token")
 
-        assert "No post content" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_content"
+        assert "No post content" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_dry_run(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -391,8 +396,9 @@ class TestPublishingTools:
         tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_publish"](dry_run=True, _external_access_token="test_token")
 
-        assert "DRY RUN" in result
-        assert "Test post content" in result
+        assert result["status"] == "dry_run"
+        assert result["character_count"] == 17
+        assert "Test post content" in result["full_content"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_without_token(
@@ -413,7 +419,9 @@ class TestPublishingTools:
         tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_publish"](dry_run=False)
 
-        assert "Authentication required" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_oauth_token"
+        assert "Authentication required" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_success(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -429,21 +437,29 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.linkedin_person_urn = "urn:li:person:123"
+        # Mock httpx client for userinfo fetch
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = MagicMock()
+            mock_response.raise_for_status = MagicMock()
+            mock_response.json = MagicMock(return_value={"sub": "test_person_id"})
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
-            # Mock the LinkedInClient class used inside the publishing function
+            # Mock LinkedInClient for post creation
             with patch("chuk_mcp_linkedin.api.LinkedInClient") as mock_client_class:
-                mock_client_instance = mock_client_class.return_value
-                mock_client_instance.create_text_post = AsyncMock(return_value={"id": "post-123"})
+                mock_linkedin_instance = mock_client_class.return_value
+                mock_linkedin_instance.create_text_post = AsyncMock(
+                    return_value={"id": "urn:li:share:post-123"}
+                )
 
                 tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
                 result = await tools["linkedin_publish"](
                     visibility="PUBLIC", dry_run=False, _external_access_token="test_token"
                 )
 
-                assert "Successfully published" in result
-                assert "post-123" in result
+                assert result["status"] == "published"
+                assert result["post_id"] == "urn:li:share:post-123"
+                assert "post_url" in result
 
     @pytest.mark.asyncio
     async def test_linkedin_publish_api_error(self, mock_mcp, mock_manager, mock_linkedin_client):
@@ -460,20 +476,26 @@ class TestPublishingTools:
         )
         mock_manager.get_current_draft.return_value = mock_draft
 
-        with patch("chuk_mcp_linkedin.api.config") as mock_config:
-            mock_config.linkedin_person_urn = "urn:li:person:123"
+        # Mock httpx client for userinfo fetch
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = MagicMock()
+            mock_response.raise_for_status = MagicMock()
+            mock_response.json = MagicMock(return_value={"sub": "test_person_id"})
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
-            # Mock the LinkedInClient to raise error
+            # Mock LinkedInClient to raise error
             with patch("chuk_mcp_linkedin.api.LinkedInClient") as mock_client_class:
-                mock_client_instance = mock_client_class.return_value
-                mock_client_instance.create_text_post = AsyncMock(
+                mock_linkedin_instance = mock_client_class.return_value
+                mock_linkedin_instance.create_text_post = AsyncMock(
                     side_effect=LinkedInAPIError("API Error")
                 )
 
                 tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
                 result = await tools["linkedin_publish"](_external_access_token="test_token")
 
-                assert "Failed to publish" in result
+                assert result["status"] == "error"
+                assert result["error_type"] == "linkedin_api_error"
 
     @pytest.mark.asyncio
     async def test_linkedin_test_connection_success(
@@ -482,16 +504,26 @@ class TestPublishingTools:
         """Test successful connection test with OAuth"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
-        # Mock the LinkedInClient to return success
-        with patch("chuk_mcp_linkedin.api.LinkedInClient") as mock_client_class:
-            mock_client_instance = mock_client_class.return_value
-            mock_client_instance.test_connection = AsyncMock(return_value=True)
+        # Mock httpx client for userinfo fetch
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = MagicMock()
+            mock_response.raise_for_status = MagicMock()
+            mock_response.json = MagicMock(
+                return_value={
+                    "sub": "test_person_id",
+                    "name": "Test User",
+                    "email": "test@example.com",
+                }
+            )
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
             tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
             result = await tools["linkedin_test_connection"](_external_access_token="test_token")
 
-            assert "successful" in result
-            assert "10 characters" in result  # Length of "test_token"
+            assert result["status"] == "connected"
+            assert result["name"] == "Test User"
+            assert result["email"] == "test@example.com"
 
     @pytest.mark.asyncio
     async def test_linkedin_test_connection_failure(
@@ -503,8 +535,9 @@ class TestPublishingTools:
         tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
         result = await tools["linkedin_test_connection"]()
 
-        assert "Authentication required" in result
-        assert "OAuth" in result
+        assert result["status"] == "error"
+        assert result["error_type"] == "missing_oauth_token"
+        assert "Authentication required" in result["error"]
 
     @pytest.mark.asyncio
     async def test_linkedin_test_connection_invalid_credentials(
@@ -513,15 +546,18 @@ class TestPublishingTools:
         """Test connection test with invalid OAuth token"""
         from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
-        # Mock LinkedIn client to fail connection test
-        with patch("chuk_mcp_linkedin.api.LinkedInClient") as mock_client_class:
-            mock_client_instance = mock_client_class.return_value
-            mock_client_instance.test_connection = AsyncMock(return_value=False)
+        # Mock httpx client to raise an error
+        with patch("httpx.AsyncClient") as mock_httpx_client:
+            mock_client_instance = mock_httpx_client.return_value.__aenter__.return_value
+            mock_response = AsyncMock()
+            mock_response.raise_for_status = AsyncMock(side_effect=Exception("Unauthorized"))
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
 
             tools = register_publishing_tools(mock_mcp, mock_linkedin_client)
             result = await tools["linkedin_test_connection"](_external_access_token="invalid_token")
 
-            assert "failed" in result
+            assert result["status"] == "error"
+            assert result["error_type"] == "connection_failed"
 
 
 class TestRegistryTools:

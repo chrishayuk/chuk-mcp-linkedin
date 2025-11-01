@@ -21,7 +21,7 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
         visibility: str = "PUBLIC",
         dry_run: bool = False,
         _external_access_token: Optional[str] = None,
-    ) -> str:
+    ) -> Dict[str, Any]:
         """
         Publish current draft to LinkedIn.
 
@@ -31,7 +31,8 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
             _external_access_token: External OAuth access token (injected by OAuth middleware)
 
         Returns:
-            Success message or error
+            Dictionary with status, post_id, post_url, visibility, character_count, and author_urn on success,
+            or status and error details on failure
         """
         import logging
 
@@ -43,7 +44,11 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
         manager = get_current_manager()
         draft = manager.get_current_draft()
         if not draft:
-            return "No active draft"
+            return {
+                "status": "error",
+                "error": "No active draft",
+                "error_type": "no_draft",
+            }
 
         # Protocol handler should have already validated OAuth - this is a safety check
         if not _external_access_token:
@@ -145,7 +150,9 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
 
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
-    async def linkedin_test_connection(_external_access_token: Optional[str] = None) -> dict:
+    async def linkedin_test_connection(
+        _external_access_token: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """
         Test LinkedIn API connection and configuration.
 
@@ -153,7 +160,8 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
             _external_access_token: External OAuth access token (injected by OAuth middleware)
 
         Returns:
-            Connection status with user profile information
+            Dictionary with connection status and user profile information (name, email, person_id, person_urn)
+            on success, or status and error details on failure
         """
         # Check if OAuth token is provided
         if not _external_access_token:

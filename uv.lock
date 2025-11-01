@@ -481,7 +481,7 @@ dev = [
 requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = ">=23.7.0" },
     { name = "chuk-artifacts", specifier = ">=0.4.1" },
-    { name = "chuk-mcp-server", specifier = ">=0.5.1" },
+    { name = "chuk-mcp-server", specifier = ">=0.5.3" },
     { name = "chuk-sessions", extras = ["redis"], specifier = ">=0.4.2" },
     { name = "httpx", specifier = ">=0.24.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.5.0" },
@@ -517,7 +517,7 @@ dev = [
 
 [[package]]
 name = "chuk-mcp-server"
-version = "0.5.1"
+version = "0.5.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "chuk-mcp" },
@@ -530,9 +530,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "uvloop", marker = "sys_platform != 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c2/a4/135b316c719c73246dced21cf2a1f87db67de939ac304963ddabb89a0ac3/chuk_mcp_server-0.5.1.tar.gz", hash = "sha256:bcfdfc7371e5d9d14f1208285347ea70cf52b84dd8f2a39ddcacb85ce27d92af", size = 407032, upload-time = "2025-11-01T00:00:28.038Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/44/92/453dd5b5fc080896e4b3ef8571da3190d18b4a6bc8f05aac4c3f36e1a79d/chuk_mcp_server-0.5.3.tar.gz", hash = "sha256:d922d7de81ea8664eddabc1295b7138a4f04abb2f3528d6e1a726079e185a25c", size = 407884, upload-time = "2025-11-01T01:32:29.903Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/25/5dd3a12635856b01f17d908ff2f66379f9b53499a0bed2f394b9fa10cf21/chuk_mcp_server-0.5.1-py3-none-any.whl", hash = "sha256:98856b4d978a462e240494445055310591cbe86784815881c9bffdf2cc4d8a2f", size = 134853, upload-time = "2025-11-01T00:00:26.199Z" },
+    { url = "https://files.pythonhosted.org/packages/54/fa/716577e4b403752a8673f5b7cb138c44c9544ceeb5870932c957703fbb96/chuk_mcp_server-0.5.3-py3-none-any.whl", hash = "sha256:778a05a82d0eb46d26b027668a36971a85fd92c3a0d659d4d118d8d9f5cafd1e", size = 135970, upload-time = "2025-11-01T01:32:28.195Z" },
 ]
 
 [[package]]

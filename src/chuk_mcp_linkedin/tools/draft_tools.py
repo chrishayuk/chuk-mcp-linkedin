@@ -16,7 +16,9 @@ User Isolation:
 
 import json
 from typing import Any, Dict, Optional
+
 from chuk_mcp_server.decorators import requires_auth
+
 from ..manager_factory import get_current_manager
 
 

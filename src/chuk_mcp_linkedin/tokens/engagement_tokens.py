@@ -5,7 +5,7 @@ Engagement pattern tokens for LinkedIn posts.
 Based on 2025 algorithm optimization data.
 """
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class EngagementTokens:

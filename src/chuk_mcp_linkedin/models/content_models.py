@@ -5,8 +5,9 @@ Pydantic models for content component data structures.
 Provides type-safe validation for Quote, BigStat, Timeline, KeyTakeaway, and ProCon components.
 """
 
+from typing import Dict, List
+
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Dict
 
 
 class QuoteData(BaseModel):

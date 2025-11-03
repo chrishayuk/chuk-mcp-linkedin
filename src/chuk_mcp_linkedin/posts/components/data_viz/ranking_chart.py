@@ -5,9 +5,10 @@ Ranked list chart component with medals and numbers.
 Use for top lists and leaderboards with 🥇🥈🥉 medals.
 """
 
-from typing import Dict, Optional, Any
-from ..base import PostComponent
+from typing import Any, Dict, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class RankingChart(PostComponent):

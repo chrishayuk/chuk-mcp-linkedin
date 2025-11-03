@@ -17,17 +17,19 @@ Architecture:
     7. Provider validates token and uses LinkedIn token for API calls
 """
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from chuk_mcp_server.oauth import (
-    BaseOAuthProvider,
     AuthorizationParams,
-    OAuthToken,
-    OAuthClientInfo,
     AuthorizeError,
-    TokenError,
+    BaseOAuthProvider,
+    OAuthClientInfo,
+    OAuthToken,
     RegistrationError,
+    TokenError,
     TokenStore,
 )
+
 from .linkedin_client import LinkedInOAuthClient
 
 

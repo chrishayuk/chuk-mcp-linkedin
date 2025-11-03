@@ -5,9 +5,10 @@ Main content body component for LinkedIn posts.
 Supports multiple structures: linear, listicle, framework, story_arc, comparison.
 """
 
-from typing import Optional, Any
-from ..base import PostComponent
+from typing import Any, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class Body(PostComponent):

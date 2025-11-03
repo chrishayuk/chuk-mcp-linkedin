@@ -1,14 +1,15 @@
 """Tests for manager factory module."""
 
 import pytest
+
+from chuk_mcp_linkedin.manager import LinkedInManager
 from chuk_mcp_linkedin.manager_factory import (
     ManagerFactory,
-    get_factory,
-    set_factory,
-    get_manager_for_user,
     get_current_manager,
+    get_factory,
+    get_manager_for_user,
+    set_factory,
 )
-from chuk_mcp_linkedin.manager import LinkedInManager
 
 
 class TestManagerFactory:

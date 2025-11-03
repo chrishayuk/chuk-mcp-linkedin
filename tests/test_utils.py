@@ -1,8 +1,9 @@
 """Tests for utility modules."""
 
-import pytest
 import tempfile
 from unittest.mock import patch
+
+import pytest
 
 from chuk_mcp_linkedin.utils import DocumentConverter
 

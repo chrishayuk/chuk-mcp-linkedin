@@ -5,10 +5,10 @@ Provides session-isolated, secure preview URLs with automatic cleanup.
 """
 
 import uuid
-from typing import Optional, Any, List
+from typing import Any, List, Optional
 
 from chuk_artifacts import ArtifactStore
-from chuk_artifacts.config import configure_memory, configure_filesystem
+from chuk_artifacts.config import configure_filesystem, configure_memory
 
 
 class ArtifactPreviewManager:

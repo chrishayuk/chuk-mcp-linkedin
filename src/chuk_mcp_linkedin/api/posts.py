@@ -5,9 +5,11 @@ LinkedIn Posts API operations.
 Handles creating text posts, image posts, video posts, and other post types.
 """
 
-from typing import Dict, Any, List, Optional
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import httpx
+
 from .errors import LinkedInAPIError
 
 

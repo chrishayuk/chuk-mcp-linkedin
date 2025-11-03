@@ -7,10 +7,10 @@ engagement patterns, timing optimization, and visual design based on
 2025 performance data.
 """
 
-from .text_tokens import TextTokens
+from .design_tokens import DesignTokens
 from .engagement_tokens import EngagementTokens
 from .structure_tokens import StructureTokens
-from .design_tokens import DesignTokens
+from .text_tokens import TextTokens
 
 __all__ = [
     "TextTokens",

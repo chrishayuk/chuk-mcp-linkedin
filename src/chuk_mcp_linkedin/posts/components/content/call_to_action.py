@@ -5,7 +5,8 @@ Call-to-action component for LinkedIn posts.
 Supports types: direct, curiosity, action, share, soft.
 """
 
-from typing import Optional, Any
+from typing import Any, Optional
+
 from ..base import PostComponent
 
 

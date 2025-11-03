@@ -4,7 +4,7 @@ Base component class for all LinkedIn post components.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Any, Optional
 
 
 class PostComponent(ABC):

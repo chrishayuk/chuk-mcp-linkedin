@@ -3,8 +3,10 @@
 Tests all error handling paths and edge cases.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from chuk_mcp_linkedin.manager import Draft
 from chuk_mcp_linkedin.tools import composition_tools
 
@@ -668,8 +670,9 @@ class TestCompositionToolsErrorPaths:
     @pytest.mark.asyncio
     async def test_preview_html_failed_generation(self, mock_mcp, mock_manager):
         """Test HTML preview when generation fails"""
-        from chuk_mcp_linkedin.tools.composition_tools import register_composition_tools
         from unittest.mock import AsyncMock
+
+        from chuk_mcp_linkedin.tools.composition_tools import register_composition_tools
 
         mock_draft = Draft(
             draft_id="draft-123", name="Test", post_type="text", content={}, theme=None

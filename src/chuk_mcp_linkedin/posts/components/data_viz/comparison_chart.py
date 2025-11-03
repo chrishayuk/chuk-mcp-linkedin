@@ -5,9 +5,10 @@ Side-by-side A vs B comparison chart component.
 Use for contrasting options with bullet points.
 """
 
-from typing import Dict, Any, Optional
-from ..base import PostComponent
+from typing import Any, Dict, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class ComparisonChart(PostComponent):

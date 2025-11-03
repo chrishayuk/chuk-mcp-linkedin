@@ -5,9 +5,10 @@ Feature list component with icons and descriptions.
 Use for product features, benefits, capabilities, service offerings.
 """
 
-from typing import List, Dict, Optional, Any
-from ..base import PostComponent
+from typing import Any, Dict, List, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class FeatureList(PostComponent):

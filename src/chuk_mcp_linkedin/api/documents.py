@@ -5,9 +5,11 @@ LinkedIn Documents API operations.
 Handles uploading documents and creating posts with document attachments.
 """
 
-from typing import Dict, Any, Optional
 from pathlib import Path
+from typing import Any, Dict, Optional
+
 import httpx
+
 from .errors import LinkedInAPIError
 
 

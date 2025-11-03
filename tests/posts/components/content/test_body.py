@@ -1,7 +1,8 @@
 """Tests for Body component."""
 
-from chuk_mcp_linkedin.posts.components.content.body import Body
 from unittest.mock import MagicMock
+
+from chuk_mcp_linkedin.posts.components.content.body import Body
 
 
 class TestBodyInitialization:

@@ -5,9 +5,10 @@ Before/After comparison component for transformations.
 Use for showing improvements, transformations, comparisons, results.
 """
 
-from typing import List, Dict, Optional, Any
-from ..base import PostComponent
+from typing import Any, Dict, List, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class BeforeAfter(PostComponent):

@@ -5,8 +5,9 @@ Theme management system for LinkedIn posts.
 Provides 10 pre-built themes for different LinkedIn personas and strategies.
 """
 
-from typing import Dict, List, Any, Literal
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from typing import Any, Dict, List, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class LinkedInTheme(BaseModel):

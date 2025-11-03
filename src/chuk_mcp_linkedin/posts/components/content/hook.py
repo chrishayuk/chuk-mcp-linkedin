@@ -5,7 +5,8 @@ Opening hook component for LinkedIn posts.
 Use for question, stat, story, controversy, list, or curiosity hooks.
 """
 
-from typing import Optional, Any
+from typing import Any, Optional
+
 from ..base import PostComponent
 
 

@@ -6,7 +6,9 @@ Handles authentication, configuration, and common functionality.
 """
 
 from typing import Dict, Optional
+
 import httpx
+
 from .config import LinkedInConfig
 
 

@@ -5,7 +5,8 @@ Tip/Note box component for highlighting important information.
 Use for pro tips, warnings, important notes, best practices.
 """
 
-from typing import Optional, Any
+from typing import Any, Optional
+
 from ..base import PostComponent
 
 

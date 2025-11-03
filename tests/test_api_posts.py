@@ -4,9 +4,11 @@ Tests for LinkedIn Posts API.
 Tests post creation methods with mocked HTTP requests.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from chuk_mcp_linkedin.api import LinkedInClient, LinkedInConfig, LinkedInAPIError
+
+import pytest
+
+from chuk_mcp_linkedin.api import LinkedInAPIError, LinkedInClient, LinkedInConfig
 
 
 @pytest.fixture

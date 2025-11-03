@@ -1,7 +1,8 @@
 """Tests for Hashtags component."""
 
-from chuk_mcp_linkedin.posts.components.content.hashtags import Hashtags
 from unittest.mock import MagicMock
+
+from chuk_mcp_linkedin.posts.components.content.hashtags import Hashtags
 
 
 class TestHashtagsInitialization:

@@ -10,14 +10,14 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.models import (
     BarChartData,
-    MetricsChartData,
     ComparisonChartData,
+    MetricsChartData,
     ProgressChartData,
     RankingChartData,
 )
+from chuk_mcp_linkedin.posts import ComposablePost
 
 
 def test_bar_chart():

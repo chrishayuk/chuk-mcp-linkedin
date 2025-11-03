@@ -6,23 +6,23 @@ from pydantic import ValidationError
 from chuk_mcp_linkedin.models import (
     # Chart models
     BarChartData,
-    MetricsChartData,
+    BeforeAfterData,
+    BigStatData,
+    ChecklistData,
     ComparisonChartData,
+    FeatureListData,
+    KeyTakeawayData,
+    MetricsChartData,
+    NumberedListData,
+    PollPreviewData,
+    ProConData,
     ProgressChartData,
-    RankingChartData,
     # Content models
     QuoteData,
-    BigStatData,
-    TimelineData,
-    KeyTakeawayData,
-    ProConData,
-    ChecklistData,
-    BeforeAfterData,
-    TipBoxData,
+    RankingChartData,
     StatsGridData,
-    PollPreviewData,
-    FeatureListData,
-    NumberedListData,
+    TimelineData,
+    TipBoxData,
 )
 
 

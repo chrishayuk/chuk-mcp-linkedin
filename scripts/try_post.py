@@ -9,8 +9,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from chuk_mcp_linkedin.api import config
 import httpx
+
+from chuk_mcp_linkedin.api import config
 
 
 async def try_post():

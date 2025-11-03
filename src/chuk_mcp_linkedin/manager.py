@@ -21,15 +21,15 @@ Preview Methods:
 - generate_html_preview_async(): Generate and store preview HTML in artifacts
 """
 
-from typing import Dict, List, Optional, Any
-from datetime import datetime
 import json
 import uuid
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, ConfigDict
 from chuk_artifacts import ArtifactStore
-from chuk_artifacts.config import configure_memory, configure_filesystem
+from chuk_artifacts.config import configure_filesystem, configure_memory
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class DraftModel(BaseModel):

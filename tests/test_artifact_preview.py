@@ -1,6 +1,7 @@
 """Tests for artifact-based preview system."""
 
 import pytest
+
 from chuk_mcp_linkedin.preview.artifact_preview import ArtifactPreviewManager, get_artifact_manager
 
 

@@ -38,7 +38,7 @@ Note: This is for PREVIEW only. To:
 - Upload documents to LinkedIn: Use `chuk_mcp_linkedin.documents` API
 """
 
-from .post_preview import LinkedInPreview
 from .artifact_preview import ArtifactPreviewManager, get_artifact_manager
+from .post_preview import LinkedInPreview
 
 __all__ = ["LinkedInPreview", "ArtifactPreviewManager", "get_artifact_manager"]

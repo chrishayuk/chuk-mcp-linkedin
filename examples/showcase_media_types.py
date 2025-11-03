@@ -14,10 +14,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from chuk_mcp_linkedin.posts import ComposablePost
-from chuk_mcp_linkedin.themes.theme_manager import ThemeManager
-from chuk_mcp_linkedin.preview import LinkedInPreview
 import time
+
+from chuk_mcp_linkedin.posts import ComposablePost
+from chuk_mcp_linkedin.preview import LinkedInPreview
+from chuk_mcp_linkedin.themes.theme_manager import ThemeManager
 
 
 def create_single_image_post():

@@ -18,8 +18,9 @@ Usage:
         ...
 """
 
-from typing import Dict, Optional
 import threading
+from typing import Dict, Optional
+
 from .manager import LinkedInManager
 
 

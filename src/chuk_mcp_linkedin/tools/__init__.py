@@ -13,11 +13,11 @@ Each module provides a register_*_tools function that registers
 tools with the MCP server using decorators.
 """
 
-from .draft_tools import register_draft_tools
 from .composition_tools import register_composition_tools
-from .theme_tools import register_theme_tools
+from .draft_tools import register_draft_tools
 from .publishing_tools import register_publishing_tools
 from .registry_tools import register_registry_tools
+from .theme_tools import register_theme_tools
 
 __all__ = [
     "register_draft_tools",

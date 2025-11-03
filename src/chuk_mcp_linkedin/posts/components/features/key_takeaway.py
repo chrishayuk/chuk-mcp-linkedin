@@ -5,9 +5,10 @@ Key takeaway/insight box component for LinkedIn posts.
 Use for highlighting main points, lessons, and TLDR sections.
 """
 
-from typing import Optional, Any
-from ..base import PostComponent
+from typing import Any, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class KeyTakeaway(PostComponent):

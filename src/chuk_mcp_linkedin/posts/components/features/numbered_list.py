@@ -5,9 +5,10 @@ Numbered list component for ordered content.
 Use for step-by-step guides, rankings, processes, instructions.
 """
 
-from typing import List, Optional, Any
-from ..base import PostComponent
+from typing import Any, List, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class NumberedList(PostComponent):

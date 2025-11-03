@@ -5,7 +5,8 @@ Hashtag component for LinkedIn posts.
 Supports placement: inline, mid, end, first_comment.
 """
 
-from typing import List, Optional, Any
+from typing import Any, List, Optional
+
 from ..base import PostComponent
 
 

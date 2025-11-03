@@ -5,9 +5,10 @@ Progress bars chart component for tracking completion.
 Use for project status with 0-100% values.
 """
 
-from typing import Dict, Optional, Any
-from ..base import PostComponent
+from typing import Any, Dict, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class ProgressChart(PostComponent):

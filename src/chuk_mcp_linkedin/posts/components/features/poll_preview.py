@@ -5,9 +5,10 @@ Poll preview component for engagement.
 Use for poll visualization, survey questions, audience engagement.
 """
 
-from typing import List, Optional, Any
-from ..base import PostComponent
+from typing import Any, List, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class PollPreview(PostComponent):

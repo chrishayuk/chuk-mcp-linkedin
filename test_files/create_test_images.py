@@ -3,6 +3,7 @@ Create test images for preview rendering.
 """
 
 from pathlib import Path
+
 from PIL import Image, ImageDraw, ImageFont
 
 

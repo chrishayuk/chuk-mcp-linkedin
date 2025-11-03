@@ -5,9 +5,10 @@ Quote/testimonial component for LinkedIn posts.
 Use for customer quotes, testimonials, and inspirational quotes.
 """
 
-from typing import Optional, Any
-from ..base import PostComponent
+from typing import Any, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class Quote(PostComponent):

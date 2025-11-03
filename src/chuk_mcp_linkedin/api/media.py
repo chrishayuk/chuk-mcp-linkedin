@@ -5,9 +5,11 @@ LinkedIn Media API operations.
 Handles uploading images and videos to LinkedIn.
 """
 
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
 import httpx
+
 from .errors import LinkedInAPIError
 
 

@@ -1,8 +1,10 @@
 """Tests for MCP tools."""
 
-import pytest
 import json
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
 from chuk_mcp_linkedin.manager import Draft
 
 
@@ -464,8 +466,8 @@ class TestPublishingTools:
     @pytest.mark.asyncio
     async def test_linkedin_publish_api_error(self, mock_mcp, mock_manager, mock_linkedin_client):
         """Test publishing with API error"""
-        from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
         from chuk_mcp_linkedin.api import LinkedInAPIError
+        from chuk_mcp_linkedin.tools.publishing_tools import register_publishing_tools
 
         mock_draft = Draft(
             draft_id="draft-123",
@@ -1007,11 +1009,11 @@ class TestToolsInit:
     def test_all_tools_importable(self):
         """Test that all tools can be imported from __init__"""
         from chuk_mcp_linkedin.tools import (
-            register_draft_tools,
             register_composition_tools,
-            register_theme_tools,
+            register_draft_tools,
             register_publishing_tools,
             register_registry_tools,
+            register_theme_tools,
         )
 
         assert register_draft_tools is not None

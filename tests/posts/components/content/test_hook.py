@@ -1,7 +1,8 @@
 """Tests for Hook component."""
 
-from chuk_mcp_linkedin.posts.components.content.hook import Hook
 from unittest.mock import MagicMock
+
+from chuk_mcp_linkedin.posts.components.content.hook import Hook
 
 
 class TestHookInitialization:

@@ -5,7 +5,7 @@ Theme system for LinkedIn posts.
 Pre-built themes for different LinkedIn personas and content strategies.
 """
 
-from .theme_manager import LinkedInTheme, ThemeManager, THEMES
+from .theme_manager import THEMES, LinkedInTheme, ThemeManager
 
 __all__ = [
     "LinkedInTheme",

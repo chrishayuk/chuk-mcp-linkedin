@@ -5,7 +5,7 @@ Component Renderer - Converts components to HTML/CSS.
 Renders visual elements, layouts, and other components as HTML for browser preview.
 """
 
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 
 class ComponentRenderer:

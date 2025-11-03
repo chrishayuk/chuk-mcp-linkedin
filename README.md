@@ -262,7 +262,7 @@ post.add_body("What's your biggest LinkedIn challenge in 2025?")
 
 ### Preview System
 
-Preview your posts locally before publishing:
+Preview your posts before publishing with automatic URL detection:
 
 ```python
 from chuk_mcp_linkedin.manager import LinkedInManager
@@ -277,7 +277,35 @@ draft = manager.create_draft("My Post", "text")
 preview_path = manager.generate_html_preview(draft.draft_id)
 ```
 
-**CLI Preview:**
+**MCP Tool: linkedin_preview_url**
+
+Generate shareable preview URLs with automatic server detection:
+
+```python
+# Via MCP tool
+{
+    "tool": "linkedin_preview_url",
+    "arguments": {
+        "draft_id": "draft_123"  # Optional, uses current draft if not provided
+    }
+}
+```
+
+**Preview URL Behavior:**
+- **Production (OAuth)**: Automatically uses deployed server URL from `OAUTH_SERVER_URL` env var
+  - Example: `https://linkedin.chukai.io/preview/abc123`
+- **Local Development**: Defaults to `http://localhost:8000/preview/abc123`
+- **Manual Override**: Can specify custom `base_url` parameter if needed
+
+**Environment Variables:**
+```bash
+# Production - preview URLs use this automatically
+export OAUTH_SERVER_URL=https://linkedin.chukai.io
+
+# Local - no configuration needed (defaults to localhost:8000)
+```
+
+**CLI Preview (Legacy):**
 ```bash
 # Preview current draft
 python preview_post.py
@@ -632,6 +660,355 @@ LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID  # Optional: Auto-fetched via OAuth
 - **Token TTLs** - Defaults are security-focused (short lifetimes, daily re-auth)
 
 See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup and [docs/DOCKER.md](docs/DOCKER.md) for Docker deployment.
+
+## Production Deployment
+
+### Fly.io Deployment (Recommended)
+
+Deploy the LinkedIn MCP server to Fly.io with Redis session storage:
+
+#### Prerequisites
+
+1. **Fly.io Account** - [Sign up at fly.io](https://fly.io/app/sign-up)
+2. **Fly CLI** - Install: `curl -L https://fly.io/install.sh | sh`
+3. **LinkedIn OAuth App** - Create at [LinkedIn Developers](https://www.linkedin.com/developers/apps)
+4. **Redis Instance** - Create on Fly.io (or use Upstash)
+
+#### Step 1: Create Fly.io App
+
+```bash
+# Clone repository
+git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
+cd chuk-mcp-linkedin
+
+# Login to Fly.io
+fly auth login
+
+# Create app (generates fly.toml)
+fly launch --no-deploy
+
+# Choose app name (e.g., your-linkedin-mcp)
+# Choose region (e.g., cdg for Paris)
+```
+
+#### Step 2: Create Redis Instance
+
+```bash
+# Create Redis on Fly.io
+fly redis create
+
+# Note the Redis URL from output:
+# redis://default:PASSWORD@fly-INSTANCE-NAME.upstash.io:6379
+```
+
+#### Step 3: Configure Environment Variables
+
+Set required secrets for OAuth and Redis:
+
+```bash
+# LinkedIn OAuth credentials (from https://www.linkedin.com/developers/apps)
+fly secrets set \
+  LINKEDIN_CLIENT_ID=your_linkedin_client_id \
+  LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret \
+  --app your-linkedin-mcp
+
+# Redis connection (from step 2)
+fly secrets set \
+  REDIS_URL="redis://default:PASSWORD@fly-INSTANCE-NAME.upstash.io:6379" \
+  SESSION_PROVIDER=redis \
+  --app your-linkedin-mcp
+
+# OAuth server configuration
+fly secrets set \
+  OAUTH_SERVER_URL=https://your-linkedin-mcp.fly.dev \
+  LINKEDIN_REDIRECT_URI=https://your-linkedin-mcp.fly.dev/oauth/callback \
+  --app your-linkedin-mcp
+```
+
+#### Step 4: Configure fly.toml
+
+Update `fly.toml` with production settings:
+
+```toml
+app = 'your-linkedin-mcp'
+primary_region = 'cdg'
+
+[build]
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[env]
+  SESSION_PROVIDER = 'redis'
+  ENABLE_PUBLISHING = true
+  OAUTH_SERVER_URL = 'https://your-linkedin-mcp.fly.dev'
+  LINKEDIN_REDIRECT_URI = 'https://your-linkedin-mcp.fly.dev/oauth/callback'
+```
+
+#### Step 5: Deploy
+
+```bash
+# Deploy to Fly.io
+fly deploy
+
+# Check deployment status
+fly status
+
+# View logs
+fly logs
+
+# Test OAuth endpoint
+curl https://your-linkedin-mcp.fly.dev/.well-known/oauth-authorization-server
+```
+
+#### Step 6: Configure MCP Client
+
+Update your MCP client configuration (e.g., `~/.mcp-cli/servers.yaml`):
+
+```yaml
+servers:
+  linkedin:
+    url: https://your-linkedin-mcp.fly.dev  # No trailing slash!
+    oauth: true
+```
+
+Test the connection:
+
+```bash
+uv run mcp-cli --server linkedin --provider openai --model gpt-4
+```
+
+### Redis Configuration
+
+#### Development (Memory)
+
+For local development, use in-memory session storage:
+
+```bash
+# .env file
+SESSION_PROVIDER=memory
+```
+
+No Redis installation required. Sessions are lost when the server restarts.
+
+#### Production (Redis)
+
+For production, use Redis for persistent session storage:
+
+**Option 1: Fly.io Redis (Upstash)**
+
+```bash
+# Create Redis instance
+fly redis create
+
+# Get connection details
+fly redis status your-redis-instance
+
+# Set as secret
+fly secrets set REDIS_URL="redis://default:PASSWORD@fly-INSTANCE.upstash.io:6379"
+```
+
+**Option 2: External Redis (Upstash, AWS ElastiCache, etc.)**
+
+```bash
+# Set Redis URL
+export REDIS_URL="redis://username:password@host:port/db"
+export SESSION_PROVIDER=redis
+```
+
+**Environment Variables:**
+
+```env
+# Session Provider
+SESSION_PROVIDER=redis                    # Required: redis | memory
+
+# Redis Connection (required if SESSION_PROVIDER=redis)
+REDIS_URL=redis://default:password@host:6379
+# or
+SESSION_REDIS_URL=redis://default:password@host:6379  # Alternative name
+
+# Optional Redis settings
+REDIS_TLS_INSECURE=0  # Set to 1 to disable TLS cert verification (not recommended)
+```
+
+### Custom Domain Setup
+
+Configure a custom domain for your deployment:
+
+#### Step 1: Add Domain to Fly.io
+
+```bash
+# Add custom domain
+fly certs create linkedin.yourdomain.com
+
+# Verify DNS settings
+fly certs show linkedin.yourdomain.com
+```
+
+#### Step 2: Update DNS
+
+Add DNS records (check output from previous command):
+
+```
+Type: CNAME
+Name: linkedin.yourdomain.com
+Value: your-linkedin-mcp.fly.dev
+```
+
+#### Step 3: Update OAuth URLs
+
+```bash
+# Update secrets with custom domain
+fly secrets set \
+  OAUTH_SERVER_URL=https://linkedin.yourdomain.com \
+  LINKEDIN_REDIRECT_URI=https://linkedin.yourdomain.com/oauth/callback
+```
+
+#### Step 4: Update LinkedIn App
+
+1. Go to [LinkedIn Developers](https://www.linkedin.com/developers/apps)
+2. Select your app
+3. Update "Redirect URLs" to match: `https://linkedin.yourdomain.com/oauth/callback`
+
+### Environment Variables Reference
+
+Complete list of production environment variables:
+
+```env
+# ============================================================================
+# OAuth Configuration (Required for Production)
+# ============================================================================
+
+# LinkedIn OAuth Credentials
+LINKEDIN_CLIENT_ID=your_linkedin_client_id
+LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+
+# OAuth Server URLs (must match LinkedIn app settings)
+# IMPORTANT: This URL is also used for preview URLs (linkedin_preview_url tool)
+OAUTH_SERVER_URL=https://your-app.fly.dev
+LINKEDIN_REDIRECT_URI=https://your-app.fly.dev/oauth/callback
+OAUTH_ENABLED=true
+
+# ============================================================================
+# Session Storage (Required for Production)
+# ============================================================================
+
+# Production: Use Redis
+SESSION_PROVIDER=redis
+REDIS_URL=redis://default:password@fly-instance.upstash.io:6379
+
+# Development: Use Memory
+# SESSION_PROVIDER=memory
+
+# ============================================================================
+# OAuth Token TTL Configuration (Optional - Defaults Shown)
+# ============================================================================
+
+OAUTH_AUTH_CODE_TTL=300                   # Authorization codes (5 min)
+OAUTH_ACCESS_TOKEN_TTL=900                # Access tokens (15 min)
+OAUTH_REFRESH_TOKEN_TTL=86400             # Refresh tokens (1 day)
+OAUTH_CLIENT_REGISTRATION_TTL=31536000    # Client registrations (1 year)
+OAUTH_EXTERNAL_TOKEN_TTL=86400            # LinkedIn tokens (1 day)
+
+# ============================================================================
+# Server Configuration
+# ============================================================================
+
+DEBUG=0                                   # Disable debug mode in production
+HTTP_PORT=8000                            # Server port
+ENABLE_PUBLISHING=true                    # Enable publishing tools
+
+# LinkedIn Person URN (optional - auto-detected via OAuth)
+LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID
+```
+
+### Logging Configuration
+
+Control logging levels in production:
+
+```env
+# Production logging
+LOG_LEVEL=INFO          # INFO for production, DEBUG for troubleshooting
+MCP_LOG_LEVEL=WARNING   # MCP protocol logging
+
+# Development logging
+LOG_LEVEL=DEBUG
+MCP_LOG_LEVEL=INFO
+```
+
+**Security Note**: At INFO level, sensitive data (tokens, user IDs, authorization codes) is NOT logged. This data is only logged at DEBUG level for troubleshooting.
+
+### Monitoring & Troubleshooting
+
+```bash
+# View live logs
+fly logs --app your-linkedin-mcp
+
+# Check app status
+fly status --app your-linkedin-mcp
+
+# Check Redis status
+fly redis status your-redis-instance
+
+# Restart app
+fly apps restart your-linkedin-mcp
+
+# Scale app
+fly scale count 2 --app your-linkedin-mcp  # 2 instances
+fly scale memory 2048 --app your-linkedin-mcp  # 2GB memory
+```
+
+### Health Checks
+
+The server includes health check endpoints:
+
+```bash
+# Check server health
+curl https://your-app.fly.dev/
+
+# Check OAuth discovery
+curl https://your-app.fly.dev/.well-known/oauth-authorization-server
+
+# Check MCP endpoint
+curl https://your-app.fly.dev/mcp
+```
+
+### Security Best Practices
+
+1. **Never commit secrets** - Use Fly secrets, not environment variables in fly.toml
+2. **Use HTTPS only** - Set `force_https = true` in fly.toml
+3. **Rotate tokens regularly** - LinkedIn tokens are auto-refreshed
+4. **Monitor logs** - Check for failed auth attempts
+5. **Use custom domain** - Professional appearance, easier to update
+6. **Enable auto-scaling** - Handle traffic spikes automatically
+7. **Keep dependencies updated** - Regular security updates
+
+### Cost Optimization
+
+Fly.io pricing optimization tips:
+
+```toml
+# In fly.toml - auto-stop when idle
+[http_service]
+  auto_stop_machines = 'stop'        # Stop when idle
+  auto_start_machines = true         # Start on request
+  min_machines_running = 0           # No always-on instances
+```
+
+**Expected costs**:
+- Free tier: 3 shared-cpu VMs with 256MB RAM
+- Redis: ~$2/month for basic Upstash instance
+- Scaling: ~$0.02/hour per VM after free tier
 
 ## Documentation
 

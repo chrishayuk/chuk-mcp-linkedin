@@ -147,7 +147,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
     @requires_auth()
     async def linkedin_preview_url(
         draft_id: Optional[str] = None,
-        base_url: str = "http://localhost:8000",
+        base_url: Optional[str] = None,
         expires_in: int = 3600,
         _external_access_token: Optional[str] = None,
     ) -> str:
@@ -166,17 +166,23 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
 
         Args:
             draft_id: Draft ID (optional, uses current if not provided)
-            base_url: Base URL of the server (default: http://localhost:8000)
+            base_url: Base URL of the server (optional, auto-detected from OAUTH_SERVER_URL or defaults to http://localhost:8000)
             expires_in: Expiration time in seconds for signed URLs (default: 3600 = 1 hour)
 
         Returns:
             Shareable preview URL or error message
         """
+        import os
+
         manager = get_current_manager()
         draft_id = draft_id or manager.current_draft_id
 
         if not draft_id:
             return "Error: No draft selected"
+
+        # Auto-detect base_url from OAUTH_SERVER_URL environment variable if not provided
+        if base_url is None:
+            base_url = os.getenv("OAUTH_SERVER_URL", "http://localhost:8000")
 
         # Generate preview URL using manager's method
         preview_url = await manager.generate_preview_url(

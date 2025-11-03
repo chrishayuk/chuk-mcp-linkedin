@@ -24,5 +24,8 @@ primary_region = 'cdg'
 [env]
   SESSION_PROVIDER = 'redis'
   ENABLE_PUBLISHING = true
+  # OAUTH_SERVER_URL is used for:
+  # 1. OAuth discovery endpoint (.well-known/oauth-authorization-server)
+  # 2. Preview URLs (linkedin_preview_url tool auto-detects this)
   OAUTH_SERVER_URL= 'https://linkedin.chukai.io'
   LINKEDIN_REDIRECT_URI = 'https://linkedin.chukai.io/oauth/callback'

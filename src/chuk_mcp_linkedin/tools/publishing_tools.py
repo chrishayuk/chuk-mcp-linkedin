@@ -6,7 +6,9 @@ Handles actual posting to LinkedIn via the API with OAuth authentication.
 """
 
 from typing import Any, Dict, Optional
+
 from chuk_mcp_server.decorators import requires_auth
+
 from ..manager_factory import get_current_manager
 
 
@@ -79,8 +81,9 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
             }
 
         # Create a LinkedIn client with the OAuth access token
-        from ..api import LinkedInClient
         import httpx
+
+        from ..api import LinkedInClient
 
         oauth_client = LinkedInClient()
         oauth_client.access_token = _external_access_token
@@ -172,8 +175,9 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
             }
 
         # Create a LinkedIn client with the OAuth access token
-        from ..api import LinkedInClient
         import httpx
+
+        from ..api import LinkedInClient
 
         oauth_client = LinkedInClient()
         oauth_client.access_token = _external_access_token

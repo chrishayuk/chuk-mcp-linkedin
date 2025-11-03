@@ -6,8 +6,8 @@ Uses the generic OAuth implementation from chuk-mcp-server
 with LinkedIn-specific provider.
 """
 
-from .provider import LinkedInOAuthProvider
 from .linkedin_client import LinkedInOAuthClient
+from .provider import LinkedInOAuthProvider
 
 __all__ = [
     "LinkedInOAuthProvider",

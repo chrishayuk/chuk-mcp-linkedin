@@ -6,6 +6,7 @@ This module provides backward compatibility and delegates to the CLI.
 """
 
 import sys
+
 from .cli import main
 
 # For backward compatibility, keep the old entry point

@@ -4,14 +4,15 @@ Try to get member info from LinkedIn's /v2/me endpoint.
 """
 
 import asyncio
+import json
 import sys
 from pathlib import Path
-import json
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from chuk_mcp_linkedin.api import config
 import httpx
+
+from chuk_mcp_linkedin.api import config
 
 
 async def get_me():

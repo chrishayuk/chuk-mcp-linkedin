@@ -10,9 +10,11 @@ The MCP server obtains tokens via OAuth and passes them to these classes.
 For OAuth flow tests, see test_oauth.py and test_session_oauth.py.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from chuk_mcp_linkedin.api import LinkedInClient, LinkedInConfig, LinkedInAPIError
+
+import pytest
+
+from chuk_mcp_linkedin.api import LinkedInAPIError, LinkedInClient, LinkedInConfig
 
 
 class TestLinkedInConfig:

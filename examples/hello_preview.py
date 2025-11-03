@@ -12,9 +12,10 @@ Usage:
 """
 
 import asyncio
+
+from chuk_mcp_linkedin.manager_factory import ManagerFactory, set_factory
 from chuk_mcp_linkedin.posts import ComposablePost
 from chuk_mcp_linkedin.themes import ThemeManager
-from chuk_mcp_linkedin.manager_factory import ManagerFactory, set_factory
 
 
 async def main():
@@ -34,7 +35,7 @@ async def main():
 
     post.add_hook("question", "What's the most underrated growth lever on LinkedIn in 2025?")
     post.add_body(
-        "Hint: documents. Short, skimmable, 5–10 pages. " "Try it this week.", structure="linear"
+        "Hint: documents. Short, skimmable, 5–10 pages. Try it this week.", structure="linear"
     )
     post.add_cta("curiosity", "Tried docs vs text lately?")
     post.add_hashtags(["LinkedInTips", "B2B", "ContentStrategy"])

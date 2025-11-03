@@ -5,9 +5,9 @@ LinkedIn post preview generator.
 Creates HTML previews of LinkedIn posts for local viewing.
 """
 
-from typing import Dict, Any, Optional, List
-from datetime import datetime
 import html
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 class LinkedInPreview:

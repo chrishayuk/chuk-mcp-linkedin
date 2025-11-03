@@ -5,9 +5,10 @@ Visual separator component for LinkedIn posts.
 Use for visual breaks between sections.
 """
 
-from typing import Optional, Any
-from ..base import PostComponent
+from typing import Any, Optional
+
 from ....tokens.structure_tokens import StructureTokens
+from ..base import PostComponent
 
 
 class Separator(PostComponent):

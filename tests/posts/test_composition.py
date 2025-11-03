@@ -1,6 +1,7 @@
 """Tests for posts/composition module."""
 
 import pytest
+
 from chuk_mcp_linkedin.posts.composition import ComposablePost, PostBuilder
 
 

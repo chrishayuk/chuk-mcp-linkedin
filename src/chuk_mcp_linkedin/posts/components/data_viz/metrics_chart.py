@@ -5,9 +5,10 @@ Key metrics chart component with emoji indicators.
 Use for KPIs and statistics with ✅/❌ indicators.
 """
 
-from typing import Dict, Optional, Any
-from ..base import PostComponent
+from typing import Any, Dict, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class MetricsChart(PostComponent):

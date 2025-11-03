@@ -5,12 +5,12 @@ LinkedIn API integration module.
 Clean, modular API for interacting with LinkedIn.
 """
 
-from .config import LinkedInConfig, config
-from .errors import LinkedInAPIError
 from .client import LinkedInClient as BaseLinkedInClient
-from .posts import PostsAPIMixin
+from .config import LinkedInConfig, config
 from .documents import DocumentsAPIMixin
+from .errors import LinkedInAPIError
 from .media import MediaAPIMixin
+from .posts import PostsAPIMixin
 
 
 class LinkedInClient(PostsAPIMixin, MediaAPIMixin, DocumentsAPIMixin, BaseLinkedInClient):

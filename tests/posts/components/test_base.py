@@ -1,6 +1,7 @@
 """Tests for base PostComponent class."""
 
 import pytest
+
 from chuk_mcp_linkedin.posts.components.base import PostComponent
 
 

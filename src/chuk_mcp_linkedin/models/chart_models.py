@@ -5,8 +5,9 @@ Pydantic models for chart component data structures.
 Provides type-safe validation for chart inputs.
 """
 
+from typing import Any, Dict
+
 from pydantic import BaseModel, Field, field_validator
-from typing import Dict, Any
 
 
 class BarChartData(BaseModel):

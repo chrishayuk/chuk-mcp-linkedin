@@ -1,7 +1,8 @@
 """Tests for CallToAction component."""
 
-from chuk_mcp_linkedin.posts.components.content.call_to_action import CallToAction
 from unittest.mock import MagicMock
+
+from chuk_mcp_linkedin.posts.components.content.call_to_action import CallToAction
 
 
 class TestCallToActionInitialization:

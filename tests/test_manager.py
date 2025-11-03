@@ -2,10 +2,12 @@
 Tests for LinkedInManager and Draft.
 """
 
-import pytest
 import json
 import tempfile
 from pathlib import Path
+
+import pytest
+
 from chuk_mcp_linkedin.manager import Draft, LinkedInManager
 
 

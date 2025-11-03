@@ -6,7 +6,7 @@ Centralized design system tokens for typography, colors, spacing,
 and canvas sizes - similar to the PPTX design token system.
 """
 
-from typing import Dict, Tuple, Any
+from typing import Any, Dict, Tuple
 
 
 class DesignTokens:

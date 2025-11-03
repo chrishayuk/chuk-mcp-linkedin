@@ -15,17 +15,19 @@ OAuth Support:
     Note: Uses generic OAuth implementation from chuk-mcp-server.
 """
 
-from typing import Optional, Any
+import os
+from typing import Any, Optional
+
 from chuk_mcp_server import ChukMCPServer
+
+from .api import LinkedInClient
 from .manager import LinkedInManager
 from .manager_factory import ManagerFactory, set_factory
-from .api import LinkedInClient
-from .tools.draft_tools import register_draft_tools
 from .tools.composition_tools import register_composition_tools
-from .tools.theme_tools import register_theme_tools
-from .tools.registry_tools import register_registry_tools
+from .tools.draft_tools import register_draft_tools
 from .tools.publishing_tools import register_publishing_tools
-import os
+from .tools.registry_tools import register_registry_tools
+from .tools.theme_tools import register_theme_tools
 
 # Initialize the MCP server with OAuth provider getter
 mcp = ChukMCPServer("chuk-mcp-linkedin")
@@ -67,9 +69,9 @@ publishing_tools = register_publishing_tools(mcp, linkedin_client)
 
 def setup_preview_routes() -> None:
     """Set up preview routes for serving HTML previews."""
-    from starlette.responses import HTMLResponse, JSONResponse
-    from starlette.requests import Request
     from chuk_mcp_server.endpoint_registry import http_endpoint_registry
+    from starlette.requests import Request
+    from starlette.responses import HTMLResponse, JSONResponse
 
     async def serve_preview(request: Request) -> HTMLResponse | JSONResponse:
         """Serve HTML preview for a draft using shareable preview token."""

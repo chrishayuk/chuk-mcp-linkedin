@@ -5,7 +5,8 @@ Provides comprehensive information about all post types, variants, themes,
 and their properties.
 """
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 from .themes.theme_manager import THEMES
 from .variants import VariantResolver
 

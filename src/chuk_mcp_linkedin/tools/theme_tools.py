@@ -10,15 +10,17 @@ user-scoped data persistence across sessions.
 
 import json
 from typing import Any, Dict, Optional
+
 from chuk_mcp_server.decorators import requires_auth
+
 from ..manager_factory import get_current_manager
 
 
 def register_theme_tools(mcp: Any) -> Dict[str, Any]:
     """Register theme management tools with the MCP server"""
 
-    from ..themes.theme_manager import ThemeManager
     from ..registry import ComponentRegistry
+    from ..themes.theme_manager import ThemeManager
 
     theme_manager = ThemeManager()
     registry = ComponentRegistry()

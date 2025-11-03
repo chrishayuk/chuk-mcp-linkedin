@@ -8,10 +8,11 @@ All tools require OAuth authorization to prevent server abuse and enable
 user-scoped data persistence across sessions.
 """
 
-from typing import Any, Dict, Optional, List
-from chuk_mcp_server.decorators import requires_auth
-from ..manager_factory import get_current_manager
+from typing import Any, Dict, List, Optional
 
+from chuk_mcp_server.decorators import requires_auth
+
+from ..manager_factory import get_current_manager
 from ..posts.composition import ComposablePost
 from ..themes.theme_manager import ThemeManager
 

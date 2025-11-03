@@ -2,8 +2,8 @@
 Tests for variant system.
 """
 
-from chuk_mcp_linkedin.variants import PostVariants, VariantResolver, VariantConfig
 from chuk_mcp_linkedin import ThemeManager
+from chuk_mcp_linkedin.variants import PostVariants, VariantConfig, VariantResolver
 
 
 class TestVariantConfig:

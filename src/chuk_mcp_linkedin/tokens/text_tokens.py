@@ -5,7 +5,7 @@ Text formatting tokens for LinkedIn posts.
 Based on 2025 performance data analysis of 1M+ posts.
 """
 
-from typing import Dict, Tuple, Any
+from typing import Any, Dict, Tuple
 
 
 class TextTokens:

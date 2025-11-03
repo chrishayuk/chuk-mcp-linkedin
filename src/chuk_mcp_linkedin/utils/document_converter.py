@@ -5,9 +5,9 @@ Document to image converter for LinkedIn post previews.
 Converts PDF, PowerPoint, and Word documents to images for preview rendering.
 """
 
+import hashlib
 from pathlib import Path
 from typing import List, Optional
-import hashlib
 
 
 class DocumentConverter:
@@ -147,8 +147,8 @@ class DocumentConverter:
     ) -> List[str]:
         """Convert PowerPoint to images"""
         try:
-            from pptx import Presentation
             from PIL import Image
+            from pptx import Presentation
         except ImportError:
             raise ImportError(
                 "python-pptx and Pillow are required for PowerPoint conversion. "

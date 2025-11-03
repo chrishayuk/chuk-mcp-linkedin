@@ -5,9 +5,10 @@ Timeline/step component for LinkedIn posts.
 Use for processes, journeys, and historical progression.
 """
 
-from typing import Optional, Any, Dict
-from ..base import PostComponent
+from typing import Any, Dict, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class Timeline(PostComponent):

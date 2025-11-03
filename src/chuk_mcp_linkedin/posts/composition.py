@@ -5,33 +5,34 @@ Composition system for building LinkedIn posts from components.
 Shadcn-style atomic composition with type-safe components.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
+from ..tokens.text_tokens import TextTokens
 from .components import (
-    PostComponent,
-    Hook,
+    BarChart,
+    BeforeAfter,
+    BigStat,
     Body,
     CallToAction,
-    Hashtags,
-    BarChart,
-    MetricsChart,
-    ComparisonChart,
-    ProgressChart,
-    RankingChart,
-    Quote,
-    BigStat,
-    Timeline,
-    KeyTakeaway,
-    ProCon,
     Checklist,
-    BeforeAfter,
-    TipBox,
-    StatsGrid,
-    PollPreview,
+    ComparisonChart,
     FeatureList,
+    Hashtags,
+    Hook,
+    KeyTakeaway,
+    MetricsChart,
     NumberedList,
+    PollPreview,
+    PostComponent,
+    ProCon,
+    ProgressChart,
+    Quote,
+    RankingChart,
     Separator,
+    StatsGrid,
+    Timeline,
+    TipBox,
 )
-from ..tokens.text_tokens import TextTokens
 
 
 class ComposablePost:

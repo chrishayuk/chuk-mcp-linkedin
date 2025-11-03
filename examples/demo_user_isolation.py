@@ -16,6 +16,7 @@ Security Features Demonstrated:
 """
 
 import asyncio
+
 from chuk_mcp_linkedin.manager_factory import ManagerFactory, set_factory
 
 

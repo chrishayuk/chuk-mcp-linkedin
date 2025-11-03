@@ -14,9 +14,10 @@ OAuth Flow:
     6. Refresh token when expired (if refresh token provided)
 """
 
-from typing import Optional, Dict, Any, cast
-import httpx
+from typing import Any, Dict, Optional, cast
 from urllib.parse import urlencode
+
+import httpx
 
 
 class LinkedInOAuthClient:

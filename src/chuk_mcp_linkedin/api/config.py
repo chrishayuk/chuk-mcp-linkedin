@@ -6,6 +6,7 @@ Handles environment variables and settings for LinkedIn API integration.
 """
 
 from typing import Optional
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

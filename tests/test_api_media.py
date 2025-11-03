@@ -4,9 +4,11 @@ Tests for LinkedIn Media API.
 Tests image and video upload methods with mocked HTTP requests.
 """
 
+from unittest.mock import AsyncMock, MagicMock, mock_open, patch
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch, mock_open
-from chuk_mcp_linkedin.api import LinkedInClient, LinkedInConfig, LinkedInAPIError
+
+from chuk_mcp_linkedin.api import LinkedInAPIError, LinkedInClient, LinkedInConfig
 
 
 @pytest.fixture

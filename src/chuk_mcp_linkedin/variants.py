@@ -4,8 +4,9 @@ CVA-inspired variant system for LinkedIn posts.
 Provides variant definitions and resolution with compound variant support.
 """
 
-from typing import Dict, Any, Optional
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class VariantConfig(BaseModel):

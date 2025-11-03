@@ -3,7 +3,8 @@ Tests for ThemeManager and LinkedInTheme.
 """
 
 import pytest
-from chuk_mcp_linkedin.themes.theme_manager import ThemeManager, LinkedInTheme, THEMES
+
+from chuk_mcp_linkedin.themes.theme_manager import THEMES, LinkedInTheme, ThemeManager
 
 
 class TestLinkedInTheme:

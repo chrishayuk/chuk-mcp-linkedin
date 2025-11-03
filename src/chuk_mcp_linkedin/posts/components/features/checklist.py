@@ -5,9 +5,10 @@ Checklist component for action items and tasks.
 Use for to-do lists, action items, pre-launch checklists, requirements.
 """
 
-from typing import List, Dict, Any, Optional
-from ..base import PostComponent
+from typing import Any, Dict, List, Optional
+
 from ....tokens.text_tokens import TextTokens
+from ..base import PostComponent
 
 
 class Checklist(PostComponent):

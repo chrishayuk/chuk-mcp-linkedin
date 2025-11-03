@@ -5,7 +5,7 @@ Content structure tokens for LinkedIn posts.
 Patterns for organizing and formatting post content.
 """
 
-from typing import Dict, List, Any, Tuple
+from typing import Any, Dict, List, Tuple
 
 
 class StructureTokens:

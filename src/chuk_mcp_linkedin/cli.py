@@ -12,8 +12,8 @@ import asyncio
 import logging
 import os
 import sys
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 # Load .env file if present
 try:

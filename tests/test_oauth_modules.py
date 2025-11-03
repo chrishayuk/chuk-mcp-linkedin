@@ -4,15 +4,17 @@ Tests for OAuth modules.
 Tests the OAuth context, LinkedIn client, and provider implementation.
 """
 
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import AsyncMock, Mock, patch, MagicMock
-from chuk_mcp_linkedin.oauth_context import (
-    set_linkedin_token,
-    get_linkedin_token,
-    clear_linkedin_token,
-)
+
 from chuk_mcp_linkedin.oauth.linkedin_client import LinkedInOAuthClient
 from chuk_mcp_linkedin.oauth.provider import LinkedInOAuthProvider
+from chuk_mcp_linkedin.oauth_context import (
+    clear_linkedin_token,
+    get_linkedin_token,
+    set_linkedin_token,
+)
 
 
 class TestOAuthContext:

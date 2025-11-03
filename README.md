@@ -701,7 +701,21 @@ fly redis create
 # redis://default:PASSWORD@fly-INSTANCE-NAME.upstash.io:6379
 ```
 
-#### Step 3: Configure Environment Variables
+#### Step 3: Create Tigris Storage Bucket
+
+```bash
+# Create Tigris S3-compatible storage for preview artifacts
+fly storage create --name your-linkedin-mcp
+
+# Fly automatically sets these secrets on your app:
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - AWS_ENDPOINT_URL_S3
+# - AWS_REGION
+# - BUCKET_NAME
+```
+
+#### Step 4: Configure Environment Variables
 
 Set required secrets for OAuth and Redis:
 
@@ -725,7 +739,7 @@ fly secrets set \
   --app your-linkedin-mcp
 ```
 
-#### Step 4: Configure fly.toml
+#### Step 5: Configure fly.toml
 
 Update `fly.toml` with production settings:
 
@@ -753,9 +767,14 @@ primary_region = 'cdg'
   ENABLE_PUBLISHING = true
   OAUTH_SERVER_URL = 'https://your-linkedin-mcp.fly.dev'
   LINKEDIN_REDIRECT_URI = 'https://your-linkedin-mcp.fly.dev/oauth/callback'
+
+  # Artifact Storage (Tigris S3-compatible)
+  ARTIFACT_PROVIDER = 's3'
+  ARTIFACT_S3_BUCKET = 'your-linkedin-mcp'
+  # AWS_* secrets automatically set by `fly storage create`
 ```
 
-#### Step 5: Deploy
+#### Step 6: Deploy
 
 ```bash
 # Deploy to Fly.io
@@ -771,7 +790,7 @@ fly logs
 curl https://your-linkedin-mcp.fly.dev/.well-known/oauth-authorization-server
 ```
 
-#### Step 6: Configure MCP Client
+#### Step 7: Configure MCP Client
 
 Update your MCP client configuration (e.g., `~/.mcp-cli/servers.yaml`):
 

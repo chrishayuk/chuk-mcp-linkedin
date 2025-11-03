@@ -29,3 +29,9 @@ primary_region = 'cdg'
   # 2. Preview URLs (linkedin_preview_url tool auto-detects this)
   OAUTH_SERVER_URL= 'https://linkedin.chukai.io'
   LINKEDIN_REDIRECT_URI = 'https://linkedin.chukai.io/oauth/callback'
+
+  # Artifact Storage (Tigris S3-compatible object storage)
+  # Used for storing LinkedIn post preview artifacts
+  ARTIFACT_PROVIDER = 's3'
+  ARTIFACT_S3_BUCKET = 'chuk-linkedin-mcp'
+  # AWS_* secrets are automatically set by Fly when creating Tigris bucket

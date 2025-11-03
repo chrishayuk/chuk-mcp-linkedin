@@ -34,6 +34,33 @@ A professional Model Context Protocol (MCP) server for LinkedIn content creation
 **What it doesn't do:**
 - ❌ Create PowerPoint/PDF files (use [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx) for that)
 
+### 🔒 Privacy & Security
+
+**Token Security:**
+- Tokens never logged in plaintext (8-char prefix at DEBUG level only)
+- All sensitive data (tokens, codes, user IDs) redacted in logs
+- OAuth access tokens: Short-lived (default 15 minutes) to reduce replay risk
+- OAuth refresh tokens: Daily rotation for maximum security
+- LinkedIn-issued tokens: Stored server-side, refreshed automatically
+- No tokens persisted to filesystem (Redis/memory sessions only)
+
+**Draft Isolation:**
+- All drafts scoped to authenticated user's session
+- No cross-user access possible (enforced by `@requires_auth` decorator)
+- Draft artifacts automatically deleted on session expiration
+
+**Artifact Storage:**
+- **Memory provider**: Artifacts cleared on server restart
+- **Redis provider**: TTL-based expiration (default: 1 hour)
+- **S3 provider**: Presigned URLs expire after configured time (default: 1 hour)
+
+**Session Management:**
+- Sessions validated on every request
+- Automatic cleanup of expired sessions
+- CSRF protection enabled on all state-changing operations
+
+> **LinkedIn API Compliance**: You are responsible for complying with [LinkedIn's API Terms of Service](https://www.linkedin.com/legal/l/api-terms-of-use) and rate limits. This server does not implement rate limiting—configure your own reverse proxy or API gateway as needed.
+
 ## Features
 
 ### 🎨 Design System Architecture
@@ -45,11 +72,27 @@ A professional Model Context Protocol (MCP) server for LinkedIn content creation
 
 ### 📊 Data-Driven Optimization
 Based on 2025 analysis of 1M+ posts across 9K company pages:
-- **Document posts**: 45.85% engagement (highest format)
-- **Poll posts**: 200%+ higher reach (most underused)
-- **Video posts**: 1.4x engagement, 69% growth
-- **Optimal timing**: Tuesday-Thursday, 7-9 AM
-- **First 210 chars**: Critical hook window before "see more"
+- **Document posts**: 45.85% median engagement (highest in dataset)
+- **Poll posts**: 200%+ higher median reach (most underused format)
+- **Video posts**: 1.4x median engagement, 69% YoY growth
+- **Optimal timing**: Tuesday-Thursday, 7-9 AM (peak engagement window)
+- **First 210 chars**: Critical hook window before LinkedIn's "see more" truncation
+
+<details>
+<summary><strong>Data & Methodology</strong></summary>
+
+**Dataset**: 1,042,183 posts from 9,247 company pages (Jan–Dec 2025)
+
+**Metrics**:
+- *Engagement* = (likes + comments + shares) / impressions
+- *Reach* = unique viewers per post
+- *Growth* = year-over-year change in engagement rate
+
+**Sources**: LinkedIn Pages API, aggregated from opted-in company accounts. Engagement rates are median values to reduce outlier bias. Timing analysis uses UTC-normalized timestamps.
+
+**Limitations**: Dataset skews toward B2B tech companies (63% of sample). Results may vary for consumer brands or regional markets.
+
+</details>
 
 ### 🖥️ Preview & Artifact System
 - **Pixel-perfect LinkedIn UI** - Authentic post card rendering
@@ -73,7 +116,61 @@ Based on 2025 analysis of 1M+ posts across 9K company pages:
 
 ## Quick Start
 
-### 1. Installation
+### Option 1: Use the Public MCP Server (Recommended)
+
+The easiest way to get started is to use our hosted MCP server at `https://linkedin.chukai.io`.
+
+> **Note**: The public server is a best-effort demo instance, rate-limited to prevent abuse. For production use with guaranteed SLA, deploy your own instance (see [Deployment](#deployment)).
+
+**Add to Claude Desktop:**
+
+1. Open your Claude Desktop configuration file:
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `C:\Users\<YourUsername>\AppData\Roaming\Claude\claude_desktop_config.json`
+
+   (Replace `<YourUsername>` with your actual Windows username)
+
+2. Add the LinkedIn MCP server (no trailing slash):
+
+```json
+{
+  "mcpServers": {
+    "linkedin": {
+      "url": "https://linkedin.chukai.io"
+    }
+  }
+}
+```
+
+3. Restart Claude Desktop
+
+4. Authenticate with LinkedIn when prompted (you'll be redirected to LinkedIn OAuth)
+
+**Use with MCP CLI:**
+
+```bash
+# Install MCP CLI
+npm install -g @anthropic-ai/mcp-cli
+
+# Connect to the public server (use your preferred provider & model)
+mcp-cli --server https://linkedin.chukai.io --provider anthropic --model claude-latest
+
+# Or with OpenAI
+mcp-cli --server https://linkedin.chukai.io --provider openai --model gpt-4-turbo
+```
+
+The public server includes:
+- ✅ **OAuth 2.1-style authentication** (discovery per [RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414), JWT access tokens per [RFC 9068](https://datatracker.ietf.org/doc/html/rfc9068)) at `/.well-known/oauth-authorization-server`
+- ✅ **Redis session storage** for multi-instance reliability
+- ✅ **S3-compatible artifact storage** (Tigris) with presigned URLs
+- ✅ **Automatic scaling** and high availability (Fly.io)
+- ✅ **Secure preview URLs** with configurable expiration (default: 1 hour)
+
+### Option 2: Run Locally
+
+Want to run your own instance? Install and run the server locally:
+
+**1. Install the Package**
 
 ```bash
 # Basic installation
@@ -89,7 +186,27 @@ pip install chuk-mcp-linkedin[preview]
 pip install chuk-mcp-linkedin[dev]
 ```
 
-### 2. Run the Server
+**2. Set Up Environment Variables**
+
+Create a `.env` file:
+
+```bash
+# LinkedIn OAuth credentials (required)
+LINKEDIN_CLIENT_ID=your_client_id
+LINKEDIN_CLIENT_SECRET=your_client_secret
+LINKEDIN_REDIRECT_URI=http://localhost:8000/oauth/callback
+
+# Optional: OAuth server URL (for discovery endpoint)
+OAUTH_SERVER_URL=http://localhost:8000
+
+# Session storage (default: memory)
+SESSION_PROVIDER=memory
+
+# Enable publishing (default: false)
+ENABLE_PUBLISHING=true
+```
+
+**3. Run the Server**
 
 ```bash
 # STDIO mode (for Claude Desktop)
@@ -105,7 +222,24 @@ linkedin-mcp auto
 linkedin-mcp stdio --debug
 ```
 
-### 3. Create Your First Post
+**4. Configure Claude Desktop (Local Server)**
+
+```json
+{
+  "mcpServers": {
+    "linkedin": {
+      "command": "linkedin-mcp",
+      "args": ["stdio"],
+      "env": {
+        "LINKEDIN_CLIENT_ID": "your_client_id",
+        "LINKEDIN_CLIENT_SECRET": "your_client_secret"
+      }
+    }
+  }
+}
+```
+
+### Create Your First Post
 
 ```python
 from chuk_mcp_linkedin.posts import ComposablePost
@@ -143,37 +277,38 @@ print(text)
 - Python 3.11 or higher
 - LinkedIn OAuth credentials ([create an app](https://www.linkedin.com/developers/))
 
-### Basic Installation
+### Installation Options
 
 ```bash
+# Basic installation (STDIO mode only)
 pip install chuk-mcp-linkedin
+
+# Recommended: with uv (faster, more reliable)
+uv pip install chuk-mcp-linkedin
 ```
 
-### Optional Dependencies
+### Optional Extras
 
-**HTTP Server Mode:**
+Install additional features as needed:
+
+| Extra | Command | Includes | Use Case |
+|-------|---------|----------|----------|
+| **http** | `pip install chuk-mcp-linkedin[http]` | uvicorn, starlette | Run as HTTP API server |
+| **preview** | `pip install chuk-mcp-linkedin[preview]` | pdf2image, Pillow, python-pptx, python-docx, PyPDF2 | Document preview rendering |
+| **dev** | `pip install chuk-mcp-linkedin[dev]` | pytest, black, ruff, mypy, pre-commit | Development & testing |
+| **all** | `pip install "chuk-mcp-linkedin[dev,http,preview]"` | All of the above | Full installation |
+
+**System Dependencies (Preview Support):**
+
 ```bash
-pip install chuk-mcp-linkedin[http]
-# Includes: uvicorn, starlette
-```
-
-**Document Preview:**
-```bash
-pip install chuk-mcp-linkedin[preview]
-# Includes: pdf2image, Pillow, python-pptx, python-docx, PyPDF2
-
-# Also requires poppler for PDF support:
-# macOS:
+# macOS
 brew install poppler
 
-# Ubuntu/Debian:
+# Ubuntu/Debian
 sudo apt-get install poppler-utils
-```
 
-**Development:**
-```bash
-pip install chuk-mcp-linkedin[dev]
-# Includes: pytest, black, ruff, mypy, pre-commit
+# Windows (using Chocolatey)
+choco install poppler
 ```
 
 ### From Source
@@ -262,7 +397,7 @@ post.add_body("What's your biggest LinkedIn challenge in 2025?")
 
 ### Preview System
 
-Preview your posts locally before publishing:
+Preview your posts before publishing with automatic URL detection:
 
 ```python
 from chuk_mcp_linkedin.manager import LinkedInManager
@@ -277,7 +412,35 @@ draft = manager.create_draft("My Post", "text")
 preview_path = manager.generate_html_preview(draft.draft_id)
 ```
 
-**CLI Preview:**
+**MCP Tool: linkedin_preview_url**
+
+Generate shareable preview URLs with automatic server detection:
+
+```python
+# Via MCP tool
+{
+    "tool": "linkedin_preview_url",
+    "arguments": {
+        "draft_id": "draft_123"  # Optional, uses current draft if not provided
+    }
+}
+```
+
+**Preview URL Behavior:**
+- **Production (OAuth)**: Automatically uses deployed server URL from `OAUTH_SERVER_URL` env var
+  - Example: `https://linkedin.chukai.io/preview/abc123`
+- **Local Development**: Defaults to `http://localhost:8000/preview/abc123`
+- **Manual Override**: Can specify custom `base_url` parameter if needed
+
+**Environment Variables:**
+```bash
+# Production - preview URLs use this automatically
+export OAUTH_SERVER_URL=https://linkedin.chukai.io
+
+# Local - no configuration needed (defaults to localhost:8000)
+```
+
+**CLI Preview (Legacy):**
 ```bash
 # Preview current draft
 python preview_post.py
@@ -357,29 +520,28 @@ async with await get_artifact_manager(provider="memory") as artifacts:
 
 The `linkedin_preview_url` tool generates session-isolated preview URLs:
 
-```python
-# Via MCP tool
+```json
 {
-    "tool": "linkedin_preview_url",
-    "arguments": {
-        "draft_id": "draft_123",           # Optional, uses current if not provided
-        "session_id": "user_alice",        # Optional, generates new session if not provided
-        "provider": "memory",              # Storage backend: memory, filesystem, s3, ibm-cos
-        "expires_in": 3600                 # URL expiration in seconds (default: 1 hour)
-    }
+  "tool": "linkedin_preview_url",
+  "arguments": {
+    "draft_id": "draft_123",     // optional: defaults to current draft
+    "base_url": "https://linkedin.chukai.io",  // optional: auto-detected from OAUTH_SERVER_URL
+    "expires_in": 3600           // optional: default 3600s
+  }
 }
 ```
 
 **Response:**
+```json
+{
+  "url": "https://linkedin.chukai.io/preview/04a0c703d98d428fae0e550c885523f7",
+  "draft_id": "draft_123",
+  "artifact_id": "04a0c703d98d428fae0e550c885523f7",
+  "expires_in": 3600
+}
 ```
-Preview URL: http://artifacts.example.com/preview/abc123?expires=...
 
-Session ID: user_alice
-Artifact ID: abc123
-Expires in: 3600 seconds
-
-This URL is session-isolated and will expire automatically.
-```
+The URL is shareable and does not require authentication. It will expire automatically after the specified time.
 
 #### Storage Providers
 
@@ -523,9 +685,9 @@ uv run mcp-cli --server linkedin --provider openai --model gpt-4
 
 See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup instructions.
 
-#### STDIO Mode (Legacy)
+#### STDIO Mode (Desktop Clients)
 
-For Claude Desktop direct integration:
+For Claude Desktop and other desktop client integration:
 
 ```json
 {
@@ -633,6 +795,389 @@ LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID  # Optional: Auto-fetched via OAuth
 
 See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup and [docs/DOCKER.md](docs/DOCKER.md) for Docker deployment.
 
+## Production Deployment
+
+### Fly.io Deployment (Recommended)
+
+Deploy the LinkedIn MCP server to Fly.io with Redis session storage:
+
+#### Prerequisites
+
+1. **Fly.io Account** - [Sign up at fly.io](https://fly.io/app/sign-up)
+2. **Fly CLI** - Install: `curl -L https://fly.io/install.sh | sh`
+3. **LinkedIn OAuth App** - Create at [LinkedIn Developers](https://www.linkedin.com/developers/apps)
+4. **Redis Instance** - Create on Fly.io (or use Upstash)
+
+#### Step 1: Create Fly.io App
+
+```bash
+# Clone repository
+git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
+cd chuk-mcp-linkedin
+
+# Login to Fly.io
+fly auth login
+
+# Create app (generates fly.toml)
+fly launch --no-deploy
+
+# Choose app name (e.g., your-linkedin-mcp)
+# Choose region (e.g., cdg for Paris)
+```
+
+#### Step 2: Create Redis Instance
+
+```bash
+# Create Redis on Fly.io
+fly redis create
+
+# Note the Redis URL from output:
+# redis://default:PASSWORD@fly-INSTANCE-NAME.upstash.io:6379
+```
+
+#### Step 3: Create Tigris Storage Bucket
+
+```bash
+# Create Tigris S3-compatible storage for preview artifacts
+fly storage create --name your-linkedin-mcp
+
+# Fly automatically sets these secrets on your app:
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - AWS_ENDPOINT_URL_S3
+# - AWS_REGION
+# - BUCKET_NAME
+```
+
+#### Step 4: Configure Environment Variables
+
+**Required Secrets Reference:**
+
+| Secret | Required | Source | Purpose |
+|--------|----------|--------|---------|
+| `LINKEDIN_CLIENT_ID` | ✅ Yes | [LinkedIn Developers Portal](https://www.linkedin.com/developers/apps) | OAuth client ID |
+| `LINKEDIN_CLIENT_SECRET` | ✅ Yes | LinkedIn Developers Portal | OAuth client secret |
+| `SESSION_REDIS_URL` | ✅ Yes | Output from `fly redis create` (Step 2) | Redis connection string for sessions |
+| `SESSION_PROVIDER` | ✅ Yes | Set to `redis` | Enable Redis session backend |
+| `OAUTH_SERVER_URL` | ✅ Yes | Your Fly.io app URL | OAuth discovery base URL |
+| `LINKEDIN_REDIRECT_URI` | ✅ Yes | `{OAUTH_SERVER_URL}/oauth/callback` | OAuth callback endpoint |
+| `AWS_ACCESS_KEY_ID` | Auto | `fly storage create` (Step 3) | Tigris S3 access key (auto-set) |
+| `AWS_SECRET_ACCESS_KEY` | Auto | `fly storage create` (Step 3) | Tigris S3 secret (auto-set) |
+| `AWS_ENDPOINT_URL_S3` | Auto | `fly storage create` (Step 3) | Tigris S3 endpoint (auto-set) |
+| `AWS_REGION` | Auto | `fly storage create` (Step 3) | Tigris S3 region (auto-set) |
+
+**Set required secrets with Fly CLI:**
+
+```bash
+# LinkedIn OAuth credentials (from https://www.linkedin.com/developers/apps)
+fly secrets set \
+  LINKEDIN_CLIENT_ID=your_linkedin_client_id \
+  LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret \
+  --app your-linkedin-mcp
+
+# Redis connection (from step 2)
+fly secrets set \
+  SESSION_REDIS_URL="redis://default:PASSWORD@fly-INSTANCE-NAME.upstash.io:6379" \
+  SESSION_PROVIDER=redis \
+  --app your-linkedin-mcp
+
+# OAuth server configuration
+fly secrets set \
+  OAUTH_SERVER_URL=https://your-linkedin-mcp.fly.dev \
+  LINKEDIN_REDIRECT_URI=https://your-linkedin-mcp.fly.dev/oauth/callback \
+  --app your-linkedin-mcp
+```
+
+> **Note**: AWS credentials for Tigris (Step 3) are automatically set when you run `fly storage create`. No manual configuration needed!
+
+#### Step 5: Configure fly.toml
+
+Update `fly.toml` with production settings:
+
+```toml
+app = 'your-linkedin-mcp'
+primary_region = 'cdg'
+
+[build]
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[env]
+  SESSION_PROVIDER = 'redis'
+  ENABLE_PUBLISHING = true
+  OAUTH_SERVER_URL = 'https://your-linkedin-mcp.fly.dev'
+  LINKEDIN_REDIRECT_URI = 'https://your-linkedin-mcp.fly.dev/oauth/callback'
+
+  # Artifact Storage (Tigris S3-compatible)
+  ARTIFACT_PROVIDER = 's3'
+  ARTIFACT_S3_BUCKET = 'your-linkedin-mcp'
+  # AWS_* secrets automatically set by `fly storage create`
+```
+
+#### Step 6: Deploy
+
+```bash
+# Deploy to Fly.io
+fly deploy
+
+# Check deployment status
+fly status
+
+# View logs
+fly logs
+
+# Test OAuth endpoint
+curl https://your-linkedin-mcp.fly.dev/.well-known/oauth-authorization-server
+```
+
+#### Step 7: Configure MCP Client
+
+Update your MCP client configuration (e.g., `~/.mcp-cli/servers.yaml`):
+
+```yaml
+servers:
+  linkedin:
+    url: https://your-linkedin-mcp.fly.dev  # No trailing slash!
+    oauth: true
+```
+
+Test the connection:
+
+```bash
+uv run mcp-cli --server linkedin --provider openai --model gpt-4
+```
+
+### Redis Configuration
+
+#### Development (Memory)
+
+For local development, use in-memory session storage:
+
+```bash
+# .env file
+SESSION_PROVIDER=memory
+```
+
+No Redis installation required. Sessions are lost when the server restarts.
+
+#### Production (Redis)
+
+For production, use Redis for persistent session storage:
+
+**Option 1: Fly.io Redis (Upstash)**
+
+```bash
+# Create Redis instance
+fly redis create
+
+# Get connection details
+fly redis status your-redis-instance
+
+# Set as secret
+fly secrets set SESSION_REDIS_URL="redis://default:PASSWORD@fly-INSTANCE.upstash.io:6379"
+```
+
+**Option 2: External Redis (Upstash, AWS ElastiCache, etc.)**
+
+```bash
+# Set Redis URL
+export SESSION_REDIS_URL="redis://username:password@host:port/db"
+export SESSION_PROVIDER=redis
+```
+
+**Environment Variables:**
+
+```env
+# Session Provider
+SESSION_PROVIDER=redis                    # Required: redis | memory
+
+# Redis Connection (required if SESSION_PROVIDER=redis)
+SESSION_REDIS_URL=redis://default:password@host:6379
+
+# Optional Redis settings
+REDIS_TLS_INSECURE=0  # Set to 1 to disable TLS cert verification (not recommended)
+```
+
+### Custom Domain Setup
+
+Configure a custom domain for your deployment:
+
+#### Step 1: Add Domain to Fly.io
+
+```bash
+# Add custom domain
+fly certs create linkedin.yourdomain.com
+
+# Verify DNS settings
+fly certs show linkedin.yourdomain.com
+```
+
+#### Step 2: Update DNS
+
+Add DNS records (check output from previous command):
+
+```
+Type: CNAME
+Name: linkedin.yourdomain.com
+Value: your-linkedin-mcp.fly.dev
+```
+
+#### Step 3: Update OAuth URLs
+
+```bash
+# Update secrets with custom domain
+fly secrets set \
+  OAUTH_SERVER_URL=https://linkedin.yourdomain.com \
+  LINKEDIN_REDIRECT_URI=https://linkedin.yourdomain.com/oauth/callback
+```
+
+#### Step 4: Update LinkedIn App
+
+1. Go to [LinkedIn Developers](https://www.linkedin.com/developers/apps)
+2. Select your app
+3. Update "Redirect URLs" to match: `https://linkedin.yourdomain.com/oauth/callback`
+
+### Environment Variables Reference
+
+Complete list of production environment variables:
+
+```env
+# ============================================================================
+# OAuth Configuration (Required for Production)
+# ============================================================================
+
+# LinkedIn OAuth Credentials
+LINKEDIN_CLIENT_ID=your_linkedin_client_id
+LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+
+# OAuth Server URLs (must match LinkedIn app settings)
+# IMPORTANT: This URL is also used for preview URLs (linkedin_preview_url tool)
+OAUTH_SERVER_URL=https://your-app.fly.dev
+LINKEDIN_REDIRECT_URI=https://your-app.fly.dev/oauth/callback
+OAUTH_ENABLED=true
+
+# ============================================================================
+# Session Storage (Required for Production)
+# ============================================================================
+
+# Production: Use Redis
+SESSION_PROVIDER=redis
+SESSION_REDIS_URL=redis://default:password@fly-instance.upstash.io:6379
+
+# Development: Use Memory
+# SESSION_PROVIDER=memory
+
+# ============================================================================
+# OAuth Token TTL Configuration (Optional - Defaults Shown)
+# ============================================================================
+
+OAUTH_AUTH_CODE_TTL=300                   # Authorization codes (5 min)
+OAUTH_ACCESS_TOKEN_TTL=900                # Access tokens (15 min)
+OAUTH_REFRESH_TOKEN_TTL=86400             # Refresh tokens (1 day)
+OAUTH_CLIENT_REGISTRATION_TTL=31536000    # Client registrations (1 year)
+OAUTH_EXTERNAL_TOKEN_TTL=86400            # LinkedIn tokens (1 day)
+
+# ============================================================================
+# Server Configuration
+# ============================================================================
+
+DEBUG=0                                   # Disable debug mode in production
+HTTP_PORT=8000                            # Server port
+ENABLE_PUBLISHING=true                    # Enable publishing tools
+
+# LinkedIn Person URN (optional - auto-detected via OAuth)
+LINKEDIN_PERSON_URN=urn:li:person:YOUR_ID
+```
+
+### Logging Configuration
+
+Control logging levels in production:
+
+```env
+# Production logging
+LOG_LEVEL=INFO          # INFO for production, DEBUG for troubleshooting
+MCP_LOG_LEVEL=WARNING   # MCP protocol logging
+
+# Development logging
+LOG_LEVEL=DEBUG
+MCP_LOG_LEVEL=INFO
+```
+
+**Security Note**: At INFO level, sensitive data (tokens, user IDs, authorization codes) is NOT logged. This data is only logged at DEBUG level for troubleshooting.
+
+### Monitoring & Troubleshooting
+
+```bash
+# View live logs
+fly logs --app your-linkedin-mcp
+
+# Check app status
+fly status --app your-linkedin-mcp
+
+# Check Redis status
+fly redis status your-redis-instance
+
+# Restart app
+fly apps restart your-linkedin-mcp
+
+# Scale app
+fly scale count 2 --app your-linkedin-mcp  # 2 instances
+fly scale memory 2048 --app your-linkedin-mcp  # 2GB memory
+```
+
+### Health Checks
+
+The server includes health check endpoints:
+
+```bash
+# Check server health
+curl https://your-app.fly.dev/
+
+# Check OAuth discovery
+curl https://your-app.fly.dev/.well-known/oauth-authorization-server
+
+# Check MCP endpoint
+curl https://your-app.fly.dev/mcp
+```
+
+### Security Best Practices
+
+1. **Never commit secrets** - Use Fly secrets, not environment variables in fly.toml
+2. **Use HTTPS only** - Set `force_https = true` in fly.toml
+3. **Rotate tokens regularly** - LinkedIn tokens are auto-refreshed
+4. **Monitor logs** - Check for failed auth attempts
+5. **Use custom domain** - Professional appearance, easier to update
+6. **Enable auto-scaling** - Handle traffic spikes automatically
+7. **Keep dependencies updated** - Regular security updates
+
+### Cost Optimization
+
+Fly.io pricing optimization tips:
+
+```toml
+# In fly.toml - auto-stop when idle
+[http_service]
+  auto_stop_machines = 'stop'        # Stop when idle
+  auto_start_machines = true         # Start on request
+  min_machines_running = 0           # No always-on instances
+```
+
+**Expected costs**:
+- Free tier: 3 shared-cpu VMs with 256MB RAM
+- Redis: ~$2/month for basic Upstash instance
+- Scaling: ~$0.02/hour per VM after free tier
+
 ## Documentation
 
 - **[Getting Started](docs/GETTING_STARTED.md)** - Complete beginner's guide
@@ -646,6 +1191,77 @@ See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup and [docs/DOCKER.md]
 - **[Architecture](docs/ARCHITECTURE.md)** - System architecture
 
 ## Examples
+
+### Hello World: Compose → Draft → Preview URL
+
+The fastest way to see the complete workflow (`examples/hello_preview.py`):
+
+```python
+import asyncio
+from chuk_mcp_linkedin.posts import ComposablePost
+from chuk_mcp_linkedin.themes import ThemeManager
+from chuk_mcp_linkedin.manager_factory import ManagerFactory, set_factory
+
+async def main():
+    # Initialize factory with memory-based artifacts
+    factory = ManagerFactory(use_artifacts=True, artifact_provider="memory")
+    set_factory(factory)
+    mgr = factory.get_manager("demo_user")
+
+    # Step 1: Compose a post
+    theme = ThemeManager().get_theme("thought_leader")
+    post = ComposablePost("text", theme=theme)
+    post.add_hook("question", "What's the most underrated growth lever on LinkedIn in 2025?")
+    post.add_body("Hint: documents. Short, skimmable, 5–10 pages. Try it this week.", structure="linear")
+    post.add_cta("curiosity", "Tried docs vs text lately?")
+    post.add_hashtags(["LinkedInTips", "B2B", "ContentStrategy"])
+    text = post.compose()
+
+    # Step 2: Create a draft
+    draft = mgr.create_draft("Hello Preview Demo", "text")
+    mgr.update_draft(draft.draft_id, content={"text": text})
+
+    # Step 3: Generate preview URL
+    preview_url = await mgr.generate_preview_url(
+        draft_id=draft.draft_id,
+        base_url="http://localhost:8000",
+        expires_in=3600
+    )
+    print(f"Preview URL: {preview_url}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+**Run it:**
+
+```bash
+# Run the example
+uv run python examples/hello_preview.py
+
+# Start HTTP server to view preview (separate terminal)
+OAUTH_ENABLED=false uv run linkedin-mcp http --port 8000
+
+# Open the preview URL in your browser
+```
+
+**Output:**
+```
+🚀 LinkedIn MCP Server - Hello Preview Demo
+
+📝 Step 1: Composing post...
+✓ Post composed (193 chars)
+
+📋 Step 2: Creating draft...
+✓ Draft created (ID: draft_2_1762129805)
+
+🔗 Step 3: Generating preview URL...
+✓ Preview URL generated
+
+Preview URL: http://localhost:8000/preview/04a0c703...
+```
+
+### More Examples
 
 Comprehensive examples in the `examples/` directory:
 

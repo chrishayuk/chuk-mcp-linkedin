@@ -164,8 +164,9 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info(f"🔗 Generated LinkedIn authorization URL: {linkedin_auth_url}")
-        logger.info(f"🔗 LinkedIn redirect_uri configured as: {self.linkedin_client.redirect_uri}")
+        logger.debug(f"🔗 Generated LinkedIn authorization URL: {linkedin_auth_url}")
+        logger.debug(f"🔗 LinkedIn redirect_uri configured as: {self.linkedin_client.redirect_uri}")
+        logger.info("🔗 Redirecting to LinkedIn for authorization")
 
         # Return LinkedIn authorization URL
         # MCP client should redirect user to this URL
@@ -197,7 +198,8 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info(f"🔄 Exchanging authorization code for access token (code: {code[:16]}...)")
+        logger.info("🔄 Exchanging authorization code for access token")
+        logger.debug(f"Authorization code (redacted): {code[:8]}...")
 
         # Validate authorization code
         code_data = await self.token_store.validate_authorization_code(
@@ -214,7 +216,8 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
                 error_description="Invalid or expired authorization code",
             )
 
-        logger.info(f"✓ Authorization code valid for user_id: {code_data['user_id']}")
+        logger.info("✓ Authorization code validated successfully")
+        logger.debug(f"User ID: {code_data['user_id']}")
 
         # Create access token and refresh token
         access_token, refresh_token = await self.token_store.create_access_token(
@@ -223,8 +226,9 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             scope=code_data["scope"],
         )
 
-        logger.info(
-            f"✓ Created access token: {access_token[:16]}... (expires in 900s, sandbox: {self.token_store.sandbox_id})"
+        logger.info("✓ Created access token successfully (expires in 3600s)")
+        logger.debug(
+            f"Access token (redacted): {access_token[:8]}..., sandbox: {self.token_store.sandbox_id}"
         )
 
         return OAuthToken(
@@ -288,7 +292,8 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info(f"🔍 Validating access token: {token[:16]}...")
+        logger.info("🔍 Validating access token")
+        logger.debug(f"Access token (redacted): {token[:8]}...")
 
         # Validate MCP token
         token_data = await self.token_store.validate_access_token(token)
@@ -301,7 +306,8 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
                 error_description="Invalid or expired access token",
             )
 
-        logger.info(f"✓ Token valid for user_id: {token_data.get('user_id')}")
+        logger.info("✓ Access token validated successfully")
+        logger.debug(f"User ID: {token_data.get('user_id')}")
 
         user_id = token_data["user_id"]
 

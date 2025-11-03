@@ -114,15 +114,15 @@ lint: ## Run linting checks (ruff)
 	@$(PYTHON) -m ruff check $(SRC_DIR) $(TEST_DIR) || true
 	@echo "$(GREEN)✓ Linting complete$(NC)"
 
-format: ## Format code with black
+format: ## Format code with ruff
 	@echo "$(BLUE)Formatting code...$(NC)"
-	@echo "  Running black..."
-	@$(PYTHON) -m black $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR) --line-length=100
+	@echo "  Running ruff format..."
+	@$(PYTHON) -m ruff format $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR)
 	@echo "$(GREEN)✓ Code formatted$(NC)"
 
 format-check: ## Check code formatting without changes
 	@echo "$(BLUE)Checking code format...$(NC)"
-	@$(PYTHON) -m black $(SRC_DIR) $(TEST_DIR) --check --line-length=100
+	@$(PYTHON) -m ruff format --check $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR)
 	@echo "$(GREEN)✓ Format check complete$(NC)"
 
 typecheck: ## Run type checking with mypy

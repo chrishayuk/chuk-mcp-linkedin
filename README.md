@@ -23,6 +23,8 @@
 
 A professional Model Context Protocol (MCP) server for LinkedIn content creation, featuring a shadcn-inspired component system, 10 performance-tuned themes, and data-driven optimization based on 1M+ post analysis.
 
+Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) — a modular, zero-configuration MCP server framework with smart environment detection and production-ready defaults.
+
 **What it does:**
 - ✅ Compose posts with theme-based components and variants
 - ✅ Upload documents (PDF/PPTX/DOCX) via LinkedIn API
@@ -103,7 +105,9 @@ Based on 2025 analysis of 1M+ posts across 9K company pages:
 - **Presigned URLs** - Time-limited, secure preview URLs
 
 ### 🚀 Professional CLI
+- **Built on [ChukMCPServer](https://github.com/chrishayuk/chuk-mcp-server)**: Modular framework with zero-config deployment
 - **Multiple modes**: STDIO (Claude Desktop), HTTP (API), Auto-detect
+- **Smart environment detection**: Auto-configures for local dev, Docker, Fly.io, etc.
 - **Debug logging**: Built-in logging and error handling
 - **Docker support**: Multi-stage builds, security hardened
 - **Entry points**: `linkedin-mcp` and `linkedin-mcp-server` commands
@@ -149,14 +153,17 @@ The easiest way to get started is to use our hosted MCP server at `https://linke
 **Use with MCP CLI:**
 
 ```bash
-# Install MCP CLI
-npm install -g @anthropic-ai/mcp-cli
+# Install MCP CLI (using uvx - no separate install needed)
+# Requires: ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable
 
-# Connect to the public server (use your preferred provider & model)
-mcp-cli --server https://linkedin.chukai.io --provider anthropic --model claude-latest
+# Connect with Claude
+uvx mcp-cli --server https://linkedin.chukai.io --provider anthropic --model claude-sonnet-4-5
 
 # Or with OpenAI
-mcp-cli --server https://linkedin.chukai.io --provider openai --model gpt-4-turbo
+uvx mcp-cli --server https://linkedin.chukai.io --provider openai --model gpt-5-mini
+
+# Or use local Ollama (no API key needed)
+uvx mcp-cli --server https://linkedin.chukai.io
 ```
 
 The public server includes:
@@ -680,7 +687,7 @@ For HTTP mode with OAuth authentication:
 
 Then use with MCP-CLI:
 ```bash
-uv run mcp-cli --server linkedin --provider openai --model gpt-4
+uvx mcp-cli --server linkedin --provider openai --model gpt-5-mini
 ```
 
 See [docs/OAUTH.md](docs/OAUTH.md) for complete OAuth setup instructions.
@@ -955,7 +962,7 @@ servers:
 Test the connection:
 
 ```bash
-uv run mcp-cli --server linkedin --provider openai --model gpt-4
+uvx mcp-cli --server linkedin --provider openai --model gpt-5-mini
 ```
 
 ### Redis Configuration
@@ -1388,6 +1395,12 @@ Based on analysis of 1M+ posts across 9K company pages:
 
 ## Architecture
 
+Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) - a modular MCP server framework providing:
+- **Zero-config deployment**: Smart environment detection (local, Docker, Fly.io)
+- **Production-ready defaults**: Optimized workers, connection pooling, logging
+- **OAuth 2.1 built-in**: Discovery endpoints, token management, session handling
+- **Multiple transports**: STDIO for desktop clients, HTTP/SSE for API access
+
 ```
 chuk-mcp-linkedin/
 ├── src/chuk_mcp_linkedin/
@@ -1407,7 +1420,7 @@ chuk-mcp-linkedin/
 │   ├── manager.py        # Draft & session management
 │   ├── cli.py            # CLI implementation
 │   ├── server.py         # MCP server (legacy)
-│   └── async_server.py   # Async MCP server
+│   └── async_server.py   # ChukMCPServer-based async server
 ├── tests/                # Comprehensive test suite (96% coverage)
 ├── examples/             # Usage examples
 ├── docs/                 # Documentation

@@ -168,6 +168,15 @@ docs-themes: ## View theme documentation
 	@echo "$(BLUE)Opening theme documentation...$(NC)"
 	@open $(DOCS_DIR)/THEMES.md 2>/dev/null || xdg-open $(DOCS_DIR)/THEMES.md 2>/dev/null || cat $(DOCS_DIR)/THEMES.md
 
+docs-check: ## Check README structure and key sections
+	@echo "$(BLUE)Checking README structure...$(NC)"
+	@grep -q "## Production Deployment" README.md && \
+		grep -q "## Quick Start" README.md && \
+		grep -q "## Examples" README.md && \
+		grep -q "## Features" README.md && \
+		echo "$(GREEN)✓ README structure looks good$(NC)" || \
+		(echo "$(RED)✗ Fix README structure - missing key sections$(NC)" && exit 1)
+
 ## Examples -------------------------------------------------------
 
 examples: ## Run all example scripts
@@ -203,6 +212,28 @@ publish: build ## Publish to PyPI
 	else \
 		echo "$(YELLOW)Cancelled$(NC)"; \
 	fi
+
+deploy-check: ## Check deployment health (OAuth discovery + server health)
+	@echo "$(BLUE)Checking deployment health...$(NC)"
+	@SERVER_URL=$${SERVER_URL:-https://linkedin.chukai.io}; \
+	echo "  Testing: $$SERVER_URL"; \
+	curl -sfS $$SERVER_URL/.well-known/oauth-authorization-server >/dev/null && \
+		echo "$(GREEN)  ✓ OAuth discovery endpoint healthy$(NC)" || \
+		(echo "$(RED)  ✗ OAuth discovery check failed$(NC)" && exit 1); \
+	curl -sfS $$SERVER_URL/ >/dev/null && \
+		echo "$(GREEN)  ✓ Server root endpoint healthy$(NC)" || \
+		(echo "$(RED)  ✗ Server health check failed$(NC)" && exit 1); \
+	echo "$(GREEN)✓ Deployment looks healthy$(NC)"
+
+deploy-check-local: ## Check local server health
+	@echo "$(BLUE)Checking local server health...$(NC)"
+	@curl -sfS http://localhost:8000/.well-known/oauth-authorization-server >/dev/null && \
+		echo "$(GREEN)  ✓ OAuth discovery endpoint healthy$(NC)" || \
+		(echo "$(RED)  ✗ OAuth discovery check failed (is server running?)$(NC)" && exit 1); \
+	curl -sfS http://localhost:8000/ >/dev/null && \
+		echo "$(GREEN)  ✓ Server root endpoint healthy$(NC)" || \
+		(echo "$(RED)  ✗ Server health check failed$(NC)" && exit 1); \
+	echo "$(GREEN)✓ Local server looks healthy$(NC)"
 
 ## CI/CD ----------------------------------------------------------
 

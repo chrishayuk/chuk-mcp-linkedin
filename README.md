@@ -61,6 +61,13 @@ Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) — 
 - Automatic cleanup of expired sessions
 - CSRF protection enabled on all state-changing operations
 
+**OAuth 2.1 Compliance (RFC 9728):**
+- **Authorization Server Discovery**: [RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414) metadata at `/.well-known/oauth-authorization-server`
+- **Protected Resource Metadata**: [RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728) at `/.well-known/oauth-protected-resource`
+- **JWT Access Tokens**: [RFC 9068](https://datatracker.ietf.org/doc/html/rfc9068) format with short TTL
+- **PKCE**: Required for all authorization flows (S256 challenge method)
+- **State & Nonce**: Enforced to prevent CSRF and replay attacks
+
 > **LinkedIn API Compliance**: You are responsible for complying with [LinkedIn's API Terms of Service](https://www.linkedin.com/legal/l/api-terms-of-use) and rate limits. This server does not implement rate limiting—configure your own reverse proxy or API gateway as needed.
 
 ## Features
@@ -167,7 +174,10 @@ uvx mcp-cli --server https://linkedin.chukai.io
 ```
 
 The public server includes:
-- ✅ **OAuth 2.1-style authentication** (discovery per [RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414), JWT access tokens per [RFC 9068](https://datatracker.ietf.org/doc/html/rfc9068)) at `/.well-known/oauth-authorization-server`
+- ✅ **OAuth 2.1 compliance** with full RFC support:
+  - Authorization Server Discovery ([RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414)) at `/.well-known/oauth-authorization-server`
+  - Protected Resource Metadata ([RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728)) at `/.well-known/oauth-protected-resource`
+  - JWT Access Tokens ([RFC 9068](https://datatracker.ietf.org/doc/html/rfc9068))
 - ✅ **Redis session storage** for multi-instance reliability
 - ✅ **S3-compatible artifact storage** (Tigris) with presigned URLs
 - ✅ **Automatic scaling** and high availability (Fly.io)

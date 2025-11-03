@@ -35,7 +35,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "chuk-artifacts>=0.4.1",
     "chuk-sessions[redis]>=0.4.2",
-    "chuk-mcp-server>=0.5.3",
+    "chuk-mcp-server>=0.6",
 ]
 
 [project.scripts]

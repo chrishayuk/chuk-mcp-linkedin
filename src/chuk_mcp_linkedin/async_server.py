@@ -197,6 +197,7 @@ def setup_oauth() -> Optional[Any]:
         print("✓ OAuth enabled - MCP clients can authorize with LinkedIn")
         print(f"  OAuth server: {OAUTH_SERVER_URL}")
         print(f"  Discovery: {OAUTH_SERVER_URL}/.well-known/oauth-authorization-server")
+        print(f"  Protected Resource: {OAUTH_SERVER_URL}/.well-known/oauth-protected-resource")
 
         return oauth_middleware
     elif OAUTH_ENABLED:

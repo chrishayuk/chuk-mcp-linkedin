@@ -32,6 +32,9 @@ primary_region = 'cdg'
 
   # Artifact Storage (Tigris S3-compatible object storage)
   # Used for storing LinkedIn post preview artifacts
+  # chuk-artifacts expects ARTIFACT_BUCKET (not ARTIFACT_S3_BUCKET)
   ARTIFACT_PROVIDER = 's3'
-  ARTIFACT_S3_BUCKET = 'chuk-linkedin-mcp'
+  ARTIFACT_BUCKET = 'chuk-linkedin-mcp'
   # AWS_* secrets are automatically set by Fly when creating Tigris bucket
+  # Note: Fly sets AWS_ENDPOINT_URL_S3, but chuk-artifacts expects S3_ENDPOINT_URL
+  # We'll handle this mapping in the application code if needed

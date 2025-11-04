@@ -4,11 +4,12 @@ Artifact-based preview system using chuk-artifacts.
 Provides session-isolated, secure preview URLs with automatic cleanup.
 """
 
+import os
 import uuid
 from typing import Any, List, Optional
 
 from chuk_artifacts import ArtifactStore
-from chuk_artifacts.config import configure_filesystem, configure_memory
+from chuk_artifacts.config import configure_filesystem, configure_memory, configure_s3
 
 
 class ArtifactPreviewManager:
@@ -43,9 +44,19 @@ class ArtifactPreviewManager:
         elif self.provider == "filesystem":
             configure_filesystem(root=f".artifacts/{self.sandbox_id}")
         elif self.provider in ("s3", "ibm-cos"):
-            # S3 configuration should be done via environment variables
-            # or explicit configuration before creating the manager
-            pass
+            # Map Fly.io environment variables to chuk-artifacts expected names
+            # Fly sets AWS_ENDPOINT_URL_S3, but chuk-artifacts expects S3_ENDPOINT_URL
+            if "AWS_ENDPOINT_URL_S3" in os.environ and "S3_ENDPOINT_URL" not in os.environ:
+                os.environ["S3_ENDPOINT_URL"] = os.environ["AWS_ENDPOINT_URL_S3"]
+
+            # Configure S3 using environment variables
+            configure_s3(
+                access_key=os.environ.get("AWS_ACCESS_KEY_ID", ""),
+                secret_key=os.environ.get("AWS_SECRET_ACCESS_KEY", ""),
+                bucket=os.environ.get("ARTIFACT_BUCKET", ""),
+                endpoint_url=os.environ.get("S3_ENDPOINT_URL"),
+                region=os.environ.get("AWS_REGION", "auto"),
+            )
 
         self._store = ArtifactStore()
         await self._store.__aenter__()

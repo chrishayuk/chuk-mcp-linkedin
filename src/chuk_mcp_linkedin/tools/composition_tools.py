@@ -57,6 +57,22 @@ def clear_post_cache(draft_id: Optional[str] = None) -> None:
 
 def register_composition_tools(mcp: Any) -> Dict[str, Any]:
     """Register composition tools with the MCP server"""
+    
+    def _fix_array_schemas():
+        """Fix array schemas missing 'items' field after tool registration"""
+        if not hasattr(mcp, '_tools'):
+            return
+        
+        for tool_name, tool_info in mcp._tools.items():
+            schema = tool_info.get('inputSchema') or tool_info.get('schema')
+            if not schema or 'properties' not in schema:
+                continue
+            
+            # Fix array properties missing items
+            for prop_name, prop_schema in schema['properties'].items():
+                if isinstance(prop_schema, dict):
+                    if prop_schema.get('type') == 'array' and 'items' not in prop_schema:
+                        prop_schema['items'] = {'type': 'string'}
 
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
@@ -551,7 +567,9 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
     async def linkedin_add_poll_preview(
-        question: str, options: List[str], _external_access_token: Optional[str] = None
+        question: str,
+        options: List[str],
+        _external_access_token: Optional[str] = None
     ) -> str:
         """
         Add poll preview for engagement.
@@ -625,7 +643,9 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
     async def linkedin_add_hashtags(
-        tags: List[str], placement: str = "end", _external_access_token: Optional[str] = None
+        tags: List[str],
+        placement: str = "end",
+        _external_access_token: Optional[str] = None
     ) -> str:
         """
         Add hashtags to current draft.
@@ -752,6 +772,9 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         export_json = manager.export_draft(draft.draft_id)
         return export_json or "Export failed"
 
+    # Fix array schemas after all tools are registered
+    _fix_array_schemas()
+    
     return {
         # Content components
         "linkedin_add_hook": linkedin_add_hook,

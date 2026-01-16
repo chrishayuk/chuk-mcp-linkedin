@@ -72,7 +72,21 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             for prop_name, prop_schema in schema["properties"].items():
                 if isinstance(prop_schema, dict):
                     if prop_schema.get("type") == "array" and "items" not in prop_schema:
-                        prop_schema["items"] = {"type": "string"}
+                        # Determine item type from description or property name
+                        description = prop_schema.get("description", "").lower()
+
+                        # Check if it's an array of objects (dicts)
+                        if (
+                            "dict" in description
+                            or "object" in description
+                            or prop_name in ("items", "features")
+                            or "items" in prop_name
+                            or "features" in prop_name
+                        ):
+                            prop_schema["items"] = {"type": "object"}
+                        else:
+                            # Default to string for simple arrays
+                            prop_schema["items"] = {"type": "string"}
 
     @mcp.tool  # type: ignore[misc]
     @requires_auth()

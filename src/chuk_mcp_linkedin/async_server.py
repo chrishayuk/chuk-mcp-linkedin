@@ -198,10 +198,11 @@ def setup_oauth() -> Optional[Any]:
         # Override the protected resource metadata endpoint for Keycloak mode
         # Register AFTER middleware to override the default endpoint
         @mcp.endpoint("/.well-known/oauth-protected-resource", methods=["GET"])
-        async def keycloak_protected_resource_metadata(request):
+        async def keycloak_protected_resource_metadata(request: Any) -> Any:
             """OAuth Protected Resource Metadata endpoint - points to Keycloak."""
             from starlette.responses import JSONResponse
-            metadata = oauth_provider.get_protected_resource_metadata()
+
+            metadata = oauth_provider.get_protected_resource_metadata()  # type: ignore[union-attr]
             return JSONResponse(metadata, headers={"Access-Control-Allow-Origin": "*"})
 
         print("✓ OAuth enabled - Keycloak mode")

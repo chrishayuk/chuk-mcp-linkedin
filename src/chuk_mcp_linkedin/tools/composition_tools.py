@@ -57,32 +57,36 @@ def clear_post_cache(draft_id: Optional[str] = None) -> None:
 
 def register_composition_tools(mcp: Any) -> Dict[str, Any]:
     """Register composition tools with the MCP server"""
-    
-    def _fix_array_schemas():
+
+    def _fix_array_schemas() -> None:
         """Fix array schemas missing 'items' field after tool registration"""
-        if not hasattr(mcp, '_tools'):
+        if not hasattr(mcp, "_tools"):
             return
-        
+
         for tool_name, tool_info in mcp._tools.items():
-            schema = tool_info.get('inputSchema') or tool_info.get('schema')
-            if not schema or 'properties' not in schema:
+            schema = tool_info.get("inputSchema") or tool_info.get("schema")
+            if not schema or "properties" not in schema:
                 continue
-            
+
             # Fix array properties missing items
-            for prop_name, prop_schema in schema['properties'].items():
+            for prop_name, prop_schema in schema["properties"].items():
                 if isinstance(prop_schema, dict):
-                    if prop_schema.get('type') == 'array' and 'items' not in prop_schema:
+                    if prop_schema.get("type") == "array" and "items" not in prop_schema:
                         # Determine item type from description or property name
-                        description = prop_schema.get('description', '').lower()
-                        
+                        description = prop_schema.get("description", "").lower()
+
                         # Check if it's an array of objects (dicts)
-                        if 'dict' in description or 'object' in description or \
-                           prop_name in ('items', 'features') or \
-                           'items' in prop_name or 'features' in prop_name:
-                            prop_schema['items'] = {'type': 'object'}
+                        if (
+                            "dict" in description
+                            or "object" in description
+                            or prop_name in ("items", "features")
+                            or "items" in prop_name
+                            or "features" in prop_name
+                        ):
+                            prop_schema["items"] = {"type": "object"}
                         else:
                             # Default to string for simple arrays
-                            prop_schema['items'] = {'type': 'string'}
+                            prop_schema["items"] = {"type": "string"}
 
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
@@ -577,9 +581,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
     async def linkedin_add_poll_preview(
-        question: str,
-        options: List[str],
-        _external_access_token: Optional[str] = None
+        question: str, options: List[str], _external_access_token: Optional[str] = None
     ) -> str:
         """
         Add poll preview for engagement.
@@ -653,9 +655,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
     @mcp.tool  # type: ignore[misc]
     @requires_auth()
     async def linkedin_add_hashtags(
-        tags: List[str],
-        placement: str = "end",
-        _external_access_token: Optional[str] = None
+        tags: List[str], placement: str = "end", _external_access_token: Optional[str] = None
     ) -> str:
         """
         Add hashtags to current draft.
@@ -784,7 +784,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
 
     # Fix array schemas after all tools are registered
     _fix_array_schemas()
-    
+
     return {
         # Content components
         "linkedin_add_hook": linkedin_add_hook,

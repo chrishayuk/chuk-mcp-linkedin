@@ -68,6 +68,14 @@ Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) — 
 - **PKCE**: Required for all authorization flows (S256 challenge method)
 - **State & Nonce**: Enforced to prevent CSRF and replay attacks
 
+**OAuth Modes:**
+- **LinkedIn Direct Mode** (default): Server handles OAuth flow directly with LinkedIn
+- **Keycloak Mode**: Delegates OAuth to Keycloak, which manages LinkedIn as Identity Provider
+  - Centralized authentication and SSO support
+  - Token brokering via Keycloak's Identity Provider integration
+  - Enterprise features: LDAP, SAML, 2FA
+  - See [Keycloak Setup Guide](docs/KEYCLOAK_OAUTH_SETUP.md)
+
 > **LinkedIn API Compliance**: You are responsible for complying with [LinkedIn's API Terms of Service](https://www.linkedin.com/legal/l/api-terms-of-use) and rate limits. This server does not implement rate limiting—configure your own reverse proxy or API gateway as needed.
 
 ## Features

@@ -140,12 +140,94 @@ def setup_oauth() -> Optional[Any]:
     global oauth_provider, _global_token_store
 
     OAUTH_ENABLED = os.getenv("OAUTH_ENABLED", "true").lower() == "true"
-    LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID")
-    LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET")
+    OAUTH_MODE = os.getenv("OAUTH_MODE", "linkedin").lower()  # linkedin or keycloak
 
-    if OAUTH_ENABLED and LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET:
-        # Import generic OAuth middleware from chuk-mcp-server
-        from chuk_mcp_server.oauth import OAuthMiddleware, TokenStore
+    if not OAUTH_ENABLED:
+        return None
+
+    # Import generic OAuth middleware from chuk-mcp-server
+    from chuk_mcp_server.oauth import OAuthMiddleware, TokenStore
+
+    OAUTH_SERVER_URL = os.getenv("OAUTH_SERVER_URL", "http://localhost:8000")
+
+    # Create shared token store (used by both modes)
+    if _global_token_store is None:
+        _global_token_store = TokenStore(sandbox_id="chuk-mcp-linkedin")
+        print("✓ Created shared token store for OAuth")
+
+    # ============================================================================
+    # Keycloak Mode
+    # ============================================================================
+    if OAUTH_MODE == "keycloak":
+        KEYCLOAK_BASE_URL = os.getenv("KEYCLOAK_BASE_URL")
+        KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM")
+        KEYCLOAK_PROVIDER_ALIAS = os.getenv("KEYCLOAK_PROVIDER_ALIAS", "linkedin")
+
+        if not KEYCLOAK_BASE_URL or not KEYCLOAK_REALM:
+            print("⚠ Keycloak mode enabled but configuration missing")
+            print("  Set KEYCLOAK_BASE_URL and KEYCLOAK_REALM")
+            return None
+
+        # Import Keycloak provider
+        from .oauth.keycloak_provider import KeycloakOAuthProvider
+
+        # Create Keycloak OAuth provider
+        oauth_provider = KeycloakOAuthProvider(
+            keycloak_base_url=KEYCLOAK_BASE_URL,
+            realm_name=KEYCLOAK_REALM,
+            provider_alias=KEYCLOAK_PROVIDER_ALIAS,
+            oauth_server_url=OAUTH_SERVER_URL,
+            token_store=_global_token_store,
+        )
+
+        # Initialize OAuth middleware with Keycloak provider
+        oauth_middleware = OAuthMiddleware(
+            mcp_server=mcp,
+            provider=oauth_provider,
+            oauth_server_url=OAUTH_SERVER_URL,
+            callback_path="/oauth/callback",  # Dummy path - Keycloak handles actual OAuth flow
+            scopes_supported=[
+                "linkedin.posts",
+                "linkedin.profile",
+                "linkedin.documents",
+            ],
+            service_documentation="https://github.com/chrishayuk/chuk-mcp-linkedin",
+            provider_name="Keycloak (LinkedIn)",
+        )
+
+        # Override the protected resource metadata endpoint for Keycloak mode
+        # Register AFTER middleware to override the default endpoint
+        @mcp.endpoint("/.well-known/oauth-protected-resource", methods=["GET"])
+        async def keycloak_protected_resource_metadata(request):
+            """OAuth Protected Resource Metadata endpoint - points to Keycloak."""
+            from starlette.responses import JSONResponse
+            metadata = oauth_provider.get_protected_resource_metadata()
+            return JSONResponse(metadata, headers={"Access-Control-Allow-Origin": "*"})
+
+        print("✓ OAuth enabled - Keycloak mode")
+        print(f"  MCP Resource Server: {OAUTH_SERVER_URL}")
+        print(f"  Keycloak Authorization Server: {KEYCLOAK_BASE_URL}/realms/{KEYCLOAK_REALM}")
+        print(f"  Protected Resource: {OAUTH_SERVER_URL}/.well-known/oauth-protected-resource")
+        print(f"  LinkedIn Provider Alias: {KEYCLOAK_PROVIDER_ALIAS}")
+        print()
+        print("  ⚠️  Important Keycloak Configuration:")
+        print("     1. Enable 'Store Tokens' in LinkedIn Identity Provider settings")
+        print("     2. Add 'broker -> read-token' role to users")
+        print("     3. Configure LinkedIn as Identity Provider in Keycloak")
+
+        return oauth_middleware
+
+    # ============================================================================
+    # LinkedIn Direct Mode (Default)
+    # ============================================================================
+    elif OAUTH_MODE == "linkedin":
+        LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID")
+        LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET")
+
+        if not LINKEDIN_CLIENT_ID or not LINKEDIN_CLIENT_SECRET:
+            print("⚠ OAuth disabled - LinkedIn credentials not configured")
+            print("  Set LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET to enable OAuth")
+            return None
 
         # Import LinkedIn-specific provider
         from .oauth.provider import LinkedInOAuthProvider
@@ -154,7 +236,6 @@ def setup_oauth() -> Optional[Any]:
         LINKEDIN_REDIRECT_URI = os.getenv(
             "LINKEDIN_REDIRECT_URI", "http://localhost:8000/oauth/callback"
         )
-        OAUTH_SERVER_URL = os.getenv("OAUTH_SERVER_URL", "http://localhost:8000")
 
         # Validate credentials aren't test values
         if LINKEDIN_CLIENT_ID.startswith("test_") or LINKEDIN_CLIENT_SECRET.startswith("test_"):
@@ -163,20 +244,13 @@ def setup_oauth() -> Optional[Any]:
             print("   To use OAuth, obtain real credentials from:")
             print("   https://www.linkedin.com/developers/apps")
 
-        # Create a SINGLE global token store that will be shared across all OAuth operations
-        # This is a workaround for chuk-sessions memory provider creating isolated contexts
-        # TODO: Remove when chuk-sessions ships shared_memory provider
-        if _global_token_store is None:
-            _global_token_store = TokenStore(sandbox_id="chuk-mcp-linkedin")
-            print("✓ Created shared token store for OAuth")
-
         # Create LinkedIn OAuth provider with SHARED token store
         oauth_provider = LinkedInOAuthProvider(
             linkedin_client_id=LINKEDIN_CLIENT_ID,
             linkedin_client_secret=LINKEDIN_CLIENT_SECRET,
             linkedin_redirect_uri=LINKEDIN_REDIRECT_URI,
             oauth_server_url=OAUTH_SERVER_URL,
-            token_store=_global_token_store,  # Share the instance!
+            token_store=_global_token_store,
         )
 
         # Initialize generic OAuth middleware with LinkedIn provider
@@ -194,17 +268,17 @@ def setup_oauth() -> Optional[Any]:
             provider_name="LinkedIn",
         )
 
-        print("✓ OAuth enabled - MCP clients can authorize with LinkedIn")
+        print("✓ OAuth enabled - LinkedIn direct mode")
         print(f"  OAuth server: {OAUTH_SERVER_URL}")
         print(f"  Discovery: {OAUTH_SERVER_URL}/.well-known/oauth-authorization-server")
         print(f"  Protected Resource: {OAUTH_SERVER_URL}/.well-known/oauth-protected-resource")
 
         return oauth_middleware
-    elif OAUTH_ENABLED:
-        print("⚠ OAuth disabled - LinkedIn credentials not configured")
-        print("  Set LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET to enable OAuth")
 
-    return None
+    else:
+        print(f"⚠ Unknown OAUTH_MODE: {OAUTH_MODE}")
+        print("  Valid modes: linkedin, keycloak")
+        return None
 
 
 def get_oauth_provider() -> Optional[Any]:

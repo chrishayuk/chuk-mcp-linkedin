@@ -332,7 +332,9 @@ class LinkedInManager:
         variant_config: Optional[Dict[str, Any]] = None,
     ) -> Draft:
         """Create a new draft for the authenticated user"""
-        draft_id = f"draft_{len(self.drafts) + 1}_{datetime.now().timestamp()}"
+        # Include UUID to ensure globally unique draft IDs across all users
+        # This prevents collisions when multiple users create drafts simultaneously
+        draft_id = f"draft_{len(self.drafts) + 1}_{uuid.uuid4().hex[:12]}"
 
         draft = Draft(
             draft_id=draft_id,

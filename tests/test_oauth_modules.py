@@ -459,9 +459,9 @@ class TestLinkedInOAuthProvider:
     @pytest.mark.asyncio
     async def test_handle_external_callback_success(self, provider, mock_token_store):
         """Test handling LinkedIn OAuth callback"""
-        # Set up pending authorization
+        # Set up pending authorization data
         state = "linkedin_state_123"
-        provider._pending_authorizations[state] = {
+        pending_data = {
             "mcp_client_id": "client_id",
             "mcp_redirect_uri": "http://localhost:3000/callback",
             "mcp_state": "mcp_state",
@@ -469,6 +469,13 @@ class TestLinkedInOAuthProvider:
             "mcp_code_challenge": None,
             "mcp_code_challenge_method": None,
         }
+
+        # Mock the persistent storage methods
+        mock_token_store.get_pending_authorization = AsyncMock(return_value=pending_data)
+        mock_token_store.delete_pending_authorization = AsyncMock(return_value=True)
+
+        # Also set in memory for backwards compatibility check
+        provider._pending_authorizations[state] = pending_data
 
         with patch.object(provider.linkedin_client, "exchange_code_for_token") as mock_exchange:
             with patch.object(provider.linkedin_client, "get_user_info") as mock_user_info:
@@ -488,10 +495,14 @@ class TestLinkedInOAuthProvider:
                 assert result["state"] == "mcp_state"
                 assert state not in provider._pending_authorizations
                 mock_token_store.link_external_token.assert_called_once()
+                mock_token_store.delete_pending_authorization.assert_called_once_with(state)
 
     @pytest.mark.asyncio
-    async def test_handle_external_callback_invalid_state(self, provider):
+    async def test_handle_external_callback_invalid_state(self, provider, mock_token_store):
         """Test callback with invalid state"""
+        # Mock persistent storage to return None (state not found)
+        mock_token_store.get_pending_authorization = AsyncMock(return_value=None)
+
         with pytest.raises(ValueError, match="Invalid or expired state"):
             await provider.handle_external_callback(
                 code="linkedin_code",
@@ -499,10 +510,10 @@ class TestLinkedInOAuthProvider:
             )
 
     @pytest.mark.asyncio
-    async def test_handle_external_callback_token_exchange_fails(self, provider):
+    async def test_handle_external_callback_token_exchange_fails(self, provider, mock_token_store):
         """Test callback when LinkedIn token exchange fails"""
         state = "linkedin_state_123"
-        provider._pending_authorizations[state] = {
+        pending_data = {
             "mcp_client_id": "client_id",
             "mcp_redirect_uri": "http://localhost:3000/callback",
             "mcp_state": "mcp_state",
@@ -510,6 +521,10 @@ class TestLinkedInOAuthProvider:
             "mcp_code_challenge": None,
             "mcp_code_challenge_method": None,
         }
+
+        # Mock persistent storage
+        mock_token_store.get_pending_authorization = AsyncMock(return_value=pending_data)
+        provider._pending_authorizations[state] = pending_data
 
         with patch.object(provider.linkedin_client, "exchange_code_for_token") as mock_exchange:
             mock_exchange.side_effect = Exception("Exchange failed")
@@ -521,10 +536,10 @@ class TestLinkedInOAuthProvider:
                 )
 
     @pytest.mark.asyncio
-    async def test_handle_external_callback_user_info_fails(self, provider):
+    async def test_handle_external_callback_user_info_fails(self, provider, mock_token_store):
         """Test callback when getting user info fails"""
         state = "linkedin_state_123"
-        provider._pending_authorizations[state] = {
+        pending_data = {
             "mcp_client_id": "client_id",
             "mcp_redirect_uri": "http://localhost:3000/callback",
             "mcp_state": "mcp_state",
@@ -532,6 +547,10 @@ class TestLinkedInOAuthProvider:
             "mcp_code_challenge": None,
             "mcp_code_challenge_method": None,
         }
+
+        # Mock persistent storage
+        mock_token_store.get_pending_authorization = AsyncMock(return_value=pending_data)
+        provider._pending_authorizations[state] = pending_data
 
         with patch.object(provider.linkedin_client, "exchange_code_for_token") as mock_exchange:
             with patch.object(provider.linkedin_client, "get_user_info") as mock_user_info:

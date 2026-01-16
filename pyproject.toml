@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chuk-mcp-linkedin"
-version = "0.2.0"
+version = "0.2.1"
 description = "Design system MCP server for creating LinkedIn posts with shadcn-inspired components, variants, and themes"
 readme = "README.md"
 requires-python = ">=3.11"

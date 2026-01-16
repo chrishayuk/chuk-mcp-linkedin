@@ -80,7 +80,9 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             redirect_uri=linkedin_redirect_uri,
         )
 
-        # Track ongoing authorization flows
+        # Note: Pending authorizations are now stored in token_store for persistence
+        # across server restarts and multiple instances. The in-memory dict is kept
+        # only for backwards compatibility during transition.
         self._pending_authorizations: Dict[str, Dict[str, Any]] = {}
 
     # ============================================================================
@@ -137,7 +139,8 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
                     code_challenge_method=params.code_challenge_method,
                 )
 
-                # Clean up pending authorization
+                # Clean up pending authorization from both storages
+                await self.token_store.delete_pending_authorization(state)
                 if state in self._pending_authorizations:
                     del self._pending_authorizations[state]
 
@@ -147,11 +150,11 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
                 }
 
         # Need LinkedIn authorization - redirect to LinkedIn
-        # Store pending authorization details
+        # Store pending authorization details persistently (survives restarts)
         import secrets
 
         linkedin_state = secrets.token_urlsafe(32)
-        self._pending_authorizations[linkedin_state] = {
+        pending_data = {
             "mcp_client_id": params.client_id,
             "mcp_redirect_uri": params.redirect_uri,
             "mcp_state": state,
@@ -159,6 +162,12 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             "mcp_code_challenge": params.code_challenge,
             "mcp_code_challenge_method": params.code_challenge_method,
         }
+
+        # Store in persistent storage (Redis/memory via chuk-sessions)
+        await self.token_store.store_pending_authorization(linkedin_state, pending_data)
+
+        # Also keep in memory for backwards compatibility during transition
+        self._pending_authorizations[linkedin_state] = pending_data
 
         linkedin_auth_url = self.linkedin_client.get_authorization_url(state=linkedin_state)
 
@@ -410,8 +419,11 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
         Returns:
             Dict with MCP authorization code and redirect info
         """
-        # Get pending authorization
-        pending = self._pending_authorizations.get(state)
+        # Get pending authorization from persistent storage first, then fall back to memory
+        pending = await self.token_store.get_pending_authorization(state)
+        if not pending:
+            # Fall back to in-memory for backwards compatibility
+            pending = self._pending_authorizations.get(state)
         if not pending:
             raise ValueError("Invalid or expired state parameter")
 
@@ -447,8 +459,10 @@ class LinkedInOAuthProvider(BaseOAuthProvider):
             code_challenge_method=pending["mcp_code_challenge_method"],
         )
 
-        # Clean up pending authorization
-        del self._pending_authorizations[state]
+        # Clean up pending authorization from both storages
+        await self.token_store.delete_pending_authorization(state)
+        if state in self._pending_authorizations:
+            del self._pending_authorizations[state]
 
         return {
             "code": mcp_code,

@@ -193,12 +193,12 @@ examples-simple: ## Run simple example only
 
 build: clean ## Build distribution packages
 	@echo "$(BLUE)Building distribution packages...$(NC)"
-	@$(PYTHON) -m build
+	@uv build
 	@echo "$(GREEN)✓ Build complete$(NC)"
 
 publish-test: build ## Publish to TestPyPI
 	@echo "$(BLUE)Publishing to TestPyPI...$(NC)"
-	@$(PYTHON) -m twine upload --repository testpypi dist/*
+	@uv run twine upload --repository testpypi dist/*
 	@echo "$(GREEN)✓ Published to TestPyPI$(NC)"
 
 publish: build ## Publish to PyPI
@@ -207,7 +207,7 @@ publish: build ## Publish to PyPI
 	@read -p "Are you sure? (y/N) " -n 1 -r; \
 	echo ""; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		$(PYTHON) -m twine upload dist/*; \
+		uv run twine upload dist/*; \
 		echo "$(GREEN)✓ Published to PyPI$(NC)"; \
 	else \
 		echo "$(YELLOW)Cancelled$(NC)"; \

@@ -428,7 +428,7 @@ dev = [
 requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = ">=23.7.0" },
     { name = "chuk-artifacts", specifier = ">=0.4.1" },
-    { name = "chuk-mcp-server", specifier = ">=0.6" },
+    { name = "chuk-mcp-server", specifier = ">=0.15.2" },
     { name = "chuk-sessions", extras = ["redis"], specifier = ">=0.4.2" },
     { name = "httpx", specifier = ">=0.24.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.5.0" },
@@ -464,7 +464,7 @@ dev = [
 
 [[package]]
 name = "chuk-mcp-server"
-version = "0.15.1"
+version = "0.15.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "chuk-mcp" },
@@ -480,9 +480,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "uvloop", marker = "sys_platform != 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/15/00/3156122557c23f97533b9172792f884f53b1095de6a70bbd6f17f152e340/chuk_mcp_server-0.15.1.tar.gz", hash = "sha256:b6cf69f07c63e6ce5ed7bcdbd521f139f80758e7ded4cc689caa793b3b8a4c7b", size = 538149, upload-time = "2025-12-07T00:45:07.102Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/d8/8309e48f350321d2da0765c920a4bff8827ad03d851b87c2f99a9588f2d6/chuk_mcp_server-0.15.2.tar.gz", hash = "sha256:632ec5bc1ba59348fd8e86d4931712619da47886f7e272e7b793b3a3cb6e2f12", size = 539225, upload-time = "2026-01-16T19:13:26.079Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/99/a6/cf227b20d4c5b2344f0e58ee185db0776e38c3e4c4e2f97b31e2dd7bcce2/chuk_mcp_server-0.15.1-py3-none-any.whl", hash = "sha256:96f9355d41d4cd406a894cac966f27e61fca91eedea2a741be5169f1fbe3d421", size = 141102, upload-time = "2025-12-07T00:45:05.713Z" },
+    { url = "https://files.pythonhosted.org/packages/78/e2/6b39f1c1ef04cce6063179d36cffeb45995cbf2e1a16a123ac259293265a/chuk_mcp_server-0.15.2-py3-none-any.whl", hash = "sha256:c995552d82dd69eb3343fb8a238427f0e717244f47d3b710069381b01c84f2e4", size = 141483, upload-time = "2026-01-16T19:13:24.34Z" },
 ]
 
 [[package]]

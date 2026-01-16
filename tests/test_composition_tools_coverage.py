@@ -30,7 +30,13 @@ def mock_manager():
     """Create a mock manager"""
     manager = MagicMock()
     manager.current_draft_id = "draft-123"
+    manager.user_id = "test-user"
     return manager
+
+
+def _cache_key(user_id: str, draft_id: str) -> str:
+    """Generate user-scoped cache key (must match composition_tools._get_cache_key)"""
+    return f"{user_id}:{draft_id}"
 
 
 class TestCompositionToolsErrorPaths:
@@ -62,7 +68,7 @@ class TestCompositionToolsErrorPaths:
             mock_post = MagicMock()
             mock_post.add_hook.side_effect = ValueError("Invalid hook type")
             # Add mock to cache
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_hook"]("invalid_type", "content")
             assert "Invalid hook type" in result
@@ -86,7 +92,7 @@ class TestCompositionToolsErrorPaths:
             mock_post = MagicMock()
             mock_post.add_body.side_effect = ValueError("Content too long")
             # Add mock to cache
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_body"]("x" * 10000, "linear")
             assert "Content too long" in result
@@ -111,7 +117,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_cta.side_effect = ValueError("Invalid CTA type")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_cta"]("invalid", "text")
             assert "Invalid CTA type" in result
@@ -136,7 +142,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_bar_chart.side_effect = ValueError("Invalid data")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_bar_chart"]({"A": "invalid"}, "Title")
             assert "Invalid data" in result
@@ -161,7 +167,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_metrics_chart.side_effect = ValueError("Invalid metrics")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_metrics_chart"]({"A": 123}, "Title")
             assert "Invalid metrics" in result
@@ -186,7 +192,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_comparison_chart.side_effect = ValueError("Need 2 options")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_comparison_chart"]({"A": "only one"}, "Title")
             assert "Need 2 options" in result
@@ -211,7 +217,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_progress_chart.side_effect = ValueError("Invalid percentage")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_progress_chart"]({"A": 150}, "Title")
             assert "Invalid percentage" in result
@@ -236,7 +242,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_ranking_chart.side_effect = ValueError("Invalid ranking data")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_ranking_chart"]({}, "Title")
             assert "Invalid ranking data" in result
@@ -261,7 +267,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_quote.side_effect = ValueError("Quote too long")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_quote"]("x" * 1000, "Author")
             assert "Quote too long" in result
@@ -286,7 +292,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_big_stat.side_effect = ValueError("Invalid stat")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_big_stat"]("", "label")
             assert "Invalid stat" in result
@@ -311,7 +317,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_timeline.side_effect = ValueError("Empty timeline")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_timeline"]({}, "Title")
             assert "Empty timeline" in result
@@ -336,7 +342,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_key_takeaway.side_effect = ValueError("Message too long")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_key_takeaway"]("x" * 1000)
             assert "Message too long" in result
@@ -361,7 +367,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_pro_con.side_effect = ValueError("Empty lists")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_pro_con"]([], [])
             assert "Empty lists" in result
@@ -386,7 +392,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_separator.side_effect = ValueError("Invalid style")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_separator"]("invalid")
             assert "Invalid style" in result
@@ -411,7 +417,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_checklist.side_effect = ValueError("Invalid checklist items")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_checklist"]([])
             assert "Invalid checklist items" in result
@@ -436,7 +442,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_before_after.side_effect = ValueError("Mismatched lists")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_before_after"]([], [])
             assert "Mismatched lists" in result
@@ -461,7 +467,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_tip_box.side_effect = ValueError("Message empty")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_tip_box"]("")
             assert "Message empty" in result
@@ -486,7 +492,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_stats_grid.side_effect = ValueError("Invalid columns")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_stats_grid"]({"A": "1"}, columns=10)
             assert "Invalid columns" in result
@@ -511,7 +517,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_poll_preview.side_effect = ValueError("Not enough options")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_poll_preview"]("Question?", ["A"])
             assert "Not enough options" in result
@@ -536,7 +542,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_feature_list.side_effect = ValueError("Missing title")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_feature_list"]([{"no_title": "oops"}])
             assert "Missing title" in result
@@ -561,7 +567,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_numbered_list.side_effect = ValueError("Empty list")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_numbered_list"]([])
             assert "Empty list" in result
@@ -586,7 +592,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.add_hashtags.side_effect = ValueError("No tags")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_add_hashtags"]([])
             assert "No tags" in result
@@ -612,7 +618,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.optimize_for_engagement.return_value = None
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_compose_post"](optimize=True)
             assert "Content exceeds limit" in result
@@ -637,7 +643,7 @@ class TestCompositionToolsErrorPaths:
             mock_post.get_preview.side_effect = ValueError("No content")
             # Add mock to cache
 
-            composition_tools._post_cache["draft-123"] = mock_post
+            composition_tools._post_cache[_cache_key("test-user", "draft-123")] = mock_post
 
             result = await tools["linkedin_get_preview"]()
             assert "No content" in result
@@ -662,7 +668,7 @@ class TestCompositionToolsErrorPaths:
 
         assert "Added body" in result
         # Verify ComposablePost was created in cache with theme
-        assert "draft-123" in composition_tools._post_cache
+        assert _cache_key("test-user", "draft-123") in composition_tools._post_cache
 
         # Cleanup cache
         composition_tools._post_cache.clear()

@@ -6,8 +6,12 @@ Thin wrapper around ComposablePost for MCP tool integration.
 
 All tools require OAuth authorization to prevent server abuse and enable
 user-scoped data persistence across sessions.
+
+Component data is persisted to draft.content["components"] to survive server
+restarts and enable multi-instance deployments.
 """
 
+import logging
 from typing import Any, Dict, List, Optional
 
 from chuk_mcp_server.decorators import requires_auth
@@ -16,8 +20,155 @@ from ..manager_factory import get_current_manager
 from ..posts.composition import ComposablePost
 from ..themes.theme_manager import ThemeManager
 
-# Cache of ComposablePost instances per draft ID
+logger = logging.getLogger(__name__)
+
+# Cache of ComposablePost instances per user_id:draft_id
+# This is a session-level cache only; source of truth is draft.content["components"]
 _post_cache: Dict[str, ComposablePost] = {}
+
+
+def _get_cache_key(user_id: str, draft_id: str) -> str:
+    """Generate cache key scoped by user and draft."""
+    return f"{user_id}:{draft_id}"
+
+
+def _restore_components_from_draft(
+    post: ComposablePost, components_data: List[Dict[str, Any]]
+) -> None:
+    """
+    Restore components to a ComposablePost from persisted data.
+
+    Args:
+        post: ComposablePost instance to restore components to
+        components_data: List of component data dicts from draft.content["components"]
+    """
+    for comp in components_data:
+        comp_type = comp.get("type")
+        params = comp.get("params", {})
+
+        try:
+            if comp_type == "hook":
+                post.add_hook(params.get("hook_type", ""), params.get("content", ""))
+            elif comp_type == "body":
+                post.add_body(params.get("content", ""), structure=params.get("structure"))
+            elif comp_type == "cta":
+                post.add_cta(params.get("cta_type", ""), params.get("text", ""))
+            elif comp_type == "hashtags":
+                post.add_hashtags(params.get("tags", []), placement=params.get("placement", "end"))
+            elif comp_type == "bar_chart":
+                post.add_bar_chart(
+                    params.get("data", {}),
+                    title=params.get("title"),
+                    unit=params.get("unit", ""),
+                )
+            elif comp_type == "metrics_chart":
+                post.add_metrics_chart(params.get("data", {}), title=params.get("title"))
+            elif comp_type == "comparison_chart":
+                post.add_comparison_chart(params.get("data", {}), title=params.get("title"))
+            elif comp_type == "progress_chart":
+                post.add_progress_chart(params.get("data", {}), title=params.get("title"))
+            elif comp_type == "ranking_chart":
+                post.add_ranking_chart(
+                    params.get("data", {}),
+                    title=params.get("title"),
+                    show_medals=params.get("show_medals", True),
+                )
+            elif comp_type == "quote":
+                post.add_quote(
+                    params.get("text", ""),
+                    params.get("author", ""),
+                    source=params.get("source"),
+                )
+            elif comp_type == "big_stat":
+                post.add_big_stat(
+                    params.get("number", ""),
+                    params.get("label", ""),
+                    context=params.get("context"),
+                )
+            elif comp_type == "timeline":
+                post.add_timeline(
+                    params.get("steps", {}),
+                    title=params.get("title"),
+                    style=params.get("style", "arrow"),
+                )
+            elif comp_type == "key_takeaway":
+                post.add_key_takeaway(
+                    params.get("message", ""),
+                    title=params.get("title", "KEY TAKEAWAY"),
+                    style=params.get("style", "box"),
+                )
+            elif comp_type == "pro_con":
+                post.add_pro_con(
+                    params.get("pros", []),
+                    params.get("cons", []),
+                    title=params.get("title"),
+                )
+            elif comp_type == "checklist":
+                post.add_checklist(
+                    params.get("items", []),
+                    title=params.get("title"),
+                    show_progress=params.get("show_progress", False),
+                )
+            elif comp_type == "before_after":
+                post.add_before_after(
+                    params.get("before", []),
+                    params.get("after", []),
+                    title=params.get("title"),
+                    labels=params.get("labels"),
+                )
+            elif comp_type == "tip_box":
+                post.add_tip_box(
+                    params.get("message", ""),
+                    title=params.get("title"),
+                    style=params.get("style", "info"),
+                )
+            elif comp_type == "stats_grid":
+                post.add_stats_grid(
+                    params.get("stats", {}),
+                    title=params.get("title"),
+                    columns=params.get("columns", 2),
+                )
+            elif comp_type == "poll_preview":
+                post.add_poll_preview(params.get("question", ""), params.get("options", []))
+            elif comp_type == "feature_list":
+                post.add_feature_list(params.get("features", []), title=params.get("title"))
+            elif comp_type == "numbered_list":
+                post.add_numbered_list(
+                    params.get("items", []),
+                    title=params.get("title"),
+                    style=params.get("style", "numbers"),
+                    start=params.get("start", 1),
+                )
+            elif comp_type == "separator":
+                post.add_separator(style=params.get("style", "line"))
+            else:
+                logger.warning(f"Unknown component type during restore: {comp_type}")
+        except Exception as e:
+            logger.error(f"Error restoring component {comp_type}: {e}")
+
+
+def _save_component_to_draft(
+    draft: Any, manager: Any, comp_type: str, params: Dict[str, Any]
+) -> None:
+    """
+    Save a component to the draft's persistent storage.
+
+    Args:
+        draft: Draft object
+        manager: LinkedInManager instance
+        comp_type: Component type name
+        params: Component parameters
+    """
+    # Initialize components list if needed
+    if "components" not in draft.content:
+        draft.content["components"] = []
+
+    # Add component data
+    draft.content["components"].append({"type": comp_type, "params": params})
+
+    # Persist to storage
+    manager.update_draft(draft.draft_id, content=draft.content)
+    logger.debug(f"Saved {comp_type} component to draft {draft.draft_id}")
 
 
 def _get_or_create_post() -> ComposablePost:
@@ -27,8 +178,11 @@ def _get_or_create_post() -> ComposablePost:
     if not draft:
         raise ValueError("No active draft")
 
+    # Create user-scoped cache key
+    cache_key = _get_cache_key(manager.user_id, draft.draft_id)
+
     # Get or create ComposablePost instance from cache
-    if draft.draft_id not in _post_cache:
+    if cache_key not in _post_cache:
         # Create new ComposablePost
         theme = None
         if draft.theme:
@@ -36,21 +190,36 @@ def _get_or_create_post() -> ComposablePost:
             theme = theme_mgr.get_theme(draft.theme)
 
         post = ComposablePost(draft.post_type, theme=theme, variant_config=draft.variant_config)
-        _post_cache[draft.draft_id] = post
 
-    result: ComposablePost = _post_cache[draft.draft_id]
+        # Restore components from persisted data if available
+        stored_components = draft.content.get("components", [])
+        if stored_components:
+            logger.info(f"Restoring {len(stored_components)} components for draft {draft.draft_id}")
+            _restore_components_from_draft(post, stored_components)
+
+        _post_cache[cache_key] = post
+
+    result: ComposablePost = _post_cache[cache_key]
     return result
 
 
-def clear_post_cache(draft_id: Optional[str] = None) -> None:
+def clear_post_cache(draft_id: Optional[str] = None, user_id: Optional[str] = None) -> None:
     """
     Clear the ComposablePost cache.
 
     Args:
         draft_id: Specific draft ID to clear, or None to clear all
+        user_id: User ID for scoped clearing (required if draft_id is provided)
     """
     if draft_id:
-        _post_cache.pop(draft_id, None)
+        if user_id:
+            cache_key = _get_cache_key(user_id, draft_id)
+            _post_cache.pop(cache_key, None)
+        else:
+            # Clear all entries for this draft_id (backwards compatibility)
+            keys_to_remove = [k for k in _post_cache if k.endswith(f":{draft_id}")]
+            for k in keys_to_remove:
+                _post_cache.pop(k, None)
     else:
         _post_cache.clear()
 
@@ -104,8 +273,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_hook(hook_type, content)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "hook", {"hook_type": hook_type, "content": content}
+            )
+
             return f"Added {hook_type} hook to draft"
         except ValueError as e:
             return str(e)
@@ -126,8 +306,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_body(content, structure=structure)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "body", {"content": content, "structure": structure}
+            )
+
             return f"Added body with {structure} structure"
         except ValueError as e:
             return str(e)
@@ -148,8 +339,17 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_cta(cta_type, text)
+
+            # Persist component data
+            _save_component_to_draft(draft, manager, "cta", {"cta_type": cta_type, "text": text})
+
             return f"Added {cta_type} CTA"
         except ValueError as e:
             return str(e)
@@ -177,8 +377,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             data={"AI-Assisted": 12, "Code Review": 6, "Documentation": 4}, unit="hours"
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_bar_chart(data, title=title, unit=unit)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "bar_chart", {"data": data, "title": title, "unit": unit}
+            )
+
             return f"Added bar chart with {len(data)} bars"
         except ValueError as e:
             return str(e)
@@ -204,8 +415,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             data={"Faster problem-solving": "67%", "Better learning": "89%"}
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_metrics_chart(data, title=title)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "metrics_chart", {"data": data, "title": title}
+            )
+
             return f"Added metrics chart with {len(data)} metrics"
         except ValueError as e:
             return str(e)
@@ -234,8 +456,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             }
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_comparison_chart(data, title=title)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "comparison_chart", {"data": data, "title": title}
+            )
+
             return f"Added comparison chart with {len(data)} options"
         except ValueError as e:
             return str(e)
@@ -261,8 +494,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             data={"Completion": 75, "Testing": 50, "Documentation": 30}
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_progress_chart(data, title=title)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "progress_chart", {"data": data, "title": title}
+            )
+
             return f"Added progress chart with {len(data)} items"
         except ValueError as e:
             return str(e)
@@ -290,8 +534,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             data={"Python": "1M users", "JavaScript": "900K users", "Rust": "500K users"}
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_ranking_chart(data, title=title, show_medals=show_medals)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "ranking_chart",
+                {"data": data, "title": title, "show_medals": show_medals},
+            )
+
             return f"Added ranking chart with {len(data)} items"
         except ValueError as e:
             return str(e)
@@ -321,8 +579,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             source="CTO at TechCorp"
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_quote(text, author, source=source)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "quote", {"text": text, "author": author, "source": source}
+            )
+
             return f"Added quote from {author}"
         except ValueError as e:
             return str(e)
@@ -352,8 +621,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             context="↑ 340% growth year-over-year"
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_big_stat(number, label, context=context)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "big_stat",
+                {"number": number, "label": label, "context": context},
+            )
+
             return f"Added big stat: {number}"
         except ValueError as e:
             return str(e)
@@ -383,8 +666,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             style="arrow"
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_timeline(steps, title=title, style=style)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "timeline",
+                {"steps": steps, "title": title, "style": style},
+            )
+
             return f"Added timeline with {len(steps)} steps"
         except ValueError as e:
             return str(e)
@@ -414,8 +711,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             style="box"
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_key_takeaway(message, title=title, style=style)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "key_takeaway",
+                {"message": message, "title": title, "style": style},
+            )
+
             return "Added key takeaway"
         except ValueError as e:
             return str(e)
@@ -445,8 +756,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             title="AI CODING TOOLS"
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_pro_con(pros, cons, title=title)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "pro_con",
+                {"pros": pros, "cons": cons, "title": title},
+            )
+
             return f"Added pro/con comparison ({len(pros)} pros, {len(cons)} cons)"
         except ValueError as e:
             return str(e)
@@ -466,8 +791,17 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_separator(style=style)
+
+            # Persist component data
+            _save_component_to_draft(draft, manager, "separator", {"style": style})
+
             return f"Added {style} separator"
         except ValueError as e:
             return str(e)
@@ -492,8 +826,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_checklist(items, title=title, show_progress=show_progress)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "checklist",
+                {"items": items, "title": title, "show_progress": show_progress},
+            )
+
             return f"Added checklist with {len(items)} items"
         except ValueError as e:
             return str(e)
@@ -520,8 +868,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_before_after(before, after, title=title, labels=labels)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "before_after",
+                {"before": before, "after": after, "title": title, "labels": labels},
+            )
+
             return "Added before/after comparison"
         except ValueError as e:
             return str(e)
@@ -546,8 +908,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_tip_box(message, title=title, style=style)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "tip_box",
+                {"message": message, "title": title, "style": style},
+            )
+
             return f"Added {style} tip box"
         except ValueError as e:
             return str(e)
@@ -572,8 +948,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_stats_grid(stats, title=title, columns=columns)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "stats_grid",
+                {"stats": stats, "title": title, "columns": columns},
+            )
+
             return f"Added stats grid with {len(stats)} stats"
         except ValueError as e:
             return str(e)
@@ -594,8 +984,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_poll_preview(question, options)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "poll_preview", {"question": question, "options": options}
+            )
+
             return f"Added poll with {len(options)} options"
         except ValueError as e:
             return str(e)
@@ -618,8 +1019,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_feature_list(features, title=title)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "feature_list", {"features": features, "title": title}
+            )
+
             return f"Added feature list with {len(features)} features"
         except ValueError as e:
             return str(e)
@@ -646,8 +1058,22 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_numbered_list(items, title=title, style=style, start=start)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft,
+                manager,
+                "numbered_list",
+                {"items": items, "title": title, "style": style, "start": start},
+            )
+
             return f"Added numbered list with {len(items)} items"
         except ValueError as e:
             return str(e)
@@ -668,8 +1094,19 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
             Success message
         """
         try:
+            manager = get_current_manager()
+            draft = manager.get_current_draft()
+            if not draft:
+                return "No active draft"
+
             post = _get_or_create_post()
             post.add_hashtags(tags, placement=placement)
+
+            # Persist component data
+            _save_component_to_draft(
+                draft, manager, "hashtags", {"tags": tags, "placement": placement}
+            )
+
             return f"Added {len(tags)} hashtags"
         except ValueError as e:
             return str(e)

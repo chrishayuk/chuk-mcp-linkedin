@@ -75,6 +75,11 @@ Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) — 
   - Token brokering via Keycloak's Identity Provider integration
   - Enterprise features: LDAP, SAML, 2FA
   - See [Keycloak Setup Guide](docs/KEYCLOAK_OAUTH_SETUP.md)
+- **Passthrough Mode**: Accept LinkedIn bearer tokens directly (no OAuth flow)
+  - Ideal for testing and development
+  - No OAuth credentials required
+  - Token validated with LinkedIn userinfo endpoint
+  - See [Passthrough Mode Guide](docs/PASSTHROUGH_MODE.md)
 
 > **LinkedIn API Compliance**: You are responsible for complying with [LinkedIn's API Terms of Service](https://www.linkedin.com/legal/l/api-terms-of-use) and rate limits. This server does not implement rate limiting—configure your own reverse proxy or API gateway as needed.
 

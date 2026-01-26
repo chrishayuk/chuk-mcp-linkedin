@@ -140,7 +140,7 @@ def setup_oauth() -> Optional[Any]:
     global oauth_provider, _global_token_store
 
     OAUTH_ENABLED = os.getenv("OAUTH_ENABLED", "true").lower() == "true"
-    OAUTH_MODE = os.getenv("OAUTH_MODE", "linkedin").lower()  # linkedin or keycloak
+    OAUTH_MODE = os.getenv("OAUTH_MODE", "linkedin").lower()  # linkedin, keycloak, or passthrough
 
     if not OAUTH_ENABLED:
         return None
@@ -276,9 +276,58 @@ def setup_oauth() -> Optional[Any]:
 
         return oauth_middleware
 
+    # ============================================================================
+    # Passthrough Mode
+    # ============================================================================
+    elif OAUTH_MODE == "passthrough":
+        # Import Passthrough provider
+        from .oauth.passthrough_provider import PassthroughOAuthProvider
+
+        # Create Passthrough OAuth provider
+        oauth_provider = PassthroughOAuthProvider(
+            oauth_server_url=OAUTH_SERVER_URL,
+            token_store=_global_token_store,
+        )
+
+        # Initialize OAuth middleware with Passthrough provider
+        oauth_middleware = OAuthMiddleware(
+            mcp_server=mcp,
+            provider=oauth_provider,
+            oauth_server_url=OAUTH_SERVER_URL,
+            callback_path="/oauth/callback",  # Not used in passthrough mode
+            scopes_supported=[
+                "linkedin.posts",
+                "linkedin.profile",
+                "linkedin.documents",
+            ],
+            service_documentation="https://github.com/chrishayuk/chuk-mcp-linkedin",
+            provider_name="Passthrough (LinkedIn)",
+        )
+
+        # Override the protected resource metadata endpoint for Passthrough mode
+        # Register AFTER middleware to override the default endpoint
+        @mcp.endpoint("/.well-known/oauth-protected-resource", methods=["GET"])
+        async def passthrough_protected_resource_metadata(request: Any) -> Any:
+            """OAuth Protected Resource Metadata endpoint - passthrough mode."""
+            from starlette.responses import JSONResponse
+
+            metadata = oauth_provider.get_protected_resource_metadata()  # type: ignore[union-attr]
+            return JSONResponse(metadata, headers={"Access-Control-Allow-Origin": "*"})
+
+        print("✓ OAuth enabled - Passthrough mode")
+        print(f"  MCP Resource Server: {OAUTH_SERVER_URL}")
+        print(f"  Protected Resource: {OAUTH_SERVER_URL}/.well-known/oauth-protected-resource")
+        print()
+        print("  ℹ️  Passthrough Mode:")
+        print("     - Send LinkedIn bearer token directly in Authorization header")
+        print("     - Token is validated with LinkedIn and passed through to API calls")
+        print("     - No OAuth flow required - ideal for testing and development")
+
+        return oauth_middleware
+
     else:
         print(f"⚠ Unknown OAUTH_MODE: {OAUTH_MODE}")
-        print("  Valid modes: linkedin, keycloak")
+        print("  Valid modes: linkedin, keycloak, passthrough")
         return None
 
 

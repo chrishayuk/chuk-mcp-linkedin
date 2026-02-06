@@ -19,6 +19,7 @@ import os
 from typing import Any, Optional
 
 from chuk_mcp_server import ChukMCPServer
+from chuk_mcp_server.oauth import BaseOAuthProvider
 
 from .api import LinkedInClient
 from .manager import LinkedInManager
@@ -48,7 +49,7 @@ linkedin_client = LinkedInClient()
 mcp.protocol.oauth_provider_getter = lambda: get_oauth_provider()
 
 # Global OAuth provider (will be set if OAuth is enabled)
-oauth_provider = None
+oauth_provider: Optional[BaseOAuthProvider] = None
 
 # Global token store - shared across all OAuth operations
 # This ensures tokens stored in one context are visible in another
@@ -311,7 +312,7 @@ def setup_oauth() -> Optional[Any]:
             """OAuth Protected Resource Metadata endpoint - passthrough mode."""
             from starlette.responses import JSONResponse
 
-            metadata = oauth_provider.get_protected_resource_metadata()  # type: ignore[union-attr]
+            metadata = oauth_provider.get_protected_resource_metadata()
             return JSONResponse(metadata, headers={"Access-Control-Allow-Origin": "*"})
 
         print("✓ OAuth enabled - Passthrough mode")

@@ -38,7 +38,7 @@ from chuk_mcp_server.oauth import (
 class KeycloakOAuthProvider(BaseOAuthProvider):
     """
     OAuth provider that uses Keycloak for authentication and token brokering.
-    
+
     Keycloak manages LinkedIn as an Identity Provider and stores LinkedIn tokens.
     This provider validates Keycloak tokens and retrieves LinkedIn tokens via
     Keycloak's token broker endpoint.
@@ -88,10 +88,10 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     def get_protected_resource_metadata(self) -> Dict[str, Any]:
         """
         Return OAuth Protected Resource metadata.
-        
+
         This tells MCP clients that this resource is protected and points them
         to Keycloak as the authorization server.
-        
+
         Returns:
             Dict with resource metadata per RFC 8414
         """
@@ -115,7 +115,7 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     ) -> Dict[str, Any]:
         """
         Handle authorization request from MCP client.
-        
+
         Returns Keycloak authorization URL - MCP client should redirect user there.
         Keycloak handles the entire OAuth flow including LinkedIn authentication.
 
@@ -167,7 +167,7 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     ) -> OAuthToken:
         """
         Exchange authorization code for access token.
-        
+
         Note: In Keycloak mode, the MCP client exchanges the code directly with
         Keycloak. This method is here for compatibility but may not be used.
 
@@ -195,7 +195,7 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     ) -> OAuthToken:
         """
         Refresh access token using refresh token.
-        
+
         In Keycloak mode, clients refresh tokens directly with Keycloak.
 
         Args:
@@ -216,7 +216,7 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     ) -> Dict[str, Any]:
         """
         Validate Keycloak access token and retrieve LinkedIn token.
-        
+
         This is the core method for Keycloak integration:
         1. Validates the Keycloak token by calling userinfo endpoint
         2. Exchanges Keycloak token for LinkedIn token via broker endpoint
@@ -237,13 +237,13 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
         try:
             user_info = await self._get_keycloak_userinfo(token)
             user_id = user_info.get("sub")  # Keycloak user ID
-            
+
             if not user_id:
                 raise TokenError(
                     error="invalid_token",
                     error_description="Token validation failed: no user ID",
                 )
-            
+
             logger.info(f"✓ Keycloak token validated for user: {user_id}")
 
         except httpx.HTTPError as e:
@@ -278,7 +278,7 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     ) -> OAuthClientInfo:
         """
         Register a new MCP client.
-        
+
         In Keycloak mode, clients are registered in Keycloak, not here.
 
         Args:
@@ -316,12 +316,13 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
                 headers={"Authorization": f"Bearer {access_token}"},
             )
             response.raise_for_status()
-            return response.json()
+            result: Dict[str, Any] = response.json()
+            return result
 
     async def _get_linkedin_token(self, keycloak_token: str) -> str:
         """
         Exchange Keycloak user token for stored LinkedIn token.
-        
+
         Uses Keycloak's token broker endpoint to retrieve the LinkedIn token
         that Keycloak stored when the user authenticated via LinkedIn IdP.
 
@@ -343,9 +344,10 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
             if response.status_code == 200:
                 data = response.json()
                 linkedin_token = data.get("access_token")
-                if not linkedin_token:
+                if not linkedin_token or not isinstance(linkedin_token, str):
                     raise Exception("No access_token in Keycloak broker response")
-                return linkedin_token
+                result_token: str = linkedin_token
+                return result_token
 
             elif response.status_code == 400:
                 raise Exception(
@@ -373,7 +375,7 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
     ) -> Dict[str, Any]:
         """
         Handle external OAuth callback.
-        
+
         Not used in Keycloak mode - Keycloak handles all callbacks.
 
         Args:
@@ -384,8 +386,8 @@ class KeycloakOAuthProvider(BaseOAuthProvider):
             Callback result
         """
         raise NotImplementedError(
-            "Keycloak mode does not use external callbacks. "
-            "Keycloak handles all OAuth flows."
+            "Keycloak mode does not use external callbacks. Keycloak handles all OAuth flows."
         )
+
 
 # Made with Bob

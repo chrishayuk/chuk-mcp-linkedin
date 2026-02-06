@@ -20,7 +20,6 @@ Use Cases:
 
 """
 
-import os
 from typing import Any, Dict, Optional
 
 import httpx
@@ -39,7 +38,7 @@ from chuk_mcp_server.oauth import (
 class PassthroughOAuthProvider(BaseOAuthProvider):
     """
     OAuth provider that passes bearer tokens directly to external services.
-    
+
     This provider accepts a bearer token and passes it through without exchange.
     Optionally validates the token with LinkedIn's userinfo endpoint to extract
     user information using the LinkedInOAuthClient.
@@ -77,10 +76,10 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     def get_protected_resource_metadata(self) -> Dict[str, Any]:
         """
         Return OAuth Protected Resource metadata.
-        
+
         This tells MCP clients that this resource is protected but uses
         passthrough authentication.
-        
+
         Returns:
             Dict with resource metadata per RFC 8414
         """
@@ -105,7 +104,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     ) -> Dict[str, Any]:
         """
         Handle authorization request from MCP client.
-        
+
         In passthrough mode, this is not typically used as clients send tokens directly.
         Returns an error indicating passthrough mode usage.
 
@@ -130,7 +129,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     ) -> OAuthToken:
         """
         Exchange authorization code for access token.
-        
+
         Not used in passthrough mode - clients send tokens directly.
 
         Args:
@@ -155,7 +154,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     ) -> OAuthToken:
         """
         Refresh access token using refresh token.
-        
+
         Not used in passthrough mode - clients manage token refresh.
 
         Args:
@@ -177,7 +176,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     ) -> Dict[str, Any]:
         """
         Validate bearer token and pass it through as external_access_token.
-        
+
         This is the core method for passthrough integration:
         1. Validates the token with LinkedIn userinfo endpoint
         2. Extracts user_id from LinkedIn response (stable across token refreshes)
@@ -188,7 +187,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
 
         Returns:
             Token data with user_id and external_access_token
-            
+
         Raises:
             TokenError: If token validation fails or user_id cannot be extracted
         """
@@ -207,16 +206,16 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
                 )
                 response.raise_for_status()
                 user_info = response.json()
-            
+
             user_id = user_info.get("sub")  # LinkedIn user ID
             user_name = user_info.get("name", "Unknown")  # User's display name
-            
+
             if not user_id:
                 raise TokenError(
                     error="invalid_token",
                     error_description="No user ID in LinkedIn response",
                 )
-            
+
             logger.info(f"✓ Authenticated LinkedIn user: {user_name} (ID: {user_id})")
 
         except TokenError:
@@ -249,7 +248,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     ) -> OAuthClientInfo:
         """
         Register a new MCP client.
-        
+
         Not used in passthrough mode - no client registration needed.
 
         Args:
@@ -275,7 +274,7 @@ class PassthroughOAuthProvider(BaseOAuthProvider):
     ) -> Dict[str, Any]:
         """
         Handle external OAuth callback.
-        
+
         Not used in passthrough mode - no OAuth flow.
 
         Args:

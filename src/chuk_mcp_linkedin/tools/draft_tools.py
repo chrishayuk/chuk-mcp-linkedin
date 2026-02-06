@@ -25,7 +25,7 @@ from ..manager_factory import get_current_manager
 def register_draft_tools(mcp: Any) -> Dict[str, Any]:
     """Register draft management tools with the MCP server"""
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_create(
         name: str,
@@ -52,7 +52,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
         )
         return f"Created draft '{draft.name}' (ID: {draft.draft_id})"
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_list(_external_access_token: Optional[str] = None) -> str:
         """
@@ -65,7 +65,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
         drafts = manager.list_drafts()
         return json.dumps(drafts, indent=2)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_switch(
         draft_id: str,
@@ -86,7 +86,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
             return f"Switched to draft {draft_id}"
         return f"Draft {draft_id} not found"
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_get_info(
         draft_id: Optional[str] = None,
@@ -111,7 +111,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
             return json.dumps(info, indent=2)
         return "No draft found"
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_delete(
         draft_id: str,
@@ -132,7 +132,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
             return f"Deleted draft {draft_id}"
         return f"Draft {draft_id} not found"
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_clear_all(_external_access_token: Optional[str] = None) -> str:
         """
@@ -145,7 +145,7 @@ def register_draft_tools(mcp: Any) -> Dict[str, Any]:
         count = manager.clear_all_drafts()
         return f"Cleared {count} drafts"
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_preview_url(
         draft_id: Optional[str] = None,

@@ -17,7 +17,7 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
 
     from ..api import LinkedInAPIError
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_publish(
         visibility: str = "PUBLIC",
@@ -151,7 +151,7 @@ def register_publishing_tools(mcp: Any, linkedin_client: Any) -> Dict[str, Any]:
                 "error_type": "linkedin_api_error",
             }
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_test_connection(
         _external_access_token: Optional[str] = None,

@@ -257,7 +257,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
                             # Default to string for simple arrays
                             prop_schema["items"] = {"type": "string"}
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_hook(
         hook_type: str, content: str, _external_access_token: Optional[str] = None
@@ -290,7 +290,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_body(
         content: str, structure: str = "linear", _external_access_token: Optional[str] = None
@@ -323,7 +323,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_cta(
         cta_type: str, text: str, _external_access_token: Optional[str] = None
@@ -354,7 +354,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_bar_chart(
         data: Dict[str, int],
@@ -394,7 +394,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_metrics_chart(
         data: Dict[str, str],
@@ -432,7 +432,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_comparison_chart(
         data: Dict[str, Any],
@@ -473,7 +473,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_progress_chart(
         data: Dict[str, int],
@@ -511,7 +511,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_ranking_chart(
         data: Dict[str, str],
@@ -554,7 +554,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_quote(
         text: str,
@@ -596,7 +596,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_big_stat(
         number: str,
@@ -641,7 +641,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_timeline(
         steps: Dict[str, str],
@@ -686,7 +686,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_key_takeaway(
         message: str,
@@ -731,7 +731,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_pro_con(
         pros: List[str],
@@ -776,7 +776,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_separator(
         style: str = "line", _external_access_token: Optional[str] = None
@@ -806,7 +806,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_checklist(
         items: List[Dict[str, Any]],
@@ -846,7 +846,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_before_after(
         before: List[str],
@@ -888,7 +888,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_tip_box(
         message: str,
@@ -928,7 +928,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_stats_grid(
         stats: Dict[str, str],
@@ -968,7 +968,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_poll_preview(
         question: str, options: List[str], _external_access_token: Optional[str] = None
@@ -1001,7 +1001,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_feature_list(
         features: List[Dict[str, str]],
@@ -1036,7 +1036,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_numbered_list(
         items: List[str],
@@ -1078,7 +1078,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_add_hashtags(
         tags: List[str], placement: str = "end", _external_access_token: Optional[str] = None
@@ -1111,7 +1111,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_compose_post(
         optimize: bool = True, _external_access_token: Optional[str] = None
@@ -1147,7 +1147,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_get_preview(_external_access_token: Optional[str] = None) -> str:
         """
@@ -1163,7 +1163,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         except ValueError as e:
             return str(e)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_preview_html(
         base_url: str = "http://localhost:8000",
@@ -1202,7 +1202,7 @@ def register_composition_tools(mcp: Any) -> Dict[str, Any]:
         else:
             return f"Preview URL:\n{preview_url}\n\nOpen this URL in your browser to view."
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_export_draft(_external_access_token: Optional[str] = None) -> str:
         """

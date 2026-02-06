@@ -21,7 +21,7 @@ def register_registry_tools(mcp: Any) -> Dict[str, Any]:
 
     registry = ComponentRegistry()
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_list_components(_external_access_token: Optional[str] = None) -> str:
         """
@@ -33,7 +33,7 @@ def register_registry_tools(mcp: Any) -> Dict[str, Any]:
         components = registry.list_post_components()
         return json.dumps(components, indent=2)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_get_component_info(
         component_type: str, _external_access_token: Optional[str] = None
@@ -50,7 +50,7 @@ def register_registry_tools(mcp: Any) -> Dict[str, Any]:
         info = registry.get_component_info(component_type)
         return json.dumps(info, indent=2)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_get_recommendations(
         goal: str, _external_access_token: Optional[str] = None
@@ -67,7 +67,7 @@ def register_registry_tools(mcp: Any) -> Dict[str, Any]:
         recs = registry.get_recommendations(goal)
         return json.dumps(recs, indent=2)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_get_system_overview(_external_access_token: Optional[str] = None) -> str:
         """

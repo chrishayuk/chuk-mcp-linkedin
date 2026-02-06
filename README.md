@@ -5,7 +5,7 @@
 **Design system MCP server for creating high-performing LinkedIn content**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-green.svg)](https://modelcontextprotocol.io)
 
@@ -344,8 +344,7 @@ choco install poppler
 ### From Source
 
 ```bash
-git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
-cd chuk-mcp-linkedin
+# Clone from your source repository
 uv pip install -e ".[dev,http,preview]"
 ```
 
@@ -841,10 +840,6 @@ Deploy the LinkedIn MCP server to Fly.io with Redis session storage:
 #### Step 1: Create Fly.io App
 
 ```bash
-# Clone repository
-git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
-cd chuk-mcp-linkedin
-
 # Login to Fly.io
 fly auth login
 
@@ -1316,10 +1311,6 @@ See [examples/README.md](examples/README.md) for complete list and OAuth setup i
 ### Setup
 
 ```bash
-# Clone repository
-git clone https://github.com/chrishayuk/chuk-mcp-linkedin.git
-cd chuk-mcp-linkedin
-
 # Install dependencies
 make install
 make dev
@@ -1489,11 +1480,11 @@ make coverage-html
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+Apache License 2.0 - see [LICENSE](LICENSE) for details.
+
+> This is a demonstration project provided as-is for learning and testing purposes.
 
 ## Credits
-
-**Built by** [Christopher Hay](https://github.com/chrishayuk)
 
 **Data Sources:**
 - 2025 LinkedIn performance data from analysis of 1M+ posts
@@ -1507,9 +1498,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/chrishayuk/chuk-mcp-linkedin/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/chrishayuk/chuk-mcp-linkedin/discussions)
-- **Email**: chris@chuk.ai
+For questions and issues, please refer to the project documentation.
 
 ## Roadmap
 
@@ -1530,7 +1519,5 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 <div align="center">
 
 **[⬆ back to top](#linkedin-mcp-server)**
-
-Made with ❤️ by [Christopher Hay](https://github.com/chrishayuk)
 
 </div>

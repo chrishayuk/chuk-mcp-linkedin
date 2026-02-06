@@ -8,8 +8,12 @@ with LinkedIn-specific provider.
 
 from .linkedin_client import LinkedInOAuthClient
 from .provider import LinkedInOAuthProvider
+from .keycloak_provider import KeycloakOAuthProvider
+from .passthrough_provider import PassthroughOAuthProvider
 
 __all__ = [
     "LinkedInOAuthProvider",
     "LinkedInOAuthClient",
+    "KeycloakOAuthProvider",
+    "PassthroughOAuthProvider",
 ]

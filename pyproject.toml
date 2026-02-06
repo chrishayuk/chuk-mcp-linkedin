@@ -4,13 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chuk-mcp-linkedin"
-version = "0.2.3"
+version = "0.2.4"
 description = "Design system MCP server for creating LinkedIn posts with shadcn-inspired components, variants, and themes"
 readme = "README.md"
 requires-python = ">=3.11"
-authors = [
-    { name = "Christopher Hay", email = "chris@somejunkmailbox.com" }
-]
 keywords = [
     "mcp",
     "linkedin",
@@ -22,7 +19,7 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -66,11 +63,6 @@ preview = [
     "python-docx>=1.0.0",  # Word document support
     "PyPDF2>=3.0.0",       # PDF page counting
 ]
-
-[project.urls]
-Homepage = "https://github.com/chrishayuk/chuk-mcp-linkedin"
-Repository = "https://github.com/chrishayuk/chuk-mcp-linkedin"
-Issues = "https://github.com/chrishayuk/chuk-mcp-linkedin/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chuk_mcp_linkedin"]

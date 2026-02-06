@@ -23,7 +23,7 @@
 
 A professional Model Context Protocol (MCP) server for LinkedIn content creation, featuring a shadcn-inspired component system, 10 performance-tuned themes, and data-driven optimization based on 1M+ post analysis.
 
-Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) — a modular, zero-configuration MCP server framework with smart environment detection and production-ready defaults.
+Built on **ChukMCPServer** — a modular, zero-configuration MCP server framework with smart environment detection and production-ready defaults.
 
 **What it does:**
 - ✅ Compose posts with theme-based components and variants
@@ -34,7 +34,7 @@ Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) — 
 - ✅ Generate secure, time-limited preview URLs
 
 **What it doesn't do:**
-- ❌ Create PowerPoint/PDF files (use [`chuk-mcp-pptx`](https://github.com/chrishayuk/chuk-mcp-pptx) for that)
+- ❌ Create PowerPoint/PDF files (this server focuses on LinkedIn content composition and publishing)
 
 ### 🔒 Privacy & Security
 
@@ -125,7 +125,7 @@ Based on 2025 analysis of 1M+ posts across 9K company pages:
 - **Presigned URLs** - Time-limited, secure preview URLs
 
 ### 🚀 Professional CLI
-- **Built on [ChukMCPServer](https://github.com/chrishayuk/chuk-mcp-server)**: Modular framework with zero-config deployment
+- **Built on ChukMCPServer**: Modular framework with zero-config deployment
 - **Multiple modes**: STDIO (Claude Desktop), HTTP (API), Auto-detect
 - **Smart environment detection**: Auto-configures for local dev, Docker, Fly.io, etc.
 - **Debug logging**: Built-in logging and error handling
@@ -483,7 +483,7 @@ python preview_post.py --list
 
 ### Session Management & Artifact Storage
 
-The server includes enterprise-grade session management and artifact storage powered by [`chuk-artifacts`](https://github.com/chrishayuk/chuk-artifacts):
+The server includes enterprise-grade session management and artifact storage powered by `chuk-artifacts`:
 
 **Features:**
 - 🔒 **Session isolation** - Each session only sees their own drafts
@@ -1409,7 +1409,7 @@ Based on analysis of 1M+ posts across 9K company pages:
 
 ## Architecture
 
-Built on [**ChukMCPServer**](https://github.com/chrishayuk/chuk-mcp-server) - a modular MCP server framework providing:
+Built on **ChukMCPServer** - a modular MCP server framework providing:
 - **Zero-config deployment**: Smart environment detection (local, Docker, Fly.io)
 - **Production-ready defaults**: Optimized workers, connection pooling, logging
 - **OAuth 2.1 built-in**: Discovery endpoints, token management, session handling

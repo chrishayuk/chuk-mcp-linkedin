@@ -25,7 +25,7 @@ def register_theme_tools(mcp: Any) -> Dict[str, Any]:
     theme_manager = ThemeManager()
     registry = ComponentRegistry()
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_list_themes(_external_access_token: Optional[str] = None) -> str:
         """
@@ -37,7 +37,7 @@ def register_theme_tools(mcp: Any) -> Dict[str, Any]:
         themes = registry.list_themes()
         return json.dumps(themes, indent=2)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_get_theme(
         theme_name: str, _external_access_token: Optional[str] = None
@@ -54,7 +54,7 @@ def register_theme_tools(mcp: Any) -> Dict[str, Any]:
         theme = theme_manager.get_theme_summary(theme_name)
         return json.dumps(theme, indent=2)
 
-    @mcp.tool  # type: ignore[misc]
+    @mcp.tool  # type: ignore[untyped-decorator]
     @requires_auth()
     async def linkedin_apply_theme(
         theme_name: str, _external_access_token: Optional[str] = None

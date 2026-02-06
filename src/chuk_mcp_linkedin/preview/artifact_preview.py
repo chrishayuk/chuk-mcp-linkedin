@@ -48,13 +48,13 @@ class ArtifactPreviewManager:
             pass
 
         self._store = ArtifactStore()
-        await self._store.__aenter__()
+        await self._store.__aenter__()  # type: ignore[no-untyped-call]
         return self
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         if self._store:
-            await self._store.__aexit__(exc_type, exc_val, exc_tb)
+            await self._store.__aexit__(exc_type, exc_val, exc_tb)  # type: ignore[no-untyped-call]
 
     def create_session(self, user_id: Optional[str] = None) -> str:
         """
@@ -173,10 +173,9 @@ class ArtifactPreviewManager:
             raise RuntimeError("ArtifactStore not initialized. Use 'async with' context.")
 
         try:
-            # Generate presigned URL (duration-based)
-            url_result: str | None = await self._store.presign_short(
-                artifact_id, expires_in=expires_in
-            )
+            # Generate presigned URL (short duration - predefined by presign_short)
+            # Note: expires_in parameter not used; presign_short has fixed duration
+            url_result: str | None = await self._store.presign_short(artifact_id)
             return url_result
         except Exception:
             # Not supported by provider or access denied

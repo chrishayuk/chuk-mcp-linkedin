@@ -230,7 +230,7 @@ class LinkedInManager:
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         if self._artifact_store:
-            await self._artifact_store.__aexit__(exc_type, exc_val, exc_tb)
+            await self._artifact_store.__aexit__(exc_type, exc_val, exc_tb)  # type: ignore[no-untyped-call]
             self._artifact_initialized = False
 
     async def _ensure_artifact_store(self) -> None:
@@ -246,7 +246,7 @@ class LinkedInManager:
                 pass
 
             self._artifact_store = ArtifactStore()
-            await self._artifact_store.__aenter__()
+            await self._artifact_store.__aenter__()  # type: ignore[no-untyped-call]
             self._artifact_initialized = True
 
     async def store_draft_as_artifact(self, draft_id: str) -> Optional[str]:
@@ -622,22 +622,22 @@ class LinkedInManager:
             artifacts = await self._artifact_store.list_by_session(session_id=self.user_id)
 
             # Filter for preview artifacts matching this draft_id
-            for artifact_id in artifacts:
+            for artifact in artifacts:
                 # Get metadata for this artifact
-                meta = await self._artifact_store.metadata(artifact_id)
+                meta = await self._artifact_store.metadata(artifact.artifact_id)
                 if meta and meta.get("type") == "preview" and meta.get("draft_id") == draft_id:
                     # Found matching preview
-                    data = await self._artifact_store.retrieve(artifact_id)
+                    data = await self._artifact_store.retrieve(artifact.artifact_id)
                     if data:
                         return str(data.decode("utf-8"))
 
             # Preview not found in artifacts, generate it
-            artifact_id = await self.generate_html_preview_async(draft_id)
-            if not artifact_id:
+            new_artifact_id = await self.generate_html_preview_async(draft_id)
+            if not new_artifact_id:
                 return None
 
             # Retrieve the newly generated preview
-            data = await self._artifact_store.retrieve(artifact_id)
+            data = await self._artifact_store.retrieve(new_artifact_id)
             if data:
                 return str(data.decode("utf-8"))
 
@@ -678,10 +678,9 @@ class LinkedInManager:
             if self._artifact_store is None:
                 return None
 
-            # Generate signed URL
-            signed_url = await self._artifact_store.get_shareable_url(
-                artifact_id=artifact_id, expires_in=expires_in
-            )
+            # Generate signed URL (short duration - predefined by presign_short)
+            # Note: expires_in parameter not used; presign_short has fixed duration
+            signed_url = await self._artifact_store.presign_short(artifact_id)
             return str(signed_url) if signed_url else None
 
         # For memory/filesystem, use token-based URL

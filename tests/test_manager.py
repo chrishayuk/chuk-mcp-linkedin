@@ -721,9 +721,9 @@ class TestLinkedInManagerWithArtifacts:
 
             draft = manager.create_draft("Test", "text")
 
-            # Mock the get_shareable_url method
+            # Mock the presign_short method
             if manager._artifact_store:
-                manager._artifact_store.get_shareable_url = AsyncMock(
+                manager._artifact_store.presign_short = AsyncMock(
                     return_value="https://s3.amazonaws.com/signed-url"
                 )
 
@@ -765,9 +765,9 @@ class TestLinkedInManagerWithArtifacts:
 
             draft = manager.create_draft("Test", "text")
 
-            # Mock get_shareable_url to return None
+            # Mock presign_short to return None
             if manager._artifact_store:
-                manager._artifact_store.get_shareable_url = AsyncMock(return_value=None)
+                manager._artifact_store.presign_short = AsyncMock(return_value=None)
 
             result = await manager.generate_preview_url(draft.draft_id)
             assert result is None
